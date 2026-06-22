@@ -24,10 +24,12 @@ class SyntheticVA(Dataset):
         # nuisance. `shift` perturbs the latent distribution to emulate covariate
         # shift between train and the OOD split.
         z = rng.normal(loc=shift, scale=1.0, size=(n, 8)).astype(np.float32)
+        # Clean per-sample valence/arousal signals (the thing the image encodes).
         val = np.tanh(0.8 * z[:, 0] - 0.3 * z[:, 1])
         aro = np.tanh(0.7 * z[:, 2] + 0.4 * z[:, 3])
-        va = np.stack([val, aro], axis=1)
-        va = va + rng.normal(0, noise, size=va.shape).astype(np.float32)
+        self.signal = np.stack([val, aro], axis=1).astype(np.float32)
+        # Observed targets add aleatoric label noise on top of the clean signal.
+        va = self.signal + rng.normal(0, noise, size=self.signal.shape).astype(np.float32)
         self.va = np.clip(va, -1.0, 1.0).astype(np.float32)
         self.z = z
         self._rng = rng
@@ -38,16 +40,18 @@ class SyntheticVA(Dataset):
     def __getitem__(self, idx: int):
         # Render a deterministic pseudo-image from the latent so a CNN has signal.
         z = self.z[idx]
+        val, aro = self.signal[idx]
         s = self.image_size
         base = np.zeros((3, s, s), dtype=np.float32)
         xs = np.linspace(-1, 1, s, dtype=np.float32)
         gx, gy = np.meshgrid(xs, xs)
-        # Render all four label-driving latents so BOTH valence (z0,z1) and
-        # arousal (z2,z3) are fully observable from the image — otherwise the
-        # axis whose latent is unrendered is unlearnable (random CCC).
-        base[0] = np.sin(3 * gx * z[0] + z[4]) + 0.6 * np.cos(2 * gy * z[3])
-        base[1] = np.cos(3 * gy * z[2] + z[5])
-        base[2] = np.sin(2 * (gx + gy) * z[1] + z[6])
+        # Encode each axis as a clean, directly-learnable feature: valence scales
+        # a horizontal ramp, arousal a vertical ramp. Both are observable with no
+        # phase scrambling, so a CNN can recover each axis (high CCC ceiling).
+        # A third channel carries seeded nuisance texture for realism.
+        base[0] = val * gx
+        base[1] = aro * gy
+        base[2] = 0.3 * np.sin(4 * (gx + gy) + z[4])
         img = torch.from_numpy(base)
         target = torch.from_numpy(self.va[idx])
         return img, target

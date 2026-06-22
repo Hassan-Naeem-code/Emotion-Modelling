@@ -1,0 +1,8 @@
+_inherit: evidential.yaml
+name: affectnet_va_evidential
+# Primary method (evidential) on the real AffectNet valence/arousal data
+# (Kaggle 'affectnetvae' layout). Uses the dataset's own Train/Validation/Test.
+#   python -m train.train --config configs/affectnet_va.yaml
+data:
+  name: affectnet_va
+  align: true
