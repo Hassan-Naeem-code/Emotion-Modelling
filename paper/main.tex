@@ -1,0 +1,44 @@
+% Calibrated, Uncertainty-Aware Multimodal Affect Estimation under Shift
+% Build: pdflatex main.tex (after `make repro && make aggregate` regenerates
+% the tables/figures this file \input's).
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\title{Knowing When It Doesn't Know:\\
+       Calibrated, Uncertainty-Aware Affect Estimation under Distribution Shift}
+\author{Muhammad Hassan Naeem}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We estimate continuous valence and arousal (VA) from faces while \emph{quantifying
+how much to trust each estimate}. Our primary model is a deep evidential
+regressor that yields aleatoric and epistemic uncertainty in a single forward
+pass; we calibrate prediction intervals with split conformal prediction for
+finite-sample coverage guarantees, and abstain when uncertainty exceeds the
+calibrated bound. We evaluate calibration (regression ECE), selective prediction
+(risk--coverage, AURC), and behaviour under distribution shift
+(AffectNet$\rightarrow$AFEW-VA), reporting that uncertainty-aware models retain
+calibration and coverage where a deterministic baseline does not. An on-device
+browser demo exposes the same calibrated uncertainty and abstention to end users
+with no data leaving the machine.
+\end{abstract}
+
+\input{sections/introduction}
+\input{sections/method}
+\input{sections/experiments}
+\input{sections/results}
+\input{sections/conclusion}
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}

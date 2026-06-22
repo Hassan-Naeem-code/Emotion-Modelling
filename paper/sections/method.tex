@@ -1,0 +1,39 @@
+\section{Method}
+
+\subsection{Backbone and heads}
+A shared visual encoder (a timm CNN; ResNet-50 unless stated) maps an aligned
+face crop to a feature vector. We compare three heads, all predicting VA in
+$[-1,1]^2$:
+\begin{itemize}
+  \item \textbf{Regression} (baseline): a deterministic point estimate trained
+        with MSE; no native uncertainty.
+  \item \textbf{Gaussian} (heteroscedastic): predicts a mean and variance per
+        dimension, trained with the Gaussian negative log-likelihood; captures
+        aleatoric uncertainty.
+  \item \textbf{Evidential} (primary): deep evidential regression places a
+        Normal--Inverse--Gamma prior over each VA dimension, yielding parameters
+        $(\gamma,\nu,\alpha,\beta)$ and thus both aleatoric variance
+        $\beta/(\alpha-1)$ and epistemic variance $\beta/(\nu(\alpha-1))$ from a
+        single forward pass.
+\end{itemize}
+
+\subsection{Uncertainty wrappers}
+At evaluation time we additionally consider MC-Dropout ($N$ stochastic passes)
+and deep ensembles ($K$ independently seeded models), whose disagreement
+estimates epistemic uncertainty.
+
+\subsection{Split conformal calibration}
+Given a held-out calibration set, we compute variance-normalised nonconformity
+scores $s_i = |y_i - \hat\mu_i| / \hat\sigma_i$ and take the
+$\lceil (n{+}1)(1-\alpha)\rceil/n$ empirical quantile $q$. The prediction
+interval $\hat\mu \pm q\,\hat\sigma$ then has coverage $\ge 1-\alpha$ on
+exchangeable data. The mean half-width supplies the abstention threshold used by
+the demonstrator, so the deployed system and the reported experiments share one
+calibrated bound.
+
+\subsection{rPPG as a gated second modality}
+We extract a pulse signal from the face ROI with the POS algorithm and a
+signal-quality score. The quality score multiplicatively gates the rPPG feature:
+a low-quality pulse contributes near zero and \emph{raises} predictive
+uncertainty rather than injecting a confident guess. This honesty constraint is
+enforced in the fusion layer, not left to the optimiser.

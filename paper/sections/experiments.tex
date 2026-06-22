@@ -1,0 +1,20 @@
+\section{Experimental Setup}
+
+\paragraph{Data.} We train on AffectNet (images with continuous VA) and use
+AFEW-VA (per-frame VA from video) as the distribution-shift test set; RAF-DB
+serves as a secondary robustness check. All splits are deterministic and seeded.
+Datasets are registration-gated and are not redistributed; a synthetic generator
+reproduces the full pipeline for continuous integration.
+
+\paragraph{Metrics.} \emph{Accuracy:} concordance correlation coefficient (CCC)
+for valence and arousal, plus RMSE/MAE. \emph{Calibration:} regression ECE via
+quantile calibration, and sharpness. \emph{Selective prediction:} risk--coverage
+and accuracy--rejection curves, summarised by the area under the risk--coverage
+curve (AURC). \emph{Shift:} cross-dataset calibration degradation and the AUROC
+of separating in-distribution from shifted inputs using the uncertainty score.
+\emph{Conformal:} empirical coverage versus the $1-\alpha$ target on in-dist and
+shifted data.
+
+\paragraph{Reproducibility.} Every result traces to a YAML config, a seed, and a
+file under \texttt{results/}; \texttt{make repro} regenerates all tables and
+figures, including the ones \texttt{\textbackslash input} into this paper.

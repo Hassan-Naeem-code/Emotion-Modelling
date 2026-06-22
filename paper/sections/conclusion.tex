@@ -1,0 +1,13 @@
+\section{Conclusion}
+
+We presented a calibrated, uncertainty-aware approach to continuous valence and
+arousal estimation that knows when it does not know. Deep evidential regression
+supplies aleatoric and epistemic uncertainty in one pass, split conformal
+prediction turns that uncertainty into intervals with coverage guarantees and a
+principled abstention threshold, and our evaluation centres on calibration and
+distribution shift rather than accuracy alone. The same calibrated bound powers
+an on-device demonstrator that abstains under poor signal and never transmits
+imagery. Limitations include reliance on the synthetic generator for CI-time
+validation and a single-window rPPG front-end; extending the gated physiological
+modality to full video and broadening the shift evaluation are natural next
+steps.
