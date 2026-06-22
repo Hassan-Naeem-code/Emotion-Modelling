@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Affect — Calibrated &amp; Uncertainty-Aware (on-device)</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <!-- Consent gate: camera does not start until the user presses start. -->
+      <section id="consent" class="card">
+        <h1>Valence–Arousal, with honest uncertainty</h1>
+        <p id="consent-copy"></p>
+        <ul id="privacy-points"></ul>
+        <button id="start-btn">Start camera</button>
+        <p class="fineprint" id="fineprint"></p>
+      </section>
+
+      <!-- Live view (hidden until consent). -->
+      <section id="live" class="hidden">
+        <div class="stage">
+          <video id="video" playsinline muted></video>
+          <canvas id="va-plane" width="360" height="360"></canvas>
+        </div>
+        <aside id="details" class="card">
+          <h2>Details (the honesty surface)</h2>
+          <div class="state" id="state-badge">initializing…</div>
+          <dl>
+            <dt>Valence</dt><dd id="d-valence">—</dd>
+            <dt>Arousal</dt><dd id="d-arousal">—</dd>
+            <dt>Readout <span class="derived">(derived)</span></dt><dd id="d-readout">—</dd>
+            <dt>Confidence</dt><dd id="d-confidence">—</dd>
+            <dt>Signal quality</dt><dd id="d-quality">—</dd>
+            <dt>Abstention reason</dt><dd id="d-reason">—</dd>
+            <dt>Model</dt><dd id="d-model">—</dd>
+          </dl>
+          <p class="fineprint" id="live-fineprint"></p>
+          <button id="stop-btn">Stop camera</button>
+        </aside>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

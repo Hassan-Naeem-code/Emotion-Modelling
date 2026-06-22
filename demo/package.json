@@ -1,0 +1,23 @@
+{
+  "name": "affect-uncertainty-demo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "On-device, uncertainty-aware valence-arousal demo. Nothing leaves the browser.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "0.10.14",
+    "onnxruntime-web": "1.18.0"
+  },
+  "devDependencies": {
+    "typescript": "5.5.3",
+    "vite": "5.3.3",
+    "vitest": "2.0.5"
+  }
+}
