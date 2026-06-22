@@ -1,0 +1,11 @@
+_inherit: _base.yaml
+name: mc_dropout
+# Reuses the evidential (or regression) checkpoint; uncertainty comes from
+# N stochastic forward passes with dropout enabled at eval time.
+# Train with: configs/evidential.yaml, then eval with this config pointed at it.
+model:
+  head: evidential
+  dropout: 0.3
+uncertainty:
+  wrapper: mc_dropout
+  mc_samples: 30

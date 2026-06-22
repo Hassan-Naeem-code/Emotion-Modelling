@@ -1,0 +1,21 @@
+# Track A — research pipeline. Pinned for reproducibility.
+# Install: python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+torch==2.3.1
+torchvision==0.18.1
+timm==1.0.7
+numpy==1.26.4
+scipy==1.13.1
+scikit-learn==1.5.1
+pandas==2.2.2
+matplotlib==3.9.1
+pyyaml==6.0.1
+tqdm==4.66.4
+onnx==1.16.1
+onnxruntime==1.18.1
+pillow==10.4.0
+pytest==8.2.2
+# Optional: landmark-based face alignment (data.align=true). Falls back to a
+# center crop if absent, so it's not required for the pipeline to run.
+# mediapipe==0.10.14
+# Optional experiment tracking (off by default; enable via config logging.wandb=true)
+# wandb==0.17.4

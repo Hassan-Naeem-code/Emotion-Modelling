@@ -1,0 +1,8 @@
+_inherit: evidential.yaml
+name: affectnet_evidential
+# Primary method (evidential) trained on AffectNet (the primary training set).
+# Download AffectNet first (see data/loaders/README.md), then:
+#   python -m train.train --config configs/affectnet.yaml
+data:
+  name: affectnet
+  align: true

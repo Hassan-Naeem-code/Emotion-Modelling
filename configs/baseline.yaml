@@ -1,0 +1,9 @@
+_inherit: _base.yaml
+name: baseline
+# Deterministic VA regression with plain MSE. No native uncertainty.
+model:
+  head: regression
+train:
+  select_by: mse
+uncertainty:
+  wrapper: none

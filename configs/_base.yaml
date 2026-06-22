@@ -1,0 +1,60 @@
+# Shared defaults. Experiment configs inherit via `_inherit: _base.yaml` and override.
+# No magic numbers live in code — everything tunable is here.
+seed: 1337
+
+data:
+  name: synthetic            # synthetic | affectnet | afew_va | raf_db
+  root: data/raw             # where real datasets live once downloaded (gitignored)
+  image_size: 224
+  # Eye-aligned face crops (matches the demo's MediaPipe preprocessing).
+  # Requires `pip install mediapipe`; falls back to center-crop if absent.
+  align: false
+  # ImageNet stats (timm backbones are pretrained on ImageNet).
+  norm_mean: [0.485, 0.456, 0.406]
+  norm_std:  [0.229, 0.224, 0.225]
+  num_workers: 4
+  batch_size: 64
+  # Synthetic dataset knobs (used only when name == synthetic).
+  synthetic:
+    n_train: 2000
+    n_val: 500
+    n_test: 500
+    n_ood: 500              # a shifted test split for OOD/coverage experiments
+    noise: 0.12
+    ood_shift: 0.6         # mean/feature shift applied to the OOD split
+
+model:
+  backbone: resnet50         # any timm model name; efficientnet_b0 for speed
+  pretrained: true
+  head: evidential           # regression | evidential | gaussian
+  dropout: 0.2               # enables MC-dropout at eval when wrapper=mc_dropout
+  use_rppg: false            # fuse rPPG arousal feature (video only)
+
+train:
+  epochs: 30
+  lr: 0.0003
+  weight_decay: 0.0001
+  optimizer: adamw
+  # Checkpoint selection: 'calibration' (interval calibration error) or 'mse'.
+  # The spec mandates selecting on calibration, not raw accuracy.
+  select_by: calibration
+  evidential_lambda: 0.01    # regularization weight in Deep Evidential Regression
+  grad_clip: 1.0
+
+uncertainty:
+  wrapper: none              # none | mc_dropout | ensemble | conformal
+  mc_samples: 30
+  ensemble_dir: null         # dir of checkpoints for deep-ensemble eval
+  conformal:
+    alpha: 0.1               # target miscoverage -> 90% prediction intervals
+    cal_split: val           # which split to calibrate conformal scores on
+
+eval:
+  target_coverage: 0.9
+  ece_bins: 15
+  reject_steps: 20           # points on the risk-coverage curve
+
+logging:
+  out_dir: results
+  wandb: false
+  wandb_project: affect-uncertainty

@@ -1,0 +1,11 @@
+_inherit: _base.yaml
+name: ensemble_member
+# Train K copies with different seeds (override --seed on the CLI), save each to
+# its own checkpoint dir, then point uncertainty.ensemble_dir at the parent dir
+# for deep-ensemble evaluation. Epistemic uncertainty = disagreement across members.
+model:
+  head: gaussian            # ensembles of Gaussian heads are the classic recipe
+train:
+  select_by: calibration
+uncertainty:
+  wrapper: none             # at eval, switch to wrapper: ensemble + ensemble_dir

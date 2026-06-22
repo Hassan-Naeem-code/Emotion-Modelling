@@ -1,0 +1,8 @@
+_inherit: evidential.yaml
+name: afew_va_evidential
+# AFEW-VA as a standalone (shift) test set. Normally you DON'T train on this —
+# it's the distribution-shift evaluation target. Use it via --ood-dataset on a
+# model trained on AffectNet (see configs/shift_affectnet_to_afew.yaml).
+data:
+  name: afew_va
+  align: true

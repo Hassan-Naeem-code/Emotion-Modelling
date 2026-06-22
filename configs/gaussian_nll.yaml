@@ -1,0 +1,10 @@
+_inherit: _base.yaml
+name: gaussian_nll
+# Heteroscedastic Gaussian: predicts mean + variance per dim, trained with NLL.
+# Captures aleatoric uncertainty only (no epistemic term).
+model:
+  head: gaussian
+train:
+  select_by: calibration
+uncertainty:
+  wrapper: none

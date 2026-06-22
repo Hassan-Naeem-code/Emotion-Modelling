@@ -1,0 +1,15 @@
+_inherit: affectnet.yaml
+name: shift_affectnet_to_afew
+# The spine of the paper: train + in-dist test on AffectNet, shift-test on
+# AFEW-VA. Train with this config, then evaluate cross-dataset:
+#
+#   python -m train.train --config configs/shift_affectnet_to_afew.yaml
+#   python -m eval.run_eval --config configs/shift_affectnet_to_afew.yaml \
+#       --ckpt results/shift_affectnet_to_afew/seed1337/best.pt \
+#       --ood-dataset afew_va
+#
+# run_eval then reports id vs ood CCC/ECE/sharpness, OOD AUROC, and whether
+# conformal coverage (calibrated on AffectNet val) holds under the AFEW-VA shift.
+data:
+  name: affectnet
+  align: true

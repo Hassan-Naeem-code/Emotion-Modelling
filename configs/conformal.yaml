@@ -1,0 +1,12 @@
+_inherit: _base.yaml
+name: conformal
+# Split-conformal wrapper around the evidential model. Calibrates per-dim
+# prediction intervals on a held-out split for finite-sample coverage guarantees.
+# The conformal interval width feeds the demo's abstention threshold.
+model:
+  head: evidential
+uncertainty:
+  wrapper: conformal
+  conformal:
+    alpha: 0.1
+    cal_split: val

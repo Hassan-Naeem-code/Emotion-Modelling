@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.ipynb_checkpoints/
+
+# Data — NEVER commit datasets or biometric data
+data/raw/
+data/AffectNet/
+data/AFEW-VA/
+data/RAF-DB/
+data/DEAP/
+*.jpg
+*.jpeg
+*.png
+!results/summary/**/*.png
+
+# Model artifacts
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.onnx.data
+checkpoints/
+# Export-generated demo model + sidecar (demo falls back to synthetic if absent).
+demo/public/model_meta.json
+
+# Results — keep only curated summaries under results/summary/
+results/*
+!results/summary/
+!results/.gitkeep
+
+# Paper: track only hand-written source; figures/tables are generated artifacts.
+paper/comparison_table.*
+paper/*_results_table.tex
+paper/*_risk_coverage.png
+paper/*_reliability.png
+paper/*_va_scatter.png
+
+# Node / web demo
+demo/node_modules/
+demo/dist/
+demo/.vite/
+
+# Misc
+.DS_Store
+*.log
+wandb/
+
+# Local IDE/agent settings (not part of the project)
+.claude/

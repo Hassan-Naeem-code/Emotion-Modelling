@@ -1,0 +1,13 @@
+_inherit: ensemble_member.yaml
+name: ensemble
+# Evaluate a deep ensemble. Train members first (scripts/train_ensemble.sh),
+# then run_eval with this config; predict_ensemble loads every best.pt under
+# ensemble_dir, averages the means, and uses member disagreement as epistemic
+# uncertainty.
+#
+#   bash scripts/train_ensemble.sh 5
+#   python -m eval.run_eval --config configs/ensemble_eval.yaml \
+#       --ckpt results/ensemble/member1/best.pt
+uncertainty:
+  wrapper: ensemble
+  ensemble_dir: results/ensemble
