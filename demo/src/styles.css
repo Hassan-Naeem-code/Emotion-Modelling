@@ -65,6 +65,25 @@ dt { color: var(--muted); }
 .derived { color: var(--warn); font-size: 0.72rem; font-style: italic; }
 dd { margin: 0; font-variant-numeric: tabular-nums; }
 
+#emotion-banner {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; margin-bottom: 12px;
+  background: linear-gradient(135deg, rgba(88,166,255,0.12), rgba(63,185,80,0.10));
+  border: 1px solid var(--border); border-radius: 12px;
+}
+#emotion-emoji { font-size: 2.6rem; line-height: 1; }
+#emotion-label { font-size: 1.5rem; font-weight: 700; }
+
+#emotion-bars { margin-bottom: 16px; display: grid; gap: 4px; }
+.ebar {
+  display: grid; grid-template-columns: 90px 1fr 34px; align-items: center;
+  gap: 8px; font-size: 0.78rem; color: var(--muted);
+}
+.etrack { background: #21262d; border-radius: 999px; height: 7px; overflow: hidden; }
+.efill { display: block; height: 100%; background: var(--accent); border-radius: 999px;
+  transition: width 0.15s ease; }
+.epct { text-align: right; font-variant-numeric: tabular-nums; }
+
 .state {
   display: inline-block; padding: 6px 12px; border-radius: 999px;
   font-weight: 700; font-size: 0.85rem; margin-bottom: 8px;

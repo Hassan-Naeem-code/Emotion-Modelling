@@ -109,3 +109,64 @@ export class AffectPredictor {
 function clamp(v: number): number {
   return Math.max(-1, Math.min(1, v));
 }
+
+export interface EmotionResult {
+  label: string;
+  confidence: number; // 0..1 (top-class probability)
+  probs: { label: string; p: number }[]; // sorted desc
+}
+
+/**
+ * Categorical emotion classifier (neutral/happy/sad/surprise/fear/disgust/anger).
+ * Loaded from /emotion.onnx if present; if absent the demo simply hides the
+ * emotion readout (graceful). This gives a recognizable, responsive label
+ * alongside the valence/arousal + uncertainty view.
+ */
+export class EmotionPredictor {
+  private session: ort.InferenceSession | null = null;
+  private classes: string[] = [];
+  private size = 224;
+  private mean: number[] = [0.485, 0.456, 0.406];
+  private std: number[] = [0.229, 0.224, 0.225];
+  available = false;
+  valAcc: number | null = null;
+
+  async load(): Promise<void> {
+    try {
+      const meta = await (await fetch("/emotion_meta.json")).json();
+      this.classes = meta.classes;
+      this.size = meta.image_size;
+      this.mean = meta.norm_mean;
+      this.std = meta.norm_std;
+      this.valAcc = meta.val_acc ?? null;
+      this.session = await ort.InferenceSession.create("/emotion.onnx", {
+        executionProviders: ["wasm"],
+      });
+      this.available = true;
+    } catch {
+      this.available = false;
+    }
+  }
+
+  async predict(crop: HTMLCanvasElement): Promise<EmotionResult | null> {
+    if (!this.session) return null;
+    const s = this.size;
+    const ctx = crop.getContext("2d", { willReadFrequently: true })!;
+    const { data } = ctx.getImageData(0, 0, s, s);
+    const out = new Float32Array(3 * s * s);
+    const plane = s * s;
+    for (let i = 0, px = 0; i < data.length; i += 4, px++) {
+      out[px] = (data[i] / 255 - this.mean[0]) / this.std[0];
+      out[plane + px] = (data[i + 1] / 255 - this.mean[1]) / this.std[1];
+      out[2 * plane + px] = (data[i + 2] / 255 - this.mean[2]) / this.std[2];
+    }
+    const res = await this.session.run({
+      input: new ort.Tensor("float32", out, [1, 3, s, s]),
+    });
+    const probs = Array.from(res.probs.data as Float32Array);
+    const ranked = probs
+      .map((p, i) => ({ label: this.classes[i], p }))
+      .sort((a, b) => b.p - a.p);
+    return { label: ranked[0].label, confidence: ranked[0].p, probs: ranked };
+  }
+}

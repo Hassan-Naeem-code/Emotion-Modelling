@@ -62,6 +62,22 @@ export const READOUT = {
   neutralRadius: 0.35,
 };
 
+/**
+ * Display metadata for the trained emotion classifier (AffectNet 7-class). The
+ * model outputs these classes; we map them to friendly labels + emojis. This is
+ * a real classifier output (not derived from VA) — the recognizable "what
+ * emotion" readout. It is still gated by the same abstention logic.
+ */
+export const EMOTION_DISPLAY: Record<string, { emoji: string; label: string }> = {
+  neutral: { emoji: "😐", label: "Neutral" },
+  happy: { emoji: "😄", label: "Happy" },
+  sad: { emoji: "😢", label: "Sad" },
+  surprise: { emoji: "😲", label: "Surprised" },
+  fear: { emoji: "😨", label: "Fearful" },
+  disgust: { emoji: "🤢", label: "Disgusted" },
+  anger: { emoji: "😠", label: "Angry" },
+};
+
 export const ABSTAIN_REASONS = {
   NO_FACE: "No face detected",
   LOW_LIGHT: "Too dark to call",

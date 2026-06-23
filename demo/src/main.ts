@@ -8,14 +8,14 @@
  */
 import { decide, type Decision } from "./abstain";
 import { frameBrightness, startCamera, stopCamera } from "./camera";
-import { PRIVACY, THRESHOLDS } from "./config";
+import { EMOTION_DISPLAY, PRIVACY, THRESHOLDS } from "./config";
 import {
   createLandmarker,
   detect,
   landmarkMotion,
   type FaceInfo,
 } from "./landmarker";
-import { AffectPredictor, type Prediction } from "./model";
+import { AffectPredictor, EmotionPredictor, type Prediction } from "./model";
 import { coarseLabel } from "./readout";
 import { VAPlane } from "./viz";
 import type { FaceLandmarker } from "@mediapipe/tasks-vision";
@@ -41,6 +41,7 @@ const cropCanvas = document.createElement("canvas");
 let stream: MediaStream | null = null;
 let landmarker: FaceLandmarker | null = null;
 const predictor = new AffectPredictor();
+const emotionPredictor = new EmotionPredictor();
 
 let prevLandmarks: { x: number; y: number }[] | null = null;
 let noFaceStreak = 0;
@@ -110,6 +111,50 @@ function smooth(pred: Prediction): Prediction {
   return smoothed;
 }
 
+// Light temporal smoothing of emotion probabilities to reduce flicker.
+let emoSmooth: Record<string, number> = {};
+function renderEmotion(e: import("./model").EmotionResult | null) {
+  const emojiEl = $("emotion-emoji");
+  const labelEl = $("emotion-label");
+  const confEl = $("emotion-conf");
+  const barsEl = $("emotion-bars");
+  if (!emotionPredictor.available) {
+    // Model not bundled yet (still training) — keep the panel quiet.
+    labelEl.textContent = "emotion model not loaded";
+    confEl.textContent = "train + export emotion.onnx to enable";
+    return;
+  }
+  if (!e) {
+    emojiEl.textContent = "·";
+    labelEl.textContent = "—";
+    confEl.innerHTML = "&nbsp;";
+    barsEl.innerHTML = "";
+    emoSmooth = {};
+    return;
+  }
+  // EMA smooth per class.
+  const a = 0.6;
+  for (const { label, p } of e.probs) {
+    emoSmooth[label] = a * (emoSmooth[label] ?? p) + (1 - a) * p;
+  }
+  const ranked = Object.entries(emoSmooth)
+    .map(([label, p]) => ({ label, p }))
+    .sort((x, y) => y.p - x.p);
+  const top = ranked[0];
+  const disp = EMOTION_DISPLAY[top.label] ?? { emoji: "🙂", label: top.label };
+  emojiEl.textContent = disp.emoji;
+  labelEl.textContent = disp.label;
+  confEl.textContent = `${Math.round(top.p * 100)}% confident`;
+  barsEl.innerHTML = ranked
+    .map((r) => {
+      const d = EMOTION_DISPLAY[r.label] ?? { emoji: "", label: r.label };
+      return `<div class="ebar"><span>${d.emoji} ${d.label}</span>
+        <span class="etrack"><span class="efill" style="width:${Math.round(r.p * 100)}%"></span></span>
+        <span class="epct">${Math.round(r.p * 100)}%</span></div>`;
+    })
+    .join("");
+}
+
 async function loop() {
   if (!running || !landmarker) return;
   const tsMs = performance.now();
@@ -120,11 +165,14 @@ async function loop() {
   noFaceStreak = face.present ? 0 : noFaceStreak + 1;
 
   let pred: Prediction | null = null;
+  let emotion = null;
   if (face.present && face.bbox) {
     const cx = face.bbox[0] + face.bbox[2] / 2;
     const cy = face.bbox[1] + face.bbox[3] / 2;
-    const raw = await predictor.predict(cropFace(face), cx, cy);
+    const crop = cropFace(face);
+    const raw = await predictor.predict(crop, cx, cy);
     pred = smooth(raw);
+    emotion = await emotionPredictor.predict(crop);
   } else {
     smoothed = null;
   }
@@ -142,6 +190,8 @@ async function loop() {
 
   plane.render(decision.abstain ? null : pred, decision);
   updateDetails(pred, decision);
+  // Only show an emotion when we're not abstaining (signal trustworthy).
+  renderEmotion(decision.abstain ? null : emotion);
   requestAnimationFrame(loop);
 }
 
@@ -150,6 +200,7 @@ async function start() {
   $("live").classList.remove("hidden");
   $("state-badge").textContent = "loading model…";
   await predictor.load();
+  await emotionPredictor.load();
   landmarker = await createLandmarker();
   stream = await startCamera(video);
   running = true;
