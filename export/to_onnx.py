@@ -55,8 +55,12 @@ def main():
     args = ap.parse_args()
 
     cfg = load_config(args.config)
-    model = AffectModel(cfg)
     state = torch.load(args.ckpt, map_location="cpu")
+    # Prefer the config stored in the checkpoint: it captures the exact training
+    # setup (backbone, head, any --set overrides), so export never mismatches the
+    # saved weights. Fall back to the YAML config for older checkpoints.
+    model_cfg = state.get("cfg", cfg)
+    model = AffectModel(model_cfg)
     model.load_state_dict(state["model"])
     model.eval()
     wrapper = ExportWrapper(model).eval()
