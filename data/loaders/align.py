@@ -65,10 +65,14 @@ def align_face(img: Image.Image, size: int) -> Image.Image:
     try:
         arr = np.asarray(img.convert("RGB"))
         eyes = _eye_centers(arr)
-    except ImportError:
+    except Exception as e:
+        # mediapipe missing OR a partial/broken install (e.g. no `solutions`
+        # API on some platforms) OR any runtime failure -> never crash the data
+        # pipeline; fall back to a center crop and warn at most once per process.
         if not _warned:
-            warnings.warn("mediapipe not installed; using center-crop fallback. "
-                          "pip install mediapipe for landmark alignment.")
+            warnings.warn(f"Face alignment unavailable ({type(e).__name__}); using "
+                          f"center-crop fallback. Install a working mediapipe for "
+                          f"landmark alignment, or set data.align=false to silence.")
             _warned = True
         return _center_crop(img, size)
     if eyes is None:

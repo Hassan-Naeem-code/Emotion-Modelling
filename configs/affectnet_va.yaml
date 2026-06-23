@@ -5,4 +5,7 @@ name: affectnet_va_evidential
 #   python -m train.train --config configs/affectnet_va.yaml
 data:
   name: affectnet_va
-  align: true
+  # AffectNet images are already face-cropped, so a center crop works well.
+  # Set align: true ONLY if you have a working mediapipe install (for eye-based
+  # alignment matching the demo); it falls back to center-crop otherwise.
+  align: false
