@@ -56,14 +56,20 @@ function cropFace(face: FaceInfo): HTMLCanvasElement {
   const vw = video.videoWidth || 640;
   const vh = video.videoHeight || 480;
   if (face.bbox) {
-    // Pad the bbox by 30% for context, clamp to frame.
+    // Build a SQUARE crop centred on the face (matches AffectNet's square face
+    // crops). Stretching a tall bbox into a square distorts the face and skews
+    // the VA estimate, so we take the larger side + padding and clamp to frame.
     const [bx, by, bw, bh] = face.bbox;
-    const pad = 0.3;
-    const x = Math.max(0, (bx - bw * pad)) * vw;
-    const y = Math.max(0, (by - bh * pad)) * vh;
-    const w = Math.min(vw - x, bw * (1 + 2 * pad) * vw);
-    const h = Math.min(vh - y, bh * (1 + 2 * pad) * vh);
-    ctx.drawImage(video, x, y, w, h, 0, 0, s, s);
+    const pad = 0.25;
+    const cx = (bx + bw / 2) * vw;
+    const cy = (by + bh / 2) * vh;
+    let side = Math.max(bw * vw, bh * vh) * (1 + 2 * pad);
+    side = Math.min(side, vw, vh);
+    let x = cx - side / 2;
+    let y = cy - side / 2;
+    x = Math.max(0, Math.min(x, vw - side));
+    y = Math.max(0, Math.min(y, vh - side));
+    ctx.drawImage(video, x, y, side, side, 0, 0, s, s);
   } else {
     ctx.drawImage(video, 0, 0, s, s);
   }

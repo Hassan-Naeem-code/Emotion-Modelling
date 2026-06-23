@@ -56,7 +56,10 @@ export const THRESHOLDS = {
 export const READOUT = {
   disclaimer: "derived from valence/arousal — a heuristic label, not a measurement",
   // Radius around the origin within which we call it neutral rather than guess.
-  neutralRadius: 0.2,
+  // A calm, non-smiling face at a webcam reads as mild negative valence + low
+  // arousal; without a generous deadzone that always tips to "sad/bored", which
+  // is misleadingly harsh for an ordinary neutral expression.
+  neutralRadius: 0.35,
 };
 
 export const ABSTAIN_REASONS = {
