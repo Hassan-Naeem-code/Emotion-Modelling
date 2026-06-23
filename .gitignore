@@ -24,8 +24,9 @@ data/DEAP/
 *.onnx
 *.onnx.data
 checkpoints/
-# Export-generated demo model + sidecar (demo falls back to synthetic if absent).
+# Export-generated demo model + sidecars (demo falls back gracefully if absent).
 demo/public/model_meta.json
+demo/public/emotion_meta.json
 
 # Results — keep only curated summaries under results/summary/
 results/*
