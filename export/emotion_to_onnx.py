@@ -21,6 +21,22 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from train.train_emotion import EMOTIONS, NORM_MEAN, NORM_STD, EmotionNet  # noqa: E402
 
 
+def _inline_weights(path: Path) -> None:
+    """Re-save the ONNX model with all weights INLINE (no external .onnx.data
+    file). ONNX Runtime Web cannot fetch external data, so a split export loads
+    in Python but silently fails in the browser. This collapses it to one file."""
+    import onnx
+    path = Path(path)
+    model = onnx.load(str(path))  # reads external data if present
+    onnx.save_model(model, str(path), save_as_external_data=False)
+    data = path.with_suffix(path.suffix + ".data")
+    if data.exists():
+        data.unlink()
+    # Some exporters name the sidecar after the file stem; clean any *.data too.
+    for extra in path.parent.glob(path.stem + "*.data"):
+        extra.unlink()
+
+
 class SoftmaxWrap(nn.Module):
     def __init__(self, model):
         super().__init__()
@@ -51,6 +67,7 @@ def main():
         dynamic_axes={"input": {0: "batch"}, "probs": {0: "batch"}},
         opset_version=18,
     )
+    _inline_weights(out_path)
     json.dump({"image_size": size, "classes": state["classes"],
                "norm_mean": NORM_MEAN.tolist(), "norm_std": NORM_STD.tolist(),
                "val_acc": state.get("val_acc")},

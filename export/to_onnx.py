@@ -76,6 +76,13 @@ def main():
                       "va_std": {0: "batch"}},
         opset_version=18,
     )
+    # Inline weights so ONNX Runtime Web (browser) can load a single file —
+    # it cannot fetch external .onnx.data sidecars.
+    import onnx
+    _m = onnx.load(str(out_path))
+    onnx.save_model(_m, str(out_path), save_as_external_data=False)
+    for _d in out_path.parent.glob(out_path.stem + "*.data"):
+        _d.unlink()
 
     # Sidecar metadata the demo reads: normalization stats + abstention threshold.
     meta = {
