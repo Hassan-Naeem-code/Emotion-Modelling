@@ -9,6 +9,14 @@
 import * as ort from "onnxruntime-web";
 import { THRESHOLDS } from "./config";
 
+// ONNX Runtime Web needs its WebAssembly runtime files. Without this, session
+// creation throws and the whole demo silently falls back to the placeholder.
+// Load the wasm from a CDN and run single-threaded so we don't require the
+// SharedArrayBuffer / cross-origin-isolation headers a dev server lacks.
+ort.env.wasm.wasmPaths =
+  "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/";
+ort.env.wasm.numThreads = 1;
+
 export interface ModelMeta {
   image_size: number;
   norm_mean: [number, number, number];
@@ -44,8 +52,9 @@ export class AffectPredictor {
         executionProviders: ["wasm"],
       });
       this.isReal = true;
-    } catch {
-      // No model bundled — run in synthetic mode. The UI clearly labels this.
+    } catch (e) {
+      // No model bundled OR the runtime failed to init — run in synthetic mode.
+      console.warn("[AffectPredictor] model load failed, using synthetic:", e);
       this.session = null;
       this.isReal = false;
       this.meta = DEFAULT_META;
@@ -143,7 +152,8 @@ export class EmotionPredictor {
         executionProviders: ["wasm"],
       });
       this.available = true;
-    } catch {
+    } catch (e) {
+      console.warn("[EmotionPredictor] model load failed:", e);
       this.available = false;
     }
   }
