@@ -6,17 +6,20 @@ from facial appearance. Two failure modes make naive deployment irresponsible:
 ambiguous, occluded, or out of distribution; and (ii) the dimensional structure
 of affect is flattened into a handful of discrete categories that discard
 intensity and ambiguity. We address both by predicting \emph{continuous} valence
-and arousal (VA) and, crucially, by attaching a \emph{calibrated} measure of
-uncertainty to every prediction, with an explicit abstention path when the
-signal cannot support a confident estimate.
+and arousal (VA) on the circumplex model of affect~\cite{russell1980circumplex}
+and, crucially, by attaching a \emph{calibrated} measure of uncertainty to every
+prediction, with an explicit abstention path when the signal cannot support a
+confident estimate.
 
 \paragraph{Contribution.} Our contribution is calibration and abstention, not raw
-accuracy. Concretely: (1) a deep evidential regression head that produces
-aleatoric and epistemic uncertainty for VA in one forward pass; (2) a split
-conformal layer that turns predictive uncertainty into prediction intervals with
-coverage guarantees and a principled abstention threshold; (3) an evaluation
-protocol centred on calibration and behaviour under distribution shift
-(AffectNet$\rightarrow$AFEW-VA); and (4) an on-device demonstrator that surfaces
+accuracy. Concretely: (1) a deep evidential regression head~\cite{amini2020evidential}
+that produces aleatoric and epistemic uncertainty for VA in one forward pass;
+(2) a split conformal layer~\cite{vovk2005algorithmic} that turns predictive
+uncertainty into prediction intervals with coverage guarantees and a principled
+abstention threshold; (3) an evaluation protocol centred on calibration and
+behaviour under distribution shift
+(AffectNet~\cite{mollahosseini2017affectnet}$\rightarrow$AFEW-VA~\cite{kossaifi2017afew});
+and (4) an on-device demonstrator that surfaces
 the uncertainty and abstention to users without transmitting any imagery.
 
 \paragraph{Scope and ethics.} The system estimates the user's own state at their

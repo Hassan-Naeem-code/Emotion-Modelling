@@ -39,6 +39,12 @@ paper/*_results_table.tex
 paper/*_risk_coverage.png
 paper/*_reliability.png
 paper/*_va_scatter.png
+# LaTeX build artifacts (the PDF is regenerated from source)
+*.aux
+*.bbl
+*.blg
+*.out
+paper/main.pdf
 
 # Node / web demo
 demo/node_modules/

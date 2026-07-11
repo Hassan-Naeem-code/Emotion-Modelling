@@ -10,7 +10,8 @@ $[-1,1]^2$:
   \item \textbf{Gaussian} (heteroscedastic): predicts a mean and variance per
         dimension, trained with the Gaussian negative log-likelihood; captures
         aleatoric uncertainty.
-  \item \textbf{Evidential} (primary): deep evidential regression places a
+  \item \textbf{Evidential} (primary): deep evidential
+        regression~\cite{amini2020evidential} places a
         Normal--Inverse--Gamma prior over each VA dimension, yielding parameters
         $(\gamma,\nu,\alpha,\beta)$ and thus both aleatoric variance
         $\beta/(\alpha-1)$ and epistemic variance $\beta/(\nu(\alpha-1))$ from a
@@ -18,12 +19,15 @@ $[-1,1]^2$:
 \end{itemize}
 
 \subsection{Uncertainty wrappers}
-At evaluation time we additionally consider MC-Dropout ($N$ stochastic passes)
-and deep ensembles ($K$ independently seeded models), whose disagreement
-estimates epistemic uncertainty.
+At evaluation time we additionally consider MC-Dropout~\cite{gal2016dropout}
+($N$ stochastic passes) and deep ensembles~\cite{lakshminarayanan2017simple}
+($K$ independently seeded models), whose disagreement estimates epistemic
+uncertainty.
 
 \subsection{Split conformal calibration}
-Given a held-out calibration set, we compute variance-normalised nonconformity
+Building on split conformal prediction~\cite{vovk2005algorithmic} and calibrated
+regression~\cite{kuleshov2018calibrated}, given a held-out calibration set we
+compute variance-normalised nonconformity
 scores $s_i = |y_i - \hat\mu_i| / \hat\sigma_i$ and take the
 $\lceil (n{+}1)(1-\alpha)\rceil/n$ empirical quantile $q$. The prediction
 interval $\hat\mu \pm q\,\hat\sigma$ then has coverage $\ge 1-\alpha$ on
@@ -32,8 +36,8 @@ the demonstrator, so the deployed system and the reported experiments share one
 calibrated bound.
 
 \subsection{rPPG as a gated second modality}
-We extract a pulse signal from the face ROI with the POS algorithm and a
-signal-quality score. The quality score multiplicatively gates the rPPG feature:
+We extract a pulse signal from the face ROI with the POS
+algorithm~\cite{wang2017pos} and a signal-quality score. The quality score multiplicatively gates the rPPG feature:
 a low-quality pulse contributes near zero and \emph{raises} predictive
 uncertainty rather than injecting a confident guess. This honesty constraint is
 enforced in the fusion layer, not left to the optimiser.

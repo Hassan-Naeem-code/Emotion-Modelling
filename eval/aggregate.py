@@ -45,6 +45,15 @@ def _fmt(v):
     return str(v)
 
 
+# Escape characters that are special in LaTeX (method names like "gaussian_nll"
+# would otherwise be read as math subscripts and break the build).
+def _tex(s: str) -> str:
+    for a, b in (("\\", r"\textbackslash{}"), ("_", r"\_"), ("&", r"\&"),
+                 ("%", r"\%"), ("#", r"\#"), ("$", r"\$")):
+        s = s.replace(a, b)
+    return s
+
+
 def collect(results_dir: Path) -> list[dict]:
     rows = []
     for mj in sorted(results_dir.glob("*/metrics.json")):
@@ -79,7 +88,7 @@ def main():
     lines = [r"\begin{tabular}{l" + "r" * (len(headers) - 1) + "}", r"\toprule",
              " & ".join(headers) + r" \\", r"\midrule"]
     for r in rows:
-        lines.append(" & ".join(_fmt(r[h]) for h in headers) + r" \\")
+        lines.append(" & ".join(_tex(_fmt(r[h])) for h in headers) + r" \\")
     lines += [r"\bottomrule", r"\end{tabular}"]
     tex_path.write_text("\n".join(lines))
 

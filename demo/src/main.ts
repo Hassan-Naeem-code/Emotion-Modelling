@@ -144,7 +144,7 @@ function renderEmotion(e: import("./model").EmotionResult | null) {
   const disp = EMOTION_DISPLAY[top.label] ?? { emoji: "🙂", label: top.label };
   emojiEl.textContent = disp.emoji;
   labelEl.textContent = disp.label;
-  confEl.textContent = `${Math.round(top.p * 100)}% confident`;
+  confEl.textContent = `p ≈ ${Math.round(top.p * 100)}% (illustrative)`;
   barsEl.innerHTML = ranked
     .map((r) => {
       const d = EMOTION_DISPLAY[r.label] ?? { emoji: "", label: r.label };

@@ -63,10 +63,12 @@ export const READOUT = {
 };
 
 /**
- * Display metadata for the trained emotion classifier (AffectNet 7-class). The
- * model outputs these classes; we map them to friendly labels + emojis. This is
- * a real classifier output (not derived from VA) — the recognizable "what
- * emotion" readout. It is still gated by the same abstention logic.
+ * Display metadata for the auxiliary 7-class classifier (AffectNet). Shown only
+ * as a SECONDARY, illustrative readout (collapsed by default) — it is NOT this
+ * project's claim. The project measures continuous valence–arousal with
+ * calibrated uncertainty and deliberately avoids asserting discrete "basic
+ * emotions"; this readout exists for interest/legibility only and is still gated
+ * by the same abstention logic.
  */
 export const EMOTION_DISPLAY: Record<string, { emoji: string; label: string }> = {
   neutral: { emoji: "😐", label: "Neutral" },

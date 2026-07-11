@@ -1,0 +1,42 @@
+\section{Related Work}
+
+\paragraph{Dimensional affect estimation.} Rather than a small set of discrete
+categories, the circumplex model represents affect along continuous valence and
+arousal axes~\cite{russell1980circumplex}. Large in-the-wild corpora annotate
+faces in this space: AffectNet~\cite{mollahosseini2017affectnet} provides
+$\sim$1M images with categorical and continuous VA labels, and
+AFEW-VA~\cite{kossaifi2017afew} supplies per-frame VA from movie clips, giving a
+natural still-image$\rightarrow$video distribution shift. We adopt this
+dimensional target and treat the AffectNet$\rightarrow$AFEW-VA gap as our shift
+benchmark.
+
+\paragraph{Uncertainty in deep networks.} A large body of work separates
+\emph{aleatoric} (data) from \emph{epistemic} (model) uncertainty. MC-Dropout
+interprets dropout at test time as approximate Bayesian
+inference~\cite{gal2016dropout}; deep ensembles capture epistemic uncertainty
+through the disagreement of independently trained
+models~\cite{lakshminarayanan2017simple}. Deep evidential
+regression~\cite{amini2020evidential} instead places a Normal--Inverse--Gamma
+prior over the target and recovers both uncertainty types in a single forward
+pass, which we take as our primary head for its efficiency and its explicit
+epistemic term.
+
+\paragraph{Calibration and conformal prediction.} Accurate uncertainty requires
+calibration, not merely a variance output. Kuleshov et
+al.~\cite{kuleshov2018calibrated} calibrate regression uncertainties so that
+predicted quantiles match empirical coverage. Split conformal
+prediction~\cite{vovk2005algorithmic} provides distribution-free, finite-sample
+coverage guarantees on exchangeable data. We combine an evidential predictor with
+a conformal calibration layer so that the abstention threshold carries a coverage
+guarantee rather than a heuristic cutoff.
+
+\paragraph{Physiological signals.} Remote photoplethysmography recovers a pulse
+signal from subtle skin-colour changes; the POS method~\cite{wang2017pos} is a
+widely used, training-free estimator. We use it as a gated second modality whose
+signal-quality score down-weights unreliable pulse estimates and \emph{raises}
+uncertainty rather than contributing a confident guess.
+
+\paragraph{Positioning.} Unlike systems that report a confident discrete emotion,
+our contribution is \emph{knowing when the estimate cannot be trusted}: we pair a
+dimensional VA target with calibrated, conformal uncertainty and an explicit
+abstention path, and expose the same calibrated bound in an on-device demonstrator.

@@ -24,14 +24,6 @@
           <canvas id="va-plane" width="360" height="360"></canvas>
         </div>
         <aside id="details" class="card">
-          <div id="emotion-banner">
-            <span id="emotion-emoji">·</span>
-            <div>
-              <div id="emotion-label">—</div>
-              <div id="emotion-conf" class="fineprint">&nbsp;</div>
-            </div>
-          </div>
-          <div id="emotion-bars"></div>
           <h2>Details (the honesty surface)</h2>
           <div class="state" id="state-badge">initializing…</div>
           <dl>
@@ -44,6 +36,27 @@
             <dt>Model</dt><dd id="d-model">—</dd>
           </dl>
           <p class="fineprint" id="live-fineprint"></p>
+
+          <!-- Secondary, illustrative-only discrete readout. NOT the model's
+               claim — the valence-arousal estimate above is the actual output.
+               Collapsed by default so it never competes with the honesty surface. -->
+          <details id="emotion-block">
+            <summary>Illustrative expression guess <span class="derived">(not the model's claim)</span></summary>
+            <div id="emotion-banner">
+              <span id="emotion-emoji">·</span>
+              <div>
+                <div id="emotion-label">—</div>
+                <div id="emotion-conf" class="fineprint">&nbsp;</div>
+              </div>
+            </div>
+            <div id="emotion-bars"></div>
+            <p class="fineprint">
+              A separate 7-class classifier, shown for interest only. This project
+              measures continuous valence–arousal with calibrated uncertainty — it
+              deliberately does <em>not</em> claim a discrete "basic emotion."
+            </p>
+          </details>
+
           <button id="stop-btn">Stop camera</button>
         </aside>
       </section>

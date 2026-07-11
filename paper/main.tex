@@ -5,6 +5,7 @@
 
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
+\usepackage{subcaption}
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{hyperref}
@@ -25,14 +26,17 @@ regressor that yields aleatoric and epistemic uncertainty in a single forward
 pass; we calibrate prediction intervals with split conformal prediction for
 finite-sample coverage guarantees, and abstain when uncertainty exceeds the
 calibrated bound. We evaluate calibration (regression ECE), selective prediction
-(risk--coverage, AURC), and behaviour under distribution shift
-(AffectNet$\rightarrow$AFEW-VA), reporting that uncertainty-aware models retain
-calibration and coverage where a deterministic baseline does not. An on-device
-browser demo exposes the same calibrated uncertainty and abstention to end users
-with no data leaving the machine.
+(risk--coverage, AURC), and behaviour under distribution shift. Under a synthetic
+out-of-distribution benchmark that exercises the full pipeline, uncertainty-aware
+models retain calibration and coverage where a deterministic baseline does not;
+on real data we report an in-distribution AffectNet evidential model and release
+the complete AffectNet$\rightarrow$AFEW-VA harness for the cross-dataset shift
+evaluation. An on-device browser demo exposes the same calibrated uncertainty and
+abstention to end users with no data leaving the machine.
 \end{abstract}
 
 \input{sections/introduction}
+\input{sections/related_work}
 \input{sections/method}
 \input{sections/experiments}
 \input{sections/results}

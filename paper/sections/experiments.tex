@@ -1,10 +1,11 @@
 \section{Experimental Setup}
 
-\paragraph{Data.} We train on AffectNet (images with continuous VA) and use
-AFEW-VA (per-frame VA from video) as the distribution-shift test set; RAF-DB
-serves as a secondary robustness check. All splits are deterministic and seeded.
-Datasets are registration-gated and are not redistributed; a synthetic generator
-reproduces the full pipeline for continuous integration.
+\paragraph{Data.} We train on AffectNet~\cite{mollahosseini2017affectnet}
+(images with continuous VA) and use AFEW-VA~\cite{kossaifi2017afew} (per-frame VA
+from video) as the distribution-shift test set; RAF-DB serves as a secondary
+robustness check. All splits are deterministic and seeded. Datasets are
+registration-gated and are not redistributed; a synthetic generator reproduces
+the full pipeline for continuous integration.
 
 \paragraph{Metrics.} \emph{Accuracy:} concordance correlation coefficient (CCC)
 for valence and arousal, plus RMSE/MAE. \emph{Calibration:} regression ECE via
