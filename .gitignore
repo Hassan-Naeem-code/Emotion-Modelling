@@ -55,6 +55,3 @@ demo/.vite/
 .DS_Store
 *.log
 wandb/
-
-# Local IDE/agent settings (not part of the project)
-.claude/
