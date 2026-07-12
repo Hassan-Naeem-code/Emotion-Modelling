@@ -58,6 +58,9 @@ the risk--coverage curve and reliability diagram for the evidential model.
 in-distribution to shifted inputs, the uncertainty-aware models raise their
 predictive uncertainty and retain conformal coverage closer to target than the
 baseline, evidencing that the system flags its own degradation rather than
-failing silently. We expect the same qualitative behaviour on the real
-AffectNet$\rightarrow$AFEW-VA shift; that cross-dataset measurement is pending
-AFEW-VA access and is not claimed here.
+failing silently. For real data, we evaluate a corruption-based shift of the
+AffectNet test set (blur/noise/brightness/contrast/JPEG, ImageNet-C style) with
+the released harness; because it perturbs the same images and labels, it isolates
+the effect of shift on calibration without confounding from a different dataset.
+The optional cross-dataset AffectNet$\rightarrow$AFEW-VA shift runs identically
+where that registration-gated data is available.

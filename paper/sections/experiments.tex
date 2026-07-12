@@ -11,8 +11,13 @@ the full pipeline for continuous integration.
 for valence and arousal, plus RMSE/MAE. \emph{Calibration:} regression ECE via
 quantile calibration, and sharpness. \emph{Selective prediction:} risk--coverage
 and accuracy--rejection curves, summarised by the area under the risk--coverage
-curve (AURC). \emph{Shift:} cross-dataset calibration degradation and the AUROC
-of separating in-distribution from shifted inputs using the uncertainty score.
+curve (AURC). \emph{Shift:} calibration degradation and the AUROC of separating
+in-distribution from shifted inputs by the uncertainty score. Our primary shift
+is corruption-based --- blur, noise, brightness, contrast, and JPEG artefacts
+applied to the AffectNet test set in the spirit of ImageNet-C --- giving a genuine
+in-distribution$\rightarrow$shifted comparison on identical images and labels with
+no second dataset; an optional cross-dataset shift to AFEW-VA reuses the same
+harness where that (registration-gated) data is available.
 \emph{Conformal:} empirical coverage versus the $1-\alpha$ target on in-dist and
 shifted data.
 

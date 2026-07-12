@@ -5,7 +5,7 @@ AFEW-VA has no train split — it's a shift test set). Callers must handle None.
 """
 from __future__ import annotations
 
-from .loaders import affectnet, affectnet_va, afew_va, raf_db, synthetic
+from .loaders import affectnet, affectnet_va, afew_va, corrupt_va, raf_db, synthetic
 
 
 def build_datasets(cfg: dict, dry_run: bool = False):
@@ -16,6 +16,8 @@ def build_datasets(cfg: dict, dry_run: bool = False):
         return affectnet.build(cfg, dry_run=dry_run)
     if name == "affectnet_va":
         return affectnet_va.build(cfg, dry_run=dry_run)
+    if name == "affectnet_va_corrupt":
+        return corrupt_va.build(cfg, dry_run=dry_run)
     if name == "afew_va":
         return afew_va.build(cfg, dry_run=dry_run)
     if name == "raf_db":

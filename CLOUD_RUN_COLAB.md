@@ -41,8 +41,11 @@ for cfg in ["baseline", "gaussian_nll", "evidential", "conformal"]:
     subprocess.run(["python","-m","train.train","--config",f"configs/{cfg}.yaml",
         "--seed","1337","--set","data.name=affectnet_va",
         "--set","model.backbone=efficientnet_b0","--out",f"results/{cfg}_real"], check=True)
+    # Eval with a REAL distribution shift: corruption-based OOD built from the
+    # AffectNet test set (ImageNet-C style) — no gated AFEW-VA needed.
     subprocess.run(["python","-m","eval.run_eval","--config",f"configs/{cfg}.yaml",
-        "--ckpt",f"results/{cfg}_real/best.pt","--set","data.name=affectnet_va"], check=True)
+        "--ckpt",f"results/{cfg}_real/best.pt","--set","data.name=affectnet_va",
+        "--ood-dataset","affectnet_va_corrupt"], check=True)
 # MC-Dropout (reuses the evidential checkpoint)
 subprocess.run(["python","-m","eval.run_eval","--config","configs/mc_dropout.yaml",
     "--ckpt","results/evidential_real/best.pt","--set","data.name=affectnet_va"], check=True)
