@@ -1,0 +1,65 @@
+# arXiv submission package
+
+Everything here is ready to upload. Built and verified 2026-08-21.
+
+## Files
+
+| File | Use |
+|---|---|
+| `arxiv-submission.tar.gz` | Upload this as the source. 230 KB. |
+| `abstract.txt` | Paste into the Abstract field (1,530 chars; limit is 1,920). |
+| `SUBMIT.md` | This file — metadata to enter. |
+
+The tarball was verified in a clean directory the way arXiv builds it: three
+`pdflatex` passes, **no BibTeX and no `refs.bib`**, relying on the bundled
+`main.bbl`. Result: 8 pages, all 11 references rendered, no undefined citations
+or references. `refs.bib` is deliberately excluded — arXiv does not run BibTeX,
+so the `.bbl` is what matters.
+
+## Metadata to enter
+
+**Title**
+```
+Knowing When It Doesn't Know: Calibrated, Uncertainty-Aware Affect Estimation under Distribution Shift
+```
+
+**Authors**
+```
+Muhammad Hassan Naeem
+```
+
+**Categories**
+- Primary: **cs.CV** (Computer Vision and Pattern Recognition) — face-based estimation from images.
+- Cross-list: **cs.LG** (Machine Learning) — the contribution is uncertainty quantification, calibration, and conformal prediction, which is where that audience reads.
+
+**Comments field** (optional but worth filling — it is where you note artifacts)
+```
+8 pages, 3 figures. Code and per-seed metrics: https://github.com/Hassan-Naeem-code/Emotion-Modelling
+```
+
+## License
+
+arXiv asks you to choose one at submission. This is your call:
+
+- **CC BY 4.0** — most permissive, standard for open science, maximises reuse and
+  citation. Recommended unless a target venue forbids it.
+- **arXiv non-exclusive license** — the conservative default. Choose this if you
+  are unsure about the workshop's preprint policy; it grants arXiv only what it
+  needs to distribute.
+
+Either is compatible with subsequently submitting to a workshop. Check the
+workshop's preprint policy first if it is double-blind — most allow arXiv
+preprints, but a few require you not to advertise them during review.
+
+## Before you click submit
+
+1. Confirm your name is spelled as you want it cited — it is hard to change later.
+2. Decide whether to add an ORCID and affiliation.
+3. If the target workshop is **double-blind**, check whether posting now is
+   permitted. If it is not, hold the arXiv post until after the review period.
+
+## Regenerating this package
+
+```bash
+make arxiv
+```

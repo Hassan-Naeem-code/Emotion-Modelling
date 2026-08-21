@@ -2,7 +2,7 @@
 PY ?= python
 SEED ?= 1337
 
-.PHONY: help install test dryrun train-all eval-all ensemble shift aggregate paper-table paper-figures repro demo-install demo clean
+.PHONY: help install test dryrun train-all eval-all ensemble shift aggregate paper-table paper-figures arxiv repro demo-install demo clean
 
 help:
 	@echo "make install     - pip install pinned requirements"
@@ -15,6 +15,7 @@ help:
 	@echo "make aggregate   - merge all metrics.json into one comparison table"
 	@echo "make paper-table - regenerate the paper's multi-seed table from results/summary/real/"
 	@echo "make paper-figures - copy the committed real-run figures into paper/"
+	@echo "make arxiv        - build + verify the arXiv source tarball into arxiv/"
 	@echo "make test        - run the Python unit tests"
 	@echo "make demo        - run the in-browser demo (cd demo && npm run dev)"
 
@@ -66,6 +67,11 @@ paper-table:
 # The paper's three figures come from the seed-1337 evidential checkpoint, which
 # is too large to ship in git. The rendered PNGs are committed alongside that
 # run's metrics instead, so the paper is reproducible from the repo alone.
+# Build the arXiv source tarball: LaTeX sources + .bbl + figures, no .bib
+# (arXiv does not run BibTeX). Verified by building in a clean directory.
+arxiv: paper-table paper-figures
+	@bash scripts/make_arxiv.sh
+
 paper-figures:
 	cp results/summary/real/evidential/seed1337/risk_coverage.png paper/evidential_risk_coverage.png
 	cp results/summary/real/evidential/seed1337/reliability.png   paper/evidential_reliability.png
