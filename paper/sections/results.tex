@@ -19,8 +19,8 @@ calibration, selective prediction, and behaviour under shift.
   seeds ($1337/7/21$); $^{\ddagger}$conformal is a single seed and is reported
   without error bars. CCC: mean concordance over valence and arousal (higher
   better). RMSE: mean over both axes (lower better). ECE: regression calibration
-  error (lower better). Sharp.: mean predictive interval width --- informative
-  only alongside ECE, so it is never ranked. AURC: area under the risk--coverage
+  error (lower better). Sharp.: mean predictive interval width, informative
+  only alongside ECE and therefore never ranked. AURC: area under the risk--coverage
   curve (lower better). OOD-AUROC: separation of clean from corrupted inputs by
   the uncertainty score (higher better). $\Delta$ECE: calibration degradation
   from clean to corrupted inputs; all uncertainty-aware methods lie within seed
@@ -39,7 +39,7 @@ therefore does not cost predictive accuracy. We deliberately do not claim an
 accuracy \emph{gain}: the spread across methods ($0.657$--$0.692$ CCC) is
 comparable to the spread across seeds within a method (up to $\pm0.017$), so on
 this axis the four methods should be read as equivalent. That equivalence is the
-precondition for the rest of our argument --- uncertainty is obtained
+precondition for the rest of our argument: uncertainty is obtained
 \emph{for free} on the accuracy axis, so the question is purely how much
 \emph{trustworthiness} each method adds, and there the methods are \emph{not}
 equivalent at all.
@@ -53,21 +53,21 @@ authors' own CNN baseline reports $0.541$ and $0.450$ on their test set
 and EmoNet~\cite{toisoul2021estimation}, a substantially larger purpose-built
 architecture, reports $0.82$ and $0.75$ on a cleaned AffectNet test set. Our
 valence accuracy is therefore close to the strongest published figure, while our
-arousal accuracy falls between the dataset's own baseline and EmoNet --- matching
+arousal accuracy falls between the dataset's own baseline and EmoNet, matching
 the widely observed asymmetry that arousal is the harder axis to recover from a
 single still image. We stress that these are \emph{indicative} rather than exact
 comparisons: the public redistribution we train on defines its own
 Train/Validation/Test partition rather than the authors' official split, and
 EmoNet's figures are computed on a cleaned subset under a different protocol. The
-point is narrow --- that the calibration comparison in Table~\ref{tab:comparison}
-is made on a predictor of representative strength rather than a crippled one.
+point is narrow: the calibration comparison in Table~\ref{tab:comparison}
+rests on a predictor of representative strength rather than a crippled one.
 
 \paragraph{Calibration and selective prediction.} The deterministic baseline
-provides no usable uncertainty --- its expected calibration error is degenerate
+provides no usable uncertainty: its expected calibration error is degenerate
 ($0.500$) and its sharpness is zero because it emits a point estimate. Among the
 uncertainty-aware methods, evidential regression is the best calibrated
-(ECE $0.011$, versus $0.024$ for Gaussian NLL and $0.015$ for conformal) --- a
-better than twofold reduction over Gaussian NLL, and the axis on which the
+(ECE $0.011$, versus $0.024$ for Gaussian NLL and $0.015$ for conformal), a
+better than twofold reduction over Gaussian NLL and the axis on which the
 methods separate most clearly. It reaches that calibration without paying for it in
 sharpness: its intervals ($0.245$) are as tight as any method's and tighter than
 Gaussian NLL's ($0.270$), so it achieves tight intervals \emph{and} correct
@@ -93,14 +93,14 @@ and reliability diagram.
     \subcaption{VA, coloured by uncertainty}\label{fig:scatter}
   \end{minipage}
   \caption{Evidential model. (a) Risk falls monotonically as the most uncertain
-  inputs are abstained on --- roughly fourfold, from $0.084$ at full coverage to
-  $0.022$ at $5\%$ --- so the uncertainty score ranks errors usefully rather than
+  inputs are abstained on, falling roughly fourfold from $0.084$ at full coverage
+  to $0.022$ at $5\%$, so the uncertainty score ranks errors usefully rather than
   merely being well calibrated on average. (b) Empirical coverage tracks the
   nominal level closely across the whole range, with mild overconfidence only in
   the extreme tail. (c) Uncertainty is highest in the \emph{interior} of the VA
   plane, where low-intensity and ambiguous expressions live, and lowest for the
-  confident high-magnitude predictions on the perimeter --- the model is least
-  sure precisely where human annotators also disagree most. The predictions also
+  confident high-magnitude predictions on the perimeter. The model is least sure
+  where human annotators also disagree most. The predictions also
   show the range compression typical of VA regression, spanning roughly
   $[-0.9, 0.8]$ in valence rather than the full $[-1,1]$.}
 \end{figure}
@@ -109,7 +109,7 @@ and reliability diagram.
 calibrated uncertainty becomes concrete. All three uncertainty-aware methods
 separate corrupted from clean inputs by their uncertainty score well above chance
 and within noise of one another (OOD-AUROC $0.606$--$0.613$). The baseline, by
-contrast, does not merely fail --- it fails \emph{unpredictably}: its three seeds
+contrast, does not merely fail; it fails \emph{unpredictably}. Its three seeds
 score $0.001$, $0.001$ and $0.987$, averaging to $0.329 \pm 0.465$. Lacking any
 uncertainty head, its ``score'' is an artefact with no consistent sign, so a
 practitioner could not tell from a single training run even which direction it
@@ -117,14 +117,14 @@ points. A point estimate cannot flag its own degradation. Equally important, the
 uncertainty-aware models stay calibrated under shift: their ECE degrades by at
 most $|\Delta\text{ECE}| \le 0.006$, so the abstention threshold calibrated on
 clean data remains meaningful on corrupted data. In other words, the system
-raises its hand when the input drifts rather than failing silently --- exactly the
+raises its hand when the input drifts rather than failing silently, which is the
 behaviour a deployed affect estimator needs.
 
 \paragraph{Summary.} Across accuracy, calibration, selective prediction, and shift
 robustness, evidential regression is the strongest single-forward-pass method.
 Its margin is not in accuracy or in selective prediction, where it is tied with
-the alternatives, but in calibration --- the quantity the abstention threshold is
-actually derived from. Gaussian NLL is a close and cheaper aleatoric-only
+the alternatives, but in calibration, the quantity from which the abstention
+threshold is actually derived. Gaussian NLL is a close and cheaper aleatoric-only
 alternative with equal OOD separation and roughly twice the calibration error, and
 conformal prediction adds distribution-free coverage guarantees on top of the same
 predictor. The deterministic baseline, competitive on raw accuracy, is unusable

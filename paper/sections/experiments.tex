@@ -16,7 +16,7 @@ contrast, and JPEG compression applied at a fixed severity, cycling
 deterministically through the five corruption types by image index so the shifted
 set is reproducible. Because this perturbs the \emph{same} images and labels, it
 isolates the effect of shift on calibration with no confounding from a change of
-subjects, annotators, or label protocol --- a confound that a cross-dataset
+subjects, annotators, or label protocol, a confound that a cross-dataset
 comparison cannot rule out. A cross-dataset shift to AFEW-VA~\cite{kossaifi2017afew}
 runs identically through the same harness where that (registration-gated) data is
 available; we do not report it here.
@@ -26,8 +26,8 @@ backbone on $224\times224$ face crops, trained with AdamW (learning rate
 $3\times10^{-4}$, weight decay $10^{-4}$), batch size $64$, gradient clipping at
 $1.0$, for $30$ epochs. Following our own premise that calibration is the
 objective, the checkpoint is selected on validation \emph{interval calibration
-error} rather than on validation MSE --- except for the deterministic baseline,
-which has no interval to calibrate and is therefore selected on MSE. Baseline,
+error} rather than on validation MSE. The exception is the deterministic
+baseline, which has no interval to calibrate and is therefore selected on MSE. Baseline,
 Gaussian NLL, and evidential are each run at three seeds ($1337$, $7$, $21$).
 Split conformal is calibrated on the validation split at $\alpha = 0.1$ and is
 reported for a single seed.
