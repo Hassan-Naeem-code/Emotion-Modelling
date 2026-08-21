@@ -2,7 +2,7 @@
 PY ?= python
 SEED ?= 1337
 
-.PHONY: help install test dryrun train-all eval-all ensemble shift aggregate repro demo-install demo clean
+.PHONY: help install test dryrun train-all eval-all ensemble shift aggregate paper-table repro demo-install demo clean
 
 help:
 	@echo "make install     - pip install pinned requirements"
@@ -13,6 +13,7 @@ help:
 	@echo "make ensemble    - train K members + evaluate deep ensemble (K=5)"
 	@echo "make shift       - train AffectNet, shift-test on AFEW-VA"
 	@echo "make aggregate   - merge all metrics.json into one comparison table"
+	@echo "make paper-table - regenerate the paper's multi-seed table from results/summary/real/"
 	@echo "make test        - run the Python unit tests"
 	@echo "make demo        - run the in-browser demo (cd demo && npm run dev)"
 
@@ -55,6 +56,11 @@ shift:
 # Merge every results/<name>/metrics.json into one comparison table.
 aggregate:
 	$(PY) -m eval.aggregate
+
+# The paper's headline table: mean +/- std over the seeds committed under
+# results/summary/real/. This is what paper/sections/results.tex \inputs.
+paper-table:
+	$(PY) -m eval.aggregate_seeds
 
 repro: train-all eval-all aggregate
 	@echo "Reproduction complete. See results/ and paper/."

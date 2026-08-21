@@ -1,26 +1,48 @@
 \section{Experimental Setup}
+\label{sec:experiments}
 
-\paragraph{Data.} We train on AffectNet~\cite{mollahosseini2017affectnet}
-(images with continuous VA) and use AFEW-VA~\cite{kossaifi2017afew} (per-frame VA
-from video) as the distribution-shift test set; RAF-DB serves as a secondary
-robustness check. All splits are deterministic and seeded. Datasets are
-registration-gated and are not redistributed; a synthetic generator reproduces
-the full pipeline for continuous integration.
+\paragraph{Data.} We train and evaluate on the AffectNet valence--arousal
+release~\cite{mollahosseini2017affectnet}, using the dataset's own splits:
+$58{,}803$ training, $3{,}500$ validation, and $5{,}000$ test images with
+continuous VA labels in $[-1,1]^2$. Splits are deterministic and seeded. The
+dataset is registration-gated and is not redistributed; a synthetic generator
+reproduces the full pipeline for continuous-integration smoke tests but supplies
+none of the numbers reported in Section~\ref{sec:results}.
+
+\paragraph{Distribution shift.} Our shift condition is corruption-based, in the
+spirit of ImageNet-C~\cite{hendrycks2019benchmarking}: we re-evaluate each trained
+model on the AffectNet test set with Gaussian blur, Gaussian noise, brightness,
+contrast, and JPEG compression applied at a fixed severity, cycling
+deterministically through the five corruption types by image index so the shifted
+set is reproducible. Because this perturbs the \emph{same} images and labels, it
+isolates the effect of shift on calibration with no confounding from a change of
+subjects, annotators, or label protocol --- a confound that a cross-dataset
+comparison cannot rule out. A cross-dataset shift to AFEW-VA~\cite{kossaifi2017afew}
+runs identically through the same harness where that (registration-gated) data is
+available; we do not report it here.
+
+\paragraph{Training.} All models share an ImageNet-pretrained EfficientNet-B0
+backbone on $224\times224$ face crops, trained with AdamW (learning rate
+$3\times10^{-4}$, weight decay $10^{-4}$), batch size $64$, gradient clipping at
+$1.0$, for $30$ epochs. Following our own premise that calibration is the
+objective, the checkpoint is selected on validation \emph{interval calibration
+error} rather than on validation MSE --- except for the deterministic baseline,
+which has no interval to calibrate and is therefore selected on MSE. Baseline,
+Gaussian NLL, and evidential are each run at three seeds ($1337$, $7$, $21$).
+Split conformal is calibrated on the validation split at $\alpha = 0.1$ and is
+reported for a single seed.
 
 \paragraph{Metrics.} \emph{Accuracy:} concordance correlation coefficient (CCC)
 for valence and arousal, plus RMSE/MAE. \emph{Calibration:} regression ECE via
-quantile calibration, and sharpness. \emph{Selective prediction:} risk--coverage
-and accuracy--rejection curves, summarised by the area under the risk--coverage
-curve (AURC). \emph{Shift:} calibration degradation and the AUROC of separating
-in-distribution from shifted inputs by the uncertainty score. Our primary shift
-is corruption-based --- blur, noise, brightness, contrast, and JPEG artefacts
-applied to the AffectNet test set in the spirit of ImageNet-C --- giving a genuine
-in-distribution$\rightarrow$shifted comparison on identical images and labels with
-no second dataset; an optional cross-dataset shift to AFEW-VA reuses the same
-harness where that (registration-gated) data is available.
-\emph{Conformal:} empirical coverage versus the $1-\alpha$ target on in-dist and
-shifted data.
+quantile calibration, and sharpness (mean predictive interval width).
+\emph{Selective prediction:} risk--coverage and accuracy--rejection curves,
+summarised by the area under the risk--coverage curve (AURC). \emph{Shift:}
+calibration degradation $\Delta$ECE and the AUROC of separating in-distribution
+from corrupted inputs by the uncertainty score. \emph{Conformal:} empirical
+coverage versus the $1-\alpha$ target on in-distribution and shifted data.
 
-\paragraph{Reproducibility.} Every result traces to a YAML config, a seed, and a
-file under \texttt{results/}; \texttt{make repro} regenerates all tables and
-figures, including the ones \texttt{\textbackslash input} into this paper.
+\paragraph{Reproducibility.} Every reported value traces to a YAML config, a
+seed, and a \texttt{metrics.json} committed under
+\texttt{results/summary/real/<method>/seed<n>/}. Table~\ref{tab:comparison} is
+emitted from exactly those files by \texttt{eval/aggregate\_seeds.py} and is not
+hand-maintained.

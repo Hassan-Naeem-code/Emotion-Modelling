@@ -1,16 +1,24 @@
 # Getting to paper-grade results (GPU + AFEW-VA)
 
-The code is done. What's missing is **execution on real data**. This guide covers
-(1) where to get a GPU, (2) the exact commands to run all methods on real
-AffectNet, and (3) how to get AFEW-VA for the shift experiment — plus fallbacks
-if you can't.
+The main sweep has been run (see below). This guide remains the reference for
+(1) where to get a GPU, (2) the exact commands to re-run all methods on real
+AffectNet, and (3) how to get AFEW-VA for the optional cross-dataset shift.
+For the short list of what still needs doing before submission, see
+[FINISH_THIS_WEEK.md](FINISH_THIS_WEEK.md).
 
 ## Where you stand today
-- ✅ Real AffectNet-VA data is already on disk (`data/raw/AffectNetVA/`).
-- ✅ One real run done: `results/affectnet_va_evidential/` (in-distribution only).
-- ❌ The 6-method comparison in the paper is still **synthetic** — must re-run on real data.
-- ❌ `mc_dropout` and `ensemble` never run at all.
-- ❌ The AffectNet→AFEW-VA shift never run (AFEW-VA not downloaded).
+- ✅ Real AffectNet-VA data on disk (`data/raw/AffectNetVA/`): 58,803 / 3,500 / 5,000.
+- ✅ **The paper's comparison is real.** baseline / gaussian_nll / evidential at three
+  seeds (1337, 7, 21) plus single-seed conformal, all on real AffectNet, run on Colab.
+  Metrics committed under `results/summary/real/`; `make paper-table` regenerates the
+  paper's table from them.
+- ✅ Corruption-based shift (ImageNet-C style) ran as the OOD condition in every eval.
+- ⚠️ The paper's three figures are still from the synthetic run and must be
+  regenerated — see `FINISH_THIS_WEEK.md` (evaluation only, ~2 min on a T4).
+- ❌ `mc_dropout` and `ensemble` never run; excluded from the paper and declared in
+  its Limitations.
+- ❌ Cross-dataset AffectNet→AFEW-VA never run (AFEW-VA not downloaded). The paper
+  reports the corruption shift instead and says so.
 
 ---
 

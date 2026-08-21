@@ -1,0 +1,43 @@
+{
+  "config": "evidential",
+  "seed": 1337,
+  "provenance": "Drive:emotion_results/evidential_real/eval_log.txt",
+  "acc": {
+    "ccc_valence": 0.8019518977061703,
+    "rmse_valence": 0.31149622797966003,
+    "mae_valence": 0.22739145159721375,
+    "ccc_arousal": 0.5632808640523513,
+    "rmse_arousal": 0.26622825860977173,
+    "mae_arousal": 0.18064770102500916,
+    "ccc_mean": 0.6826163808792608,
+    "rmse_mean": 0.2888622432947159
+  },
+  "ece": 0.015081904761904791,
+  "sharpness": 0.24547742307186127,
+  "aurc": 0.047210958972573276,
+  "shift": {
+    "id_ccc": 0.6826163808792608,
+    "id_rmse": 0.2888622432947159,
+    "id_ece": 0.015081904761904791,
+    "id_sharpness": 0.24547742307186127,
+    "ood_ccc": 0.5587675476472733,
+    "ood_rmse": 0.3368230015039444,
+    "ood_ece": 0.015059999999999985,
+    "ood_sharpness": 0.28684061765670776,
+    "ece_degradation": -2.190476190480628e-05,
+    "uncertainty_rises_under_shift": true,
+    "ood_auroc": 0.60646004,
+    "ood_dataset": "affectnet_va_corrupt"
+  },
+  "conformal": {
+    "alpha": 0.1,
+    "target": 0.9,
+    "quantiles": [
+      1.8639377090590337,
+      1.6758772999559117
+    ],
+    "coverage_test": 0.9065,
+    "coverage_ood": 0.8936,
+    "mean_half_width_test": 0.43393862404310596
+  }
+}

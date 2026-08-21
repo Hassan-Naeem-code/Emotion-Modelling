@@ -16,10 +16,10 @@ accuracy. Concretely: (1) a deep evidential regression head~\cite{amini2020evide
 that produces aleatoric and epistemic uncertainty for VA in one forward pass;
 (2) a split conformal layer~\cite{vovk2005algorithmic} that turns predictive
 uncertainty into prediction intervals with coverage guarantees and a principled
-abstention threshold; (3) an evaluation protocol centred on calibration and
-behaviour under distribution shift
-(AffectNet~\cite{mollahosseini2017affectnet}$\rightarrow$AFEW-VA~\cite{kossaifi2017afew});
-and (4) an on-device demonstrator that surfaces
+abstention threshold; (3) an evaluation protocol on real
+AffectNet~\cite{mollahosseini2017affectnet} centred on calibration and on
+behaviour under a corruption-based distribution shift, evaluated over three
+seeds; and (4) an on-device demonstrator that surfaces
 the uncertainty and abstention to users without transmitting any imagery.
 
 \paragraph{Scope and ethics.} The system estimates the user's own state at their

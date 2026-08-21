@@ -1,0 +1,43 @@
+{
+  "config": "gaussian_nll",
+  "seed": 1337,
+  "provenance": "Drive:emotion_results/gaussian_nll_real/eval_log.txt",
+  "acc": {
+    "ccc_valence": 0.8089138150564014,
+    "rmse_valence": 0.2983954846858978,
+    "mae_valence": 0.22228285670280457,
+    "ccc_arousal": 0.539385536172572,
+    "rmse_arousal": 0.26775118708610535,
+    "mae_arousal": 0.18988220393657684,
+    "ccc_mean": 0.6741496756144867,
+    "rmse_mean": 0.2830733358860016
+  },
+  "ece": 0.018326666666666696,
+  "sharpness": 0.25730547308921814,
+  "aurc": 0.045703169051557774,
+  "shift": {
+    "id_ccc": 0.6741496756144867,
+    "id_rmse": 0.2830733358860016,
+    "id_ece": 0.018326666666666696,
+    "id_sharpness": 0.25730547308921814,
+    "ood_ccc": 0.5636865722072202,
+    "ood_rmse": 0.32809747755527496,
+    "ood_ece": 0.007919047619047593,
+    "ood_sharpness": 0.2797830402851105,
+    "ece_degradation": -0.010407619047619103,
+    "uncertainty_rises_under_shift": true,
+    "ood_auroc": 0.58633396,
+    "ood_dataset": "affectnet_va_corrupt"
+  },
+  "conformal": {
+    "alpha": 0.1,
+    "target": 0.9,
+    "quantiles": [
+      1.806746688672474,
+      1.6331200880323127
+    ],
+    "coverage_test": 0.9218,
+    "coverage_ood": 0.8907,
+    "mean_half_width_test": 0.44247350247862477
+  }
+}
