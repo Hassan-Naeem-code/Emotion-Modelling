@@ -2,7 +2,7 @@
 PY ?= python
 SEED ?= 1337
 
-.PHONY: help install test dryrun train-all eval-all ensemble shift aggregate paper-table repro demo-install demo clean
+.PHONY: help install test dryrun train-all eval-all ensemble shift aggregate paper-table paper-figures repro demo-install demo clean
 
 help:
 	@echo "make install     - pip install pinned requirements"
@@ -14,6 +14,7 @@ help:
 	@echo "make shift       - train AffectNet, shift-test on AFEW-VA"
 	@echo "make aggregate   - merge all metrics.json into one comparison table"
 	@echo "make paper-table - regenerate the paper's multi-seed table from results/summary/real/"
+	@echo "make paper-figures - copy the committed real-run figures into paper/"
 	@echo "make test        - run the Python unit tests"
 	@echo "make demo        - run the in-browser demo (cd demo && npm run dev)"
 
@@ -61,6 +62,15 @@ aggregate:
 # results/summary/real/. This is what paper/sections/results.tex \inputs.
 paper-table:
 	$(PY) -m eval.aggregate_seeds
+
+# The paper's three figures come from the seed-1337 evidential checkpoint, which
+# is too large to ship in git. The rendered PNGs are committed alongside that
+# run's metrics instead, so the paper is reproducible from the repo alone.
+paper-figures:
+	cp results/summary/real/evidential/seed1337/risk_coverage.png paper/evidential_risk_coverage.png
+	cp results/summary/real/evidential/seed1337/reliability.png   paper/evidential_reliability.png
+	cp results/summary/real/evidential/seed1337/va_scatter.png    paper/evidential_va_scatter.png
+	@echo "paper/ figures refreshed from results/summary/real/"
 
 repro: train-all eval-all aggregate
 	@echo "Reproduction complete. See results/ and paper/."

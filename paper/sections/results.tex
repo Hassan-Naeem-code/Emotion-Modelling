@@ -74,9 +74,17 @@ and reliability diagram.
     \includegraphics[width=\linewidth]{evidential_va_scatter.png}
     \subcaption{VA, coloured by uncertainty}\label{fig:scatter}
   \end{minipage}
-  \caption{Evidential model. Risk drops sharply as the most uncertain inputs are
-  abstained on; predicted intervals track empirical coverage; uncertainty is
-  highest at the edges of the VA plane.}
+  \caption{Evidential model. (a) Risk falls monotonically as the most uncertain
+  inputs are abstained on --- roughly fourfold, from $0.084$ at full coverage to
+  $0.022$ at $5\%$ --- so the uncertainty score ranks errors usefully rather than
+  merely being well calibrated on average. (b) Empirical coverage tracks the
+  nominal level closely across the whole range, with mild overconfidence only in
+  the extreme tail. (c) Uncertainty is highest in the \emph{interior} of the VA
+  plane, where low-intensity and ambiguous expressions live, and lowest for the
+  confident high-magnitude predictions on the perimeter --- the model is least
+  sure precisely where human annotators also disagree most. The predictions also
+  show the range compression typical of VA regression, spanning roughly
+  $[-0.9, 0.8]$ in valence rather than the full $[-1,1]$.}
 \end{figure}
 
 \paragraph{Behaviour under shift.} The corruption shift is where the value of

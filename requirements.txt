@@ -12,6 +12,9 @@ pyyaml==6.0.1
 tqdm==4.66.4
 onnx==1.16.1
 onnxruntime==1.18.1
+# Required by torch.onnx.export on torch >= 2.5 (the dynamo exporter path).
+# Harmless on the pinned torch 2.3.1, needed on newer runtimes such as Colab.
+onnxscript
 pillow==10.4.0
 pytest==8.2.2
 # Optional: landmark-based face alignment (data.align=true). Falls back to a

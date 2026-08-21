@@ -13,8 +13,10 @@ For the short list of what still needs doing before submission, see
   Metrics committed under `results/summary/real/`; `make paper-table` regenerates the
   paper's table from them.
 - ✅ Corruption-based shift (ImageNet-C style) ran as the OOD condition in every eval.
-- ⚠️ The paper's three figures are still from the synthetic run and must be
-  regenerated — see `FINISH_THIS_WEEK.md` (evaluation only, ~2 min on a T4).
+- ✅ The paper's three figures are regenerated from the seed-1337 evidential
+  checkpoint and committed under `results/summary/real/`; `make paper-figures`
+  copies them into `paper/`. Verified against that run's metrics before use.
+- ✅ The browser demo ships the real exported ONNX model, not the placeholder.
 - ❌ `mc_dropout` and `ensemble` never run; excluded from the paper and declared in
   its Limitations.
 - ❌ Cross-dataset AffectNet→AFEW-VA never run (AFEW-VA not downloaded). The paper
