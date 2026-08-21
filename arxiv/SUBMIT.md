@@ -25,8 +25,10 @@ Knowing When It Doesn't Know: Calibrated, Uncertainty-Aware Affect Estimation un
 
 **Authors**
 ```
-Muhammad Hassan Naeem
+Hassan Naeem
 ```
+This must match the paper's author line and your arXiv account name exactly -
+split citations across name variants are a nuisance to merge later.
 
 **Categories**
 - Primary: **cs.CV** (Computer Vision and Pattern Recognition) — face-based estimation from images.
