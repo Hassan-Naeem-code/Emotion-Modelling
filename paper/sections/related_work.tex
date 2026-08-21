@@ -7,8 +7,11 @@ faces in this space: AffectNet~\cite{mollahosseini2017affectnet} provides
 $\sim$1M images with categorical and continuous VA labels, and
 AFEW-VA~\cite{kossaifi2017afew} supplies per-frame VA from movie clips, giving a
 natural still-image$\rightarrow$video distribution shift. We adopt this
-dimensional target and treat the AffectNet$\rightarrow$AFEW-VA gap as our shift
-benchmark.
+dimensional target. For shift we use corruptions of the AffectNet test set in the
+spirit of ImageNet-C~\cite{hendrycks2019benchmarking}, which holds images,
+labels, and annotators fixed and so attributes any calibration change to the
+corruption alone; the cross-dataset AFEW-VA comparison confounds those factors
+and is left as an extension.
 
 \paragraph{Uncertainty in deep networks.} A large body of work separates
 \emph{aleatoric} (data) from \emph{epistemic} (model) uncertainty. MC-Dropout
@@ -32,9 +35,12 @@ guarantee rather than a heuristic cutoff.
 
 \paragraph{Physiological signals.} Remote photoplethysmography recovers a pulse
 signal from subtle skin-colour changes; the POS method~\cite{wang2017pos} is a
-widely used, training-free estimator. We use it as a gated second modality whose
+widely used, training-free estimator. We implement it as a gated second modality whose
 signal-quality score down-weights unreliable pulse estimates and \emph{raises}
-uncertainty rather than contributing a confident guess.
+uncertainty rather than contributing a confident guess. It is disabled
+(\texttt{use\_rppg: false}) in every experiment reported here, which are
+still-image only; we describe it as released scaffolding for video, not as a
+contribution we evaluate.
 
 \paragraph{Positioning.} Unlike systems that report a confident discrete emotion,
 our contribution is \emph{knowing when the estimate cannot be trusted}: we pair a

@@ -35,7 +35,12 @@ exchangeable data. The mean half-width supplies the abstention threshold used by
 the demonstrator, so the deployed system and the reported experiments share one
 calibrated bound.
 
-\subsection{rPPG as a gated second modality}
+\subsection{rPPG as a gated second modality (not evaluated here)}
+\label{sec:rppg}
+The following component is implemented and released but is \emph{disabled in all
+experiments in this paper}, which use still images only. We describe it because
+it defines how the deployed demonstrator treats an unreliable second modality.
+
 We extract a pulse signal from the face ROI with the POS
 algorithm~\cite{wang2017pos} and a signal-quality score. The quality score multiplicatively gates the rPPG feature:
 a low-quality pulse contributes near zero and \emph{raises} predictive
