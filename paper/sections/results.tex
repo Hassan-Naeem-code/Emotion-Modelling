@@ -44,6 +44,24 @@ precondition for the rest of our argument --- uncertainty is obtained
 \emph{trustworthiness} each method adds, and there the methods are \emph{not}
 equivalent at all.
 
+\paragraph{Accuracy in context.} The claim that uncertainty is free on the
+accuracy axis only carries weight if the underlying predictor is not weak, so we
+position it against published AffectNet numbers. Our evidential model reaches
+CCC $0.802_{\pm.002}$ on valence and $0.581_{\pm.015}$ on arousal. The AffectNet
+authors' own CNN baseline reports $0.541$ and $0.450$ on their test set
+($0.60$ and $0.34$ on their validation set)~\cite{mollahosseini2017affectnet},
+and EmoNet~\cite{toisoul2021estimation}, a substantially larger purpose-built
+architecture, reports $0.82$ and $0.75$ on a cleaned AffectNet test set. Our
+valence accuracy is therefore close to the strongest published figure, while our
+arousal accuracy falls between the dataset's own baseline and EmoNet --- matching
+the widely observed asymmetry that arousal is the harder axis to recover from a
+single still image. We stress that these are \emph{indicative} rather than exact
+comparisons: the public redistribution we train on defines its own
+Train/Validation/Test partition rather than the authors' official split, and
+EmoNet's figures are computed on a cleaned subset under a different protocol. The
+point is narrow --- that the calibration comparison in Table~\ref{tab:comparison}
+is made on a predictor of representative strength rather than a crippled one.
+
 \paragraph{Calibration and selective prediction.} The deterministic baseline
 provides no usable uncertainty --- its expected calibration error is degenerate
 ($0.500$) and its sharpness is zero because it emits a point estimate. Among the
