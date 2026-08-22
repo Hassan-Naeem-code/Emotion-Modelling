@@ -41,6 +41,8 @@ paper/*_reliability.png
 paper/*_va_scatter.png
 # arXiv package: the tarball is a build artifact (make arxiv); the metadata is not.
 arxiv/*.tar.gz
+# Personal correspondence: contains an account-linked endorsement code.
+arxiv/endorsement-request.txt
 
 # LaTeX build artifacts (the PDF is regenerated from source)
 *.aux
