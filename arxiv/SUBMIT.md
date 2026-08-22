@@ -1,5 +1,18 @@
 # arXiv submission package
 
+## Status: SUBMITTED (2026-08-21) - on hold for moderation
+
+Submission ID: `submit/7979315` (arxiv.org/user)
+Account: hassan_naeem | Endorsed for cs.LG by Shrey Pareek
+Primary cs.LG, cross-list cs.CV, CC BY 4.0.
+
+"on hold" means a moderator reviews it before announcement rather than it going
+out automatically. Routine for a first submission from a new author. Do not
+delete or resubmit; that loses queue position. Expect an email.
+
+Once announced, add the arXiv ID to README.md and paper/main.tex.
+
+
 Everything here is ready to upload. Built and verified 2026-08-21.
 
 ## Files
