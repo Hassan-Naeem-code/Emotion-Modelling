@@ -31,8 +31,16 @@ This must match the paper's author line and your arXiv account name exactly -
 split citations across name variants are a nuisance to merge later.
 
 **Categories**
-- Primary: **cs.CV** (Computer Vision and Pattern Recognition) — face-based estimation from images.
-- Cross-list: **cs.LG** (Machine Learning) — the contribution is uncertainty quantification, calibration, and conformal prediction, which is where that audience reads.
+- Primary: **cs.LG** (Machine Learning). The contribution is uncertainty
+  quantification: evidential regression, split conformal prediction,
+  calibration, selective prediction, OOD detection. Faces are the application
+  domain, not the contribution.
+- Cross-list: **cs.CV** (Computer Vision and Pattern Recognition), for the
+  face-image application.
+
+(Originally drafted as cs.CV primary. cs.LG is the better fit for a paper whose
+own claim is that the methods are equivalent on accuracy and separate on
+calibration.)
 
 **Comments field** (optional but worth filling — it is where you note artifacts)
 ```
