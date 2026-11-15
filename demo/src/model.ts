@@ -23,12 +23,33 @@ export interface ModelMeta {
   norm_std: [number, number, number];
   head: string;
   abstain_std_threshold: number;
+  /** Max-score conformal quantile: the 90% joint region is mean ± q·std per axis. */
+  joint_q?: number;
+  /** Abstain when the (clipped) region area exceeds this; calibrated on validation. */
+  abstain_area_threshold?: number;
 }
 
 export interface Prediction {
   valence: number;
   arousal: number;
   std: number; // scalar predictive std (mean over dims)
+  stdV: number; // per-axis predictive std
+  stdA: number;
+}
+
+/** The paper's joint region: a rectangle [mean ± q·std] per axis, clipped to
+ *  the VA square. Contains the true VA point with probability ≥ 1−α on data
+ *  like the calibration set (not on unfamiliar faces; see the paper). */
+export interface Region {
+  v: [number, number];
+  a: [number, number];
+  area: number;
+}
+
+export function jointRegion(p: Prediction, q: number): Region {
+  const v: [number, number] = [clamp(p.valence - q * p.stdV), clamp(p.valence + q * p.stdV)];
+  const a: [number, number] = [clamp(p.arousal - q * p.stdA), clamp(p.arousal + q * p.stdA)];
+  return { v, a, area: (v[1] - v[0]) * (a[1] - a[0]) };
 }
 
 const DEFAULT_META: ModelMeta = {
@@ -94,6 +115,8 @@ export class AffectPredictor {
       valence: clamp(mean[0]),
       arousal: clamp(mean[1]),
       std: (std[0] + std[1]) / 2,
+      stdV: std[0],
+      stdA: std[1],
     };
   }
 
@@ -111,7 +134,7 @@ export class AffectPredictor {
       Math.abs(faceY - 0.5),
     );
     const std = 0.15 + edge * 0.6;
-    return { valence, arousal, std };
+    return { valence, arousal, std, stdV: std, stdA: std };
   }
 }
 

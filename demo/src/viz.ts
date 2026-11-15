@@ -5,7 +5,7 @@
  * "Not sure" state showing the reason — the visual contract of the demo.
  */
 import type { Decision } from "./abstain";
-import type { Prediction } from "./model";
+import { jointRegion, type Prediction } from "./model";
 
 export class VAPlane {
   private ctx: CanvasRenderingContext2D;
@@ -44,7 +44,7 @@ export class VAPlane {
     c.fillText("arousal −", s / 2 + 6, s - 8);
   }
 
-  render(pred: Prediction | null, decision: Decision) {
+  render(pred: Prediction | null, decision: Decision, jointQ?: number) {
     this.drawAxes();
     const c = this.ctx;
     const s = this.size;
@@ -74,15 +74,31 @@ export class VAPlane {
 
     const x = this.toPx(pred.valence, "x");
     const y = this.toPx(pred.arousal, "y");
-    // Halo radius scales with predictive std (clamped for legibility).
-    const halo = Math.max(6, Math.min(s / 2, pred.std * s * 0.9));
-
-    c.beginPath();
-    c.arc(x, y, halo, 0, Math.PI * 2);
-    c.fillStyle = "rgba(88, 166, 255, 0.18)";
-    c.fill();
-    c.strokeStyle = "rgba(88, 166, 255, 0.5)";
-    c.stroke();
+    if (jointQ) {
+      // The calibrated 90% joint region (paper, Prop. 1): a rectangle.
+      const r = jointRegion(pred, jointQ);
+      const x0 = this.toPx(r.v[0], "x");
+      const x1 = this.toPx(r.v[1], "x");
+      const y0 = this.toPx(r.a[1], "y");
+      const y1 = this.toPx(r.a[0], "y");
+      c.fillStyle = "rgba(88, 166, 255, 0.16)";
+      c.fillRect(x0, y0, x1 - x0, y1 - y0);
+      c.strokeStyle = "rgba(88, 166, 255, 0.6)";
+      c.lineWidth = 1.5;
+      c.strokeRect(x0, y0, x1 - x0, y1 - y0);
+      c.fillStyle = "#8b949e";
+      c.font = "11px system-ui, sans-serif";
+      c.fillText("90% region", Math.min(x0 + 4, s - 70), Math.max(y0 - 4, 12));
+    } else {
+      // Halo radius scales with predictive std (clamped for legibility).
+      const halo = Math.max(6, Math.min(s / 2, pred.std * s * 0.9));
+      c.beginPath();
+      c.arc(x, y, halo, 0, Math.PI * 2);
+      c.fillStyle = "rgba(88, 166, 255, 0.18)";
+      c.fill();
+      c.strokeStyle = "rgba(88, 166, 255, 0.5)";
+      c.stroke();
+    }
 
     c.beginPath();
     c.arc(x, y, 6, 0, Math.PI * 2);

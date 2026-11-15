@@ -27,8 +27,8 @@ function ctx(over: Partial<SignalContext> = {}): SignalContext {
   };
 }
 
-const confident: Prediction = { valence: 0.3, arousal: 0.2, std: 0.1 };
-const unsure: Prediction = { valence: 0.3, arousal: 0.2, std: 0.9 };
+const confident: Prediction = { valence: 0.3, arousal: 0.2, std: 0.1, stdV: 0.1, stdA: 0.1 };
+const unsure: Prediction = { valence: 0.3, arousal: 0.2, std: 0.9, stdV: 0.9, stdA: 0.9 };
 
 describe("abstention", () => {
   it("answers when signal is good and model is confident", () => {
@@ -87,5 +87,21 @@ describe("abstention", () => {
     const good = decide(ctx(), confident).quality;
     const bad = decide(ctx({ motion: THRESHOLDS.maxMotion * 0.9 }), confident).quality;
     expect(good).toBeGreaterThan(bad);
+  });
+
+  // Joint-region rule (meta from export --preds): q=2.46, area threshold 2.67.
+  const joint = { jointQ: 2.46, areaThreshold: 2.67 };
+  it("commits when the 90% joint region is small", () => {
+    expect(decide({ ...ctx(), ...joint }, confident).abstain).toBe(false);
+  });
+  it("abstains as AMBIGUOUS when the joint region is too large", () => {
+    const d = decide({ ...ctx(), ...joint }, { ...confident, stdV: 0.4, stdA: 0.4 });
+    expect(d.abstain).toBe(true);
+  });
+  it("uses the joint rule, not the scalar std, when calibrated", () => {
+    // scalar std far above the legacy 0.35 threshold, but a thin region on one
+    // axis keeps the area small -> no abstention under the joint rule.
+    const p = { ...confident, std: 0.5, stdV: 0.9, stdA: 0.05 };
+    expect(decide({ ...ctx(), ...joint }, p).abstain).toBe(false);
   });
 });

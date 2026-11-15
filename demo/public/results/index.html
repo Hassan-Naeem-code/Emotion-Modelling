@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Joint VA Coverage Results</title>
+<meta name="description" content="Every number behind 'Two Axes, One Guarantee': per method, per seed, per expression." />
+<style>
+:root {
+  --bg: #ffffff; --surface: #f6f8fa; --border: #d0d7de; --text: #1f2328;
+  --muted: #59636e; --accent: #0969da; --accent-soft: rgba(9,105,218,.14);
+  --grey: #8c959f; --bad: #cf222e; --good: #1a7f37; --line: #1f2328;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #58a6ff; --accent-soft: rgba(88,166,255,.16);
+    --grey: #6e7681; --bad: #f85149; --good: #3fb950; --line: #e6edf3;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3;
+  --muted: #8b949e; --accent: #58a6ff; --accent-soft: rgba(88,166,255,.16);
+  --grey: #6e7681; --bad: #f85149; --good: #3fb950; --line: #e6edf3;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1040px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { font-size: 26px; line-height: 1.25; margin: 0 0 8px; }
+h2 { font-size: 18px; margin: 40px 0 8px; }
+p { margin: 8px 0; }
+.lede { color: var(--muted); max-width: 70ch; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
+.links a { color: var(--accent); text-decoration: none; border: 1px solid var(--border);
+  border-radius: 6px; padding: 4px 10px; font-size: 14px; }
+.links a:hover { background: var(--accent-soft); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px; margin-top: 24px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; }
+.card .big { font-size: 28px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.card .sub { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums;
+  font-size: 13.5px; }
+th, td { padding: 7px 7px; text-align: right; white-space: nowrap;
+  border-bottom: 1px solid var(--border); }
+th:first-child, td:first-child { text-align: left; }
+thead th { background: var(--surface); font-weight: 600; }
+tbody tr:last-child td { border-bottom: 0; }
+td .sd { color: var(--muted); font-size: 11.5px; margin-left: 2px; }
+tr.seed td { color: var(--muted); font-size: 12.5px; }
+tr.seed td:first-child { padding-left: 24px; }
+.below { color: var(--bad); }
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 8px 0 12px; }
+select, button { font: inherit; font-size: 14px; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; }
+label { color: var(--muted); font-size: 14px; }
+.legend { display: flex; gap: 16px; color: var(--muted); font-size: 13px; flex-wrap: wrap; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px;
+  vertical-align: -1px; margin-right: 5px; }
+svg text { fill: var(--muted); font: 12px system-ui, sans-serif; }
+pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px; overflow-x: auto; font-size: 13px; }
+.note { color: var(--muted); font-size: 13px; }
+footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Two Axes, One Guarantee: every result, checkable</h1>
+  <p class="lede">Valence–arousal estimators on AffectNet with five uncertainty methods,
+  five seeds each. Per-axis 90% intervals cover the true VA <em>point</em> only ~86% of
+  the time; a single joint score restores 90% with smaller regions; and an expression
+  absent from calibration breaks every guarantee. Below is every number behind the
+  paper, per method, per seed and per expression.</p>
+  <div class="links">
+    <a href="/">Live demo</a>
+    <a href="https://github.com/Hassan-Naeem-code/Emotion-Modelling">Code &amp; data</a>
+    <a href="https://github.com/Hassan-Naeem-code/Emotion-Modelling/tree/main/results/v2/preds_public">Per-sample predictions</a>
+    <a href="data.json">This page's data (JSON)</a>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <h2>Coverage at nominal 90%</h2>
+  <p class="note">Joint = fraction of seen test faces whose true (valence, arousal) lies
+  in the region. Area in VA units (the square is 4). Worst = lowest joint coverage over
+  the seven seen expressions. Shift = joint coverage on corrupted images, calibrated on
+  clean data. Red = below nominal.</p>
+  <div class="controls"><label><input type="checkbox" id="seeds-cov"> show every seed</label></div>
+  <div class="scroll"><table id="cov"></table></div>
+
+  <h2>Coverage per expression</h2>
+  <div class="controls">
+    <label for="method">Method</label><select id="method"></select>
+    <span class="legend">
+      <span><span class="sw" style="background:var(--grey)"></span>Per-axis</span>
+      <span><span class="sw" style="background:var(--accent)"></span>Joint (ours)</span>
+      <span>– – nominal 90%</span>
+    </span>
+  </div>
+  <div class="scroll" style="padding:8px"><svg id="chart" viewBox="0 0 900 300" width="100%" role="img"
+    aria-label="Joint coverage by expression"></svg></div>
+  <p class="note">Bars are means over seeds; whiskers ±1 std. Contempt never appears in
+  training or calibration.</p>
+
+  <h2>Accuracy and probabilistic quality</h2>
+  <p class="note">CCC higher is better; RMSE, NLL, CRPS, ECE, AURC lower is better.
+  Ensembles combine the five seeds, so they have one value.</p>
+  <div class="controls"><label><input type="checkbox" id="seeds-acc"> show every seed</label></div>
+  <div class="scroll"><table id="acc"></table></div>
+
+  <h2>Can anything flag the unseen expression?</h2>
+  <p class="note">AUROC for separating contempt from seen test faces (0.5 = chance),
+  and the share of contempt flagged at a threshold set on validation data so that
+  ~5% of seen faces are flagged. Feature-space detectors use the network's penultimate
+  features.</p>
+  <div class="scroll"><table id="nov"></table></div>
+  <p class="note" id="nov-note"></p>
+
+  <h2>Check it yourself</h2>
+  <pre>git clone https://github.com/Hassan-Naeem-code/Emotion-Modelling
+cd Emotion-Modelling &amp;&amp; pip install numpy scipy matplotlib
+# predictions ship without AffectNet labels (licence): put the dataset in data/raw, then
+make v2-labels PY=python3   # re-attaches labels, checking image ids
+make v2-verify PY=python3   # recomputes the paper's tables from the predictions and diffs them
+make v2-tables PY=python3   # regenerates every table and figure</pre>
+
+  <footer>Research artefact. Valence–arousal labels are annotators' perceptions of a
+  displayed expression, not a person's felt emotion.</footer>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const f3 = (x) => (x == null ? "–" : x.toFixed(3));
+const sd = (x) => (x == null ? "" : `<span class="sd">±${x.toFixed(3)}</span>`);
+const NOM = 0.9;
+
+function cell(v, s, opt = {}) {
+  if (v == null) return "<td>–</td>";
+  const cls = opt.cov && v < NOM ? ' class="below"' : "";
+  return `<td${cls}>${f3(v)}${s != null && opt.sd !== false ? sd(s) : ""}</td>`;
+}
+
+function table(el, cols, data, showSeeds) {
+  const head = "<thead><tr><th>Method</th>" + cols.map((c) => `<th>${c.h}</th>`).join("") + "</tr></thead>";
+  let body = "";
+  for (const m of data.methods) {
+    body += "<tr><td>" + m.label + (m.n > 1 ? ` <span class="sd">n=${m.n}</span>` : "") + "</td>" +
+      cols.map((c) => { const v = m.summary[c.k]; return v ? cell(v[0], m.n > 1 ? v[1] : null, c) : "<td>–</td>"; }).join("") + "</tr>";
+    if (showSeeds && m.n > 1) {
+      for (const [s, r] of Object.entries(m.per_seed)) {
+        body += `<tr class="seed"><td>seed ${s}</td>` + cols.map((c) => cell(r[c.k], null, c)).join("") + "</tr>";
+      }
+    }
+  }
+  el.innerHTML = head + "<tbody>" + body + "</tbody>";
+}
+
+const COV = [
+  { h: "Per-axis joint", k: "cov_perdim_joint", cov: true }, { h: "Per-axis area", k: "area_perdim" },
+  { h: "Bonferroni joint", k: "cov_bonf", cov: true }, { h: "Bonferroni area", k: "area_bonf" },
+  { h: "Joint (ours)", k: "cov_joint", cov: true }, { h: "Area (ours)", k: "area_joint" },
+  { h: "Worst expr.", k: "worst_seen_joint", cov: true }, { h: "Shift", k: "shift_cov_joint", cov: true },
+  { h: "Contempt", k: "contempt_cov_joint", cov: true },
+];
+const ACC = [
+  { h: "CCC-V", k: "ccc_v" }, { h: "CCC-A", k: "ccc_a" }, { h: "RMSE", k: "rmse" },
+  { h: "NLL", k: "nll" }, { h: "CRPS", k: "crps" }, { h: "ECE", k: "ece" }, { h: "AURC", k: "aurc" },
+  { h: "Shift CCC", k: "shift_ccc" },
+];
+
+function chart(data, key) {
+  const m = data.methods.find((x) => x.key === key);
+  const svg = $("chart");
+  const W = 900, H = 300, L = 44, B = 40, T = 12;
+  const em = data.emotions, n = em.length, gw = (W - L - 8) / n, bw = gw * 0.34;
+  const y = (v) => T + (1 - v) * (H - T - B);
+  let s = "";
+  for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+    s += `<line x1="${L}" x2="${W - 8}" y1="${y(t)}" y2="${y(t)}" stroke="var(--border)"/>`;
+    s += `<text x="${L - 6}" y="${y(t) + 4}" text-anchor="end">${t.toFixed(2)}</text>`;
+  }
+  const series = [["cov_perdim_by_emotion", "var(--grey)"], ["cov_joint_by_emotion", "var(--accent)"]];
+  em.forEach((e, i) => {
+    series.forEach(([k, col], j) => {
+      const d = m.by_emotion[k]?.[e];
+      if (!d) return;
+      const x = L + i * gw + gw / 2 - bw + j * bw + 1;
+      s += `<rect x="${x}" y="${y(d[0])}" width="${bw - 2}" height="${y(0) - y(d[0])}" fill="${col}" rx="2"><title>${e}: ${d[0].toFixed(3)} ± ${d[1].toFixed(3)}</title></rect>`;
+      if (d[1] > 0) {
+        const cx = x + (bw - 2) / 2;
+        s += `<line x1="${cx}" x2="${cx}" y1="${y(Math.min(1, d[0] + d[1]))}" y2="${y(d[0] - d[1])}" stroke="var(--line)" opacity=".6"/>`;
+      }
+    });
+    s += `<text x="${L + i * gw + gw / 2}" y="${H - B + 18}" text-anchor="middle">${e}${e === "contempt" ? " (unseen)" : ""}</text>`;
+  });
+  s += `<line x1="${L}" x2="${W - 8}" y1="${y(NOM)}" y2="${y(NOM)}" stroke="var(--line)" stroke-dasharray="5 4"/>`;
+  svg.innerHTML = s;
+}
+
+function cards(data) {
+  const ev = data.methods.find((m) => m.key === "v2_evidential").summary;
+  const all = data.methods.filter((m) => m.summary.cov_perdim_joint);
+  const lo = Math.min(...all.map((m) => m.summary.cov_perdim_joint[0]));
+  const hi = Math.max(...all.map((m) => m.summary.cov_perdim_joint[0]));
+  const c = all.map((m) => m.summary.contempt_cov_joint[0]);
+  const shrink = 1 - ev.area_joint[0] / ev.area_bonf[0];
+  $("cards").innerHTML = [
+    [`${(lo * 100).toFixed(1)}–${(hi * 100).toFixed(1)}%`, "Per-axis 90% intervals: how often the true VA point is inside both, across all methods"],
+    [`${(ev.cov_joint[0] * 100).toFixed(1)}%`, `Our joint region (evidential), ${(shrink * 100).toFixed(0)}% smaller than Bonferroni for the same guarantee`],
+    [`${(Math.min(...c) * 100).toFixed(0)}–${(Math.max(...c) * 100).toFixed(0)}%`, "Coverage on contempt, the expression no model saw in training or calibration"],
+  ].map(([b, t]) => `<div class="card"><div class="big">${b}</div><div class="sub">${t}</div></div>`).join("");
+}
+
+function novelty(data) {
+  const nv = data.novelty, el = $("nov");
+  if (!nv) { el.innerHTML = "<tbody><tr><td>Novelty results not included in this build.</td></tr></tbody>"; return; }
+  const NAMES = { sigma: "Predictive uncertainty (Σσ)", maha: "Mahalanobis", maha_cls: "Class-cond. Mahalanobis", knn: "k-NN (k=50)" };
+  const MN = { v2_evidential: "Evidential", v2_gaussian_nll: "Gaussian", v2_baseline: "Deterministic" };
+  let body = "";
+  for (const [mk, ml] of Object.entries(MN)) {
+    const r = nv[mk]; if (!r) continue;
+    for (const [dk, dl] of Object.entries(NAMES)) {
+      const d = r[dk]; if (!d) continue;
+      body += `<tr><td>${ml} · ${dl}</td>${cell(d.auroc[0], d.auroc[1])}${cell(d.tpr[0], d.tpr[1])}${cell(d.fpr[0], d.fpr[1])}${cell(d.shift_auroc[0], d.shift_auroc[1])}</tr>`;
+    }
+  }
+  el.innerHTML = "<thead><tr><th>Model · detector</th><th>Contempt AUROC</th><th>Contempt flagged</th><th>Seen flagged</th><th>Corruption AUROC</th></tr></thead><tbody>" + body + "</tbody>";
+  $("nov-note").textContent = "Contempt faces' nearest training images are mostly neutral and happy: they look in-distribution, so detectors that only look at the input cannot single them out.";
+}
+
+fetch("data.json").then((r) => r.json()).then((data) => {
+  cards(data);
+  const draw = () => {
+    table($("cov"), COV, data, $("seeds-cov").checked);
+    table($("acc"), ACC, data, $("seeds-acc").checked);
+  };
+  $("seeds-cov").onchange = draw; $("seeds-acc").onchange = draw; draw();
+  const sel = $("method");
+  sel.innerHTML = data.methods.map((m) => `<option value="${m.key}">${m.label}</option>`).join("");
+  sel.value = "v2_evidential";
+  sel.onchange = () => chart(data, sel.value); chart(data, sel.value);
+  novelty(data);
+}).catch((e) => { document.querySelector("main").insertAdjacentHTML("beforeend", `<p class="below">Could not load data.json: ${e}</p>`); });
+</script>
+</body>
+</html>

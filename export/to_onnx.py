@@ -44,18 +44,60 @@ class ExportWrapper(torch.nn.Module):
         return mean, std
 
 
+def joint_calibration(preds_path: str, abstain_q: float, alpha: float = 0.1) -> dict:
+    """Max-score conformal quantile and an area threshold, from validation only.
+    Also reports, on test, the coverage and abstention rate the demo will have,
+    so the shipped numbers are checkable against the paper."""
+    import numpy as np
+    z = np.load(preds_path)
+    sd = lambda p: np.sqrt(np.maximum(z[f"{p}_var"], 1e-12))
+    score = lambda p: (np.abs(z[f"{p}_target"] - z[f"{p}_mean"]) / sd(p)).max(1)
+
+    def area(p, q):
+        lo = np.clip(z[f"{p}_mean"] - q * sd(p), -1, 1)
+        hi = np.clip(z[f"{p}_mean"] + q * sd(p), -1, 1)
+        return np.prod(hi - lo, axis=1)
+
+    cal = np.sort(score("val"))
+    n = len(cal)
+    q = float(cal[min(n - 1, int(np.ceil((n + 1) * (1 - alpha))) - 1)])
+    thr = float(np.quantile(area("val", q), abstain_q))
+    seen = z["test_emotion"] != 7
+    keep = area("test", q) <= thr
+    cov = score("test") <= q
+    return {
+        "joint_q": q,
+        "joint_alpha": alpha,
+        "abstain_area_threshold": thr,
+        "test_check": {
+            "joint_coverage_seen": float(cov[seen].mean()),
+            "abstain_rate_seen": float((~keep)[seen].mean()),
+            "joint_coverage_seen_kept": float(cov[seen & keep].mean()),
+            "abstain_rate_contempt": float((~keep)[~seen].mean()),
+        },
+    }
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
     ap.add_argument("--ckpt", required=True)
     ap.add_argument("--out", default="demo/public/model.onnx")
+    ap.add_argument("--preds", default=None,
+                    help="dump_preds .npz of the SAME checkpoint: calibrates the "
+                         "joint max-score region (q) and the abstention area on "
+                         "its validation split, exactly as in the paper.")
+    ap.add_argument("--abstain-quantile", type=float, default=0.9,
+                    help="Abstain when the region area exceeds this quantile of "
+                         "validation region areas (0.9 -> ~10%% abstention "
+                         "on in-distribution faces).")
     ap.add_argument("--conformal", default=None,
                     help="Optional conformal.json to copy beside the model for "
                          "the demo's abstention threshold.")
     args = ap.parse_args()
 
     cfg = load_config(args.config)
-    state = torch.load(args.ckpt, map_location="cpu")
+    state = torch.load(args.ckpt, map_location="cpu", weights_only=False)
     # Prefer the config stored in the checkpoint: it captures the exact training
     # setup (backbone, head, any --set overrides), so export never mismatches the
     # saved weights. Fall back to the YAML config for older checkpoints.
@@ -101,6 +143,8 @@ def main():
         if hw is not None:
             meta["abstain_std_threshold"] = float(hw)
         meta["conformal"] = conf
+    if args.preds:
+        meta.update(joint_calibration(args.preds, args.abstain_quantile))
     (out_path.parent / "model_meta.json").write_text(json.dumps(meta, indent=2))
     print(f"Exported ONNX -> {out_path}")
     print(f"Wrote sidecar -> {out_path.parent/'model_meta.json'}")

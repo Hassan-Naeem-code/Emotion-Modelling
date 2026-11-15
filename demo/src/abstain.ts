@@ -13,14 +13,18 @@ import {
   type AbstainReason,
 } from "./config";
 import type { FaceInfo } from "./landmarker";
-import type { Prediction } from "./model";
+import { jointRegion, type Prediction } from "./model";
 
 export interface SignalContext {
   face: FaceInfo;
   brightness: number;
   motion: number;
   noFaceStreak: number;
-  uncertaintyThreshold: number; // from model meta (conformal-derived if available)
+  uncertaintyThreshold: number; // legacy scalar-std rule (used when no joint_q)
+  /** Joint conformal quantile from model meta; enables the region-area rule. */
+  jointQ?: number;
+  /** Region area above which we abstain (validation-calibrated). */
+  areaThreshold?: number;
 }
 
 export interface Decision {
@@ -58,7 +62,12 @@ export function decide(
   // 2. Model-driven gate: the prediction itself is too uncertain to call.
   if (!pred) return abstain(ABSTAIN_REASONS.NO_FACE, quality);
   const confidence = stdToConfidence(pred.std);
-  if (pred.std > ctx.uncertaintyThreshold)
+  // With a calibrated model, abstain when the 90% joint VA region is too large
+  // to be informative: the same object the paper evaluates.
+  if (ctx.jointQ && ctx.areaThreshold) {
+    if (jointRegion(pred, ctx.jointQ).area > ctx.areaThreshold)
+      return abstain(ABSTAIN_REASONS.AMBIGUOUS, quality, confidence);
+  } else if (pred.std > ctx.uncertaintyThreshold)
     return abstain(ABSTAIN_REASONS.AMBIGUOUS, quality, confidence);
 
   return { abstain: false, reason: null, confidence, quality };

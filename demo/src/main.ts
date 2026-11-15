@@ -15,7 +15,7 @@ import {
   landmarkMotion,
   type FaceInfo,
 } from "./landmarker";
-import { AffectPredictor, EmotionPredictor, type Prediction } from "./model";
+import { AffectPredictor, EmotionPredictor, jointRegion, type Prediction } from "./model";
 import { coarseLabel } from "./readout";
 import { VAPlane } from "./viz";
 import type { FaceLandmarker } from "@mediapipe/tasks-vision";
@@ -84,6 +84,15 @@ function updateDetails(pred: Prediction | null, d: Decision) {
   $("d-readout").textContent =
     pred && !d.abstain ? coarseLabel(pred.valence, pred.arousal) : "—";
   $("d-confidence").textContent = `${Math.round(d.confidence * 100)}%`;
+  const q = predictor.meta.joint_q;
+  if (pred && q && !d.abstain) {
+    const r = jointRegion(pred, q);
+    const f = (x: number) => (x >= 0 ? "+" : "") + x.toFixed(2);
+    $("d-region").textContent =
+      `V [${f(r.v[0])}, ${f(r.v[1])}] · A [${f(r.a[0])}, ${f(r.a[1])}]`;
+  } else {
+    $("d-region").textContent = "—";
+  }
   $("d-quality").textContent = `${Math.round(d.quality * 100)}%`;
   $("d-reason").textContent = d.reason ?? "—";
   $("d-model").textContent = predictor.label;
@@ -107,6 +116,8 @@ function smooth(pred: Prediction): Prediction {
     valence: a * smoothed.valence + (1 - a) * pred.valence,
     arousal: a * smoothed.arousal + (1 - a) * pred.arousal,
     std: a * smoothed.std + (1 - a) * pred.std,
+    stdV: a * smoothed.stdV + (1 - a) * pred.stdV,
+    stdA: a * smoothed.stdA + (1 - a) * pred.stdA,
   };
   return smoothed;
 }
@@ -184,11 +195,13 @@ async function loop() {
       motion,
       noFaceStreak,
       uncertaintyThreshold: predictor.meta.abstain_std_threshold,
+      jointQ: predictor.meta.joint_q,
+      areaThreshold: predictor.meta.abstain_area_threshold,
     },
     pred,
   );
 
-  plane.render(decision.abstain ? null : pred, decision);
+  plane.render(decision.abstain ? null : pred, decision, predictor.meta.joint_q);
   updateDetails(pred, decision);
   // Only show an emotion when we're not abstaining (signal trustworthy).
   renderEmotion(decision.abstain ? null : emotion);
