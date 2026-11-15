@@ -21,7 +21,9 @@ guarantee, and for which inputs.
 and deep ensembles~\cite{lakshminarayanan2017simple} estimate epistemic
 uncertainty from the disagreement of stochastic or independently trained models;
 under dataset shift, ensembles are usually the strongest of the common
-methods~\cite{ovadia2019trust}. Deep evidential
+methods~\cite{ovadia2019trust}. Out-of-distribution detectors instead score the
+input's features, for example by Mahalanobis distance~\cite{lee2018simple} or
+nearest-neighbour distance~\cite{sun2022knn}. Deep evidential
 regression~\cite{amini2020evidential} obtains aleatoric and epistemic terms in
 one forward pass from a Normal--Inverse-Gamma output, though Meinert et
 al.~\cite{meinert2023unreasonable} show that its epistemic term is a heuristic

@@ -42,7 +42,10 @@ calibration data of the release we study, which makes it a natural unseen
 expression. On it, every method we evaluate loses its guarantee (joint coverage
 $30$--$39\%$), and none of five uncertainty estimators (heteroscedastic
 Gaussian, deep evidential regression, MC-dropout, and deep ensembles of each)
-flags it reliably (AUROC $\le0.60$); ensembles even lower its coverage. Results are over five seeds with
+flags it reliably (AUROC $\le0.60$); ensembles even lower its coverage.
+Feature-space novelty detectors fail as well, because contempt is not an unusual
+input: its nearest training faces are mostly happy and neutral, and only its
+label is new. Results are over five seeds with
 proper scoring rules, a calibration split that is never used for model selection,
 and a corruption shift. Joint coverage is cheap to obtain and should be the
 default; detecting unseen expressions remains open.

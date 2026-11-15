@@ -104,6 +104,46 @@ tighter regions are wrong in the same direction.
   \label{tab:unseen}
 \end{table}
 
+\subsection{Contempt looks familiar, so input-based detectors fail too}
+\label{sec:novelty}
+If the predictive uncertainty does not notice contempt, a detector that looks
+at the input might. We test three standard feature-space detectors on each
+model's penultimate features, fit on $12{,}000$ training images of the seven
+seen expressions: Mahalanobis distance to a single Gaussian, the minimum
+class-conditional Mahalanobis distance with shared covariance~\cite{lee2018simple},
+and the distance to the $50$th nearest training feature after $\ell_2$
+normalisation~\cite{sun2022knn}. Each detector's threshold is set on the
+validation split so that about $5\%$ of seen faces are flagged, as a deployment
+would. Table~\ref{tab:novelty} reports the evidential model; the Gaussian and
+deterministic models behave the same.
+
+None of them works. Both Mahalanobis detectors score contempt as \emph{more}
+typical than the seen test faces (AUROC $0.44$--$0.47$ across the three heads,
+below chance), $k$-NN does no better than the predictive uncertainty
+($0.57$--$0.59$), and at the deployment threshold every detector flags at most
+$8\%$ of contempt faces. The same detectors do respond to the corrupted images
+(AUROC $0.63$--$0.68$, above the predictive uncertainty's $0.58$--$0.60$), so they
+are not broken; contempt is simply not unusual as an input. Its nearest training
+neighbours are $41\%$ \emph{happy} and $28\%$ \emph{neutral} faces ($\pm3\%$
+over all $15$ models), and its distance to the training set matches that of
+seen faces. What is novel about contempt is its \emph{label}: a familiar
+asymmetric half-smile that annotators rate as clearly negative. A model that
+maps it to the valence of its look-alikes is wrong with no signal in its input
+or its features, so abstaining on flagged inputs leaves contempt coverage where
+it was ($0.39$, ``contempt safe'' in Table~\ref{tab:novelty}). The only remedy we
+see is calibration data that contains the expression.
+
+\begin{table}[h]
+  \centering\small
+  \resizebox{\linewidth}{!}{\input{tables/novelty.tex}}
+  \caption{Detecting the unseen expression (evidential model, five seeds). AUROC
+  separates contempt from seen test faces. Flagged: fraction above a threshold
+  set on validation to flag about $5\%$ of seen faces. Contempt safe: fraction of
+  contempt that is either flagged or covered by the joint region. Shift AUROC:
+  clean versus corrupted test images.}
+  \label{tab:novelty}
+\end{table}
+
 \subsection{Corruption shift}
 Under corruption at severity $3$, the evidential model's CCC drops from $0.720$
 to $0.595$. The max-score region keeps joint coverage at $0.920$ without
@@ -125,4 +165,6 @@ the guarantee useful beyond its marginal form: it lifts the worst seen
 expression from $0.868$ to $0.905$ and holds coverage under corruption
 ($0.920$ versus $0.809$) at equal accuracy. Third, none of this extends to an
 expression absent from the calibration data: coverage there is $30$--$39\%$, and
-no estimator, ensembles included, flags it better than AUROC $0.60$.
+nothing flags it, neither the predictive uncertainty, nor ensembles, nor
+feature-space detectors (AUROC $\le0.60$), because the expression looks like
+faces the model has seen.

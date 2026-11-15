@@ -35,7 +35,9 @@ this paper.
         contains \emph{contempt} only in its test split, giving a natural unseen
         expression. There the guarantee fails for every method
         ($30$--$39\%$ coverage), and no uncertainty estimator we evaluate
-        flags it reliably. This is a concrete, reproducible instance of the
+        flags it reliably, including feature-space novelty detectors. The
+        reason is that contempt looks like the happy and neutral faces the model
+        has seen; only its label is new. This is a concrete, reproducible instance of the
         limits of distribution-free inference~\cite{barber2021limits} in affect.
   \item \textbf{A clean, broader benchmark.} Five uncertainty methods
         (deterministic, Gaussian, deep evidential regression, MC-dropout, deep
