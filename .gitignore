@@ -32,6 +32,11 @@ demo/public/emotion_meta.json
 results/*
 !results/summary/
 !results/.gitkeep
+# v2: ship the per-sample predictions WITHOUT AffectNet labels (licence);
+# eval/labels.py re-attaches them from a local copy of the dataset.
+!results/v2/
+results/v2/*
+!results/v2/preds_public/
 
 # Paper: track only hand-written source; figures/tables are generated artifacts.
 paper/comparison_table.*
@@ -60,3 +65,12 @@ demo/.vite/
 .DS_Store
 *.log
 wandb/
+
+# paper_v2 LaTeX build products (main.pdf and main.bbl are kept)
+paper_v2/*.aux
+paper_v2/*.log
+paper_v2/*.out
+paper_v2/*.blg
+/main.aux
+/main.log
+/main.out
