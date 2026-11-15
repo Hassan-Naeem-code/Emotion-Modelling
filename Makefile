@@ -2,7 +2,7 @@
 PY ?= python
 SEED ?= 1337
 
-.PHONY: help install test dryrun train-all eval-all ensemble shift aggregate paper-table paper-figures arxiv repro demo-install demo clean
+.PHONY: v2-labels v2-tables v2-verify arxiv-v2 help install test dryrun train-all eval-all ensemble shift aggregate paper-table paper-figures arxiv repro demo-install demo clean
 
 help:
 	@echo "make install     - pip install pinned requirements"
@@ -16,6 +16,10 @@ help:
 	@echo "make paper-table - regenerate the paper's multi-seed table from results/summary/real/"
 	@echo "make paper-figures - copy the committed real-run figures into paper/"
 	@echo "make arxiv        - build + verify the arXiv source tarball into arxiv/"
+	@echo "make v2-labels   - attach AffectNet labels (from your data/raw copy) to the public predictions"
+	@echo "make v2-tables   - recompute every v2 number/table/figure from the committed predictions"
+	@echo "make v2-verify   - recompute into a temp dir and diff against the committed tables"
+	@echo "make arxiv-v2    - build + verify the paper_v2 arXiv tarball into arxiv/v2/"
 	@echo "make test        - run the Python unit tests"
 	@echo "make demo        - run the in-browser demo (cd demo && npm run dev)"
 
@@ -90,3 +94,32 @@ demo:
 clean:
 	rm -rf results/*/ paper/*.png paper/*.tex
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
+
+# ---- v2 (resubmission) -------------------------------------------------------
+# Every number in paper_v2 is computed from the per-sample predictions committed
+# under results/v2/preds (one .npz per model and seed); no GPU is needed.
+V2_PREDS ?= results/v2/preds
+# The public prediction files carry no AffectNet labels (licence); this rebuilds
+# the full files from your own copy of the dataset under data/raw/AffectNetVA.
+v2-labels:
+	$(PY) -m eval.labels attach --src results/v2/preds_public --dst $(V2_PREDS) --data-root data/raw
+
+v2-tables:
+	$(PY) -m eval.analyze --preds $(V2_PREDS) --out results/summary/v2 \
+		--ensemble-of gaussian_nll,evidential --tables paper_v2/tables
+	@if [ -d results/v2/feats ]; then $(PY) -m eval.novelty --feats results/v2/feats \
+		--preds $(V2_PREDS) --out results/summary/v2 --tables paper_v2/tables; \
+	else echo "(results/v2/feats absent: novelty table kept as committed; regenerate with eval.dump_feats)"; fi
+
+v2-verify:
+	@T=$$(mktemp -d); \
+	$(PY) -m eval.analyze --preds $(V2_PREDS) --out $$T/out \
+		--ensemble-of gaussian_nll,evidential --tables $$T/tables >/dev/null && \
+	for f in main coverage unseen; do \
+		diff -q $$T/tables/$$f.tex paper_v2/tables/$$f.tex >/dev/null \
+		&& echo "OK   tables/$$f.tex matches the predictions" \
+		|| { echo "DIFF tables/$$f.tex"; diff $$T/tables/$$f.tex paper_v2/tables/$$f.tex; exit 1; }; \
+	done; rm -rf $$T
+
+arxiv-v2:
+	@bash scripts/make_arxiv_v2.sh
