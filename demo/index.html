@@ -3,63 +3,134 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Affect — Calibrated &amp; Uncertainty-Aware (on-device)</title>
+    <title>Face &amp; Pulse, Honestly</title>
+    <meta name="description" content="On-device: what your face displays and what your body signals (pulse, blinks, gaze), with calibrated uncertainty. It does not read feelings." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect x=%223%22 y=%223%22 width=%2210%22 height=%2210%22 rx=%222%22 fill=%22none%22 stroke=%22%2358a6ff%22 stroke-width=%222%22/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body>
     <main id="app">
       <!-- Consent gate: camera does not start until the user presses start. -->
       <section id="consent" class="card">
-        <h1>Valence–Arousal, with honest uncertainty</h1>
+        <h1>What your face shows and your body signals, with honest uncertainty</h1>
         <p id="consent-copy"></p>
         <ul id="privacy-points"></ul>
         <button id="start-btn">Start camera</button>
         <p class="fineprint" id="fineprint"></p>
+        <p class="fineprint"><a href="/results/">Research results behind this demo →</a></p>
       </section>
 
       <!-- Live view (hidden until consent). -->
       <section id="live" class="hidden">
-        <div class="stage">
-          <video id="video" playsinline muted></video>
-          <canvas id="va-plane" width="360" height="360"></canvas>
-        </div>
-        <aside id="details" class="card">
-          <h2>Details (the honesty surface)</h2>
-          <div class="state" id="state-badge">initializing…</div>
-          <dl>
-            <dt>Valence</dt><dd id="d-valence">—</dd>
-            <dt>Arousal</dt><dd id="d-arousal">—</dd>
-            <dt>Readout <span class="derived">(derived)</span></dt><dd id="d-readout">—</dd>
-            <dt>Confidence</dt><dd id="d-confidence">—</dd>
-            <dt>90% VA region</dt><dd id="d-region">—</dd>
-            <dt>Signal quality</dt><dd id="d-quality">—</dd>
-            <dt>Abstention reason</dt><dd id="d-reason">—</dd>
-            <dt>Model</dt><dd id="d-model">—</dd>
-          </dl>
-          <p class="fineprint" id="live-fineprint"></p>
+        <p class="honesty">
+          This measures what your face <strong>displays</strong> and what your body
+          <strong>signals</strong>. It cannot see what you <strong>feel</strong>: a smile
+          is not proof of happiness. The box shows how sure the model is.
+        </p>
 
-          <!-- Secondary, illustrative-only discrete readout. NOT the model's
-               claim — the valence-arousal estimate above is the actual output.
-               Collapsed by default so it never competes with the honesty surface. -->
-          <details id="emotion-block">
-            <summary>Illustrative expression guess <span class="derived">(not the model's claim)</span></summary>
-            <div id="emotion-banner">
-              <span id="emotion-emoji">·</span>
-              <div>
-                <div id="emotion-label">—</div>
-                <div id="emotion-conf" class="fineprint">&nbsp;</div>
+        <div class="live-grid">
+          <div class="stage">
+            <video id="video" playsinline muted></video>
+            <canvas id="va-plane" width="360" height="360"></canvas>
+          </div>
+
+          <div class="cards">
+            <section class="card">
+              <h2>Facial expression <span class="sub">(displayed, not felt)</span></h2>
+              <div class="state" id="state-badge">initializing…</div>
+              <div class="metrics">
+                <div class="metric">
+                  <div class="m-label">Valence</div>
+                  <div class="m-value" id="m-valence">—</div>
+                  <div class="m-note" id="m-valence-word">pleasant ↔ unpleasant</div>
+                </div>
+                <div class="metric">
+                  <div class="m-label">Arousal</div>
+                  <div class="m-value" id="m-arousal">—</div>
+                  <div class="m-note" id="m-arousal-word">calm ↔ activated</div>
+                </div>
               </div>
-            </div>
-            <div id="emotion-bars"></div>
-            <p class="fineprint">
-              A separate 7-class classifier, shown for interest only. This project
-              measures continuous valence–arousal with calibrated uncertainty — it
-              deliberately does <em>not</em> claim a discrete "basic emotion."
-            </p>
-          </details>
+              <p class="region" id="m-region">90% region: —</p>
+              <p class="fineprint" id="m-certainty"></p>
+            </section>
 
-          <button id="stop-btn">Stop camera</button>
-        </aside>
+            <section class="card">
+              <h2>Body signals <span class="sub">(measured from the video)</span></h2>
+              <div class="metrics three">
+                <div class="metric">
+                  <div class="m-label">Pulse</div>
+                  <div class="m-value" id="m-pulse">—</div>
+                  <div class="m-note" id="m-pulse-note">hold still ~10 s</div>
+                  <div class="qbar"><span id="m-pulse-q"></span></div>
+                </div>
+                <div class="metric">
+                  <div class="m-label">Blinks</div>
+                  <div class="m-value" id="m-blinks">—</div>
+                  <div class="m-note" id="m-blinks-note">per minute</div>
+                </div>
+                <div class="metric">
+                  <div class="m-label">On screen</div>
+                  <div class="m-value" id="m-gaze">—</div>
+                  <div class="m-note" id="m-gaze-note">of the last minute</div>
+                </div>
+              </div>
+              <p class="fineprint">
+                Pulse comes from tiny colour changes in your skin with each heartbeat
+                (rPPG). It needs steady light and a still face, and stays blank rather
+                than guess. A faster pulse means higher physical arousal, not any
+                particular emotion.
+              </p>
+            </section>
+
+            <details class="card tech">
+              <summary>Technical details</summary>
+              <dl>
+                <dt>Signal quality</dt><dd id="d-quality">—</dd>
+                <dt>Abstention reason</dt><dd id="d-reason">—</dd>
+                <dt>Pulse quality</dt><dd id="d-pulse-q">—</dd>
+                <dt>Model</dt><dd id="d-model">—</dd>
+              </dl>
+            </details>
+          </div>
+        </div>
+
+        <section class="card timeline-card">
+          <div class="tl-head">
+            <h2>Over time</h2>
+            <div class="seg" role="group" aria-label="Time window">
+              <button data-win="60">1 min</button>
+              <button data-win="120" class="on">2 min</button>
+              <button data-win="300">5 min</button>
+            </div>
+          </div>
+          <p class="tl-summary" id="tl-summary">Collecting…</p>
+          <canvas id="timeline"></canvas>
+          <p class="fineprint">Shaded = 90% region. Gaps = the system said "not sure".</p>
+        </section>
+
+        <!-- Secondary, illustrative-only discrete readout. NOT the model's claim. -->
+        <details id="emotion-block" class="card">
+          <summary>Expression-category guess <span class="derived">(illustrative only)</span></summary>
+          <p class="fineprint">
+            A separate 7-class classifier and a label derived from valence/arousal,
+            shown for interest. They name a facial <em>expression</em>, the way a
+            person describing a photo would. They do not tell you what someone feels.
+          </p>
+          <dl>
+            <dt>From valence/arousal</dt><dd id="d-readout">—</dd>
+          </dl>
+          <div id="emotion-banner">
+            <span id="emotion-emoji">·</span>
+            <div>
+              <div id="emotion-label">—</div>
+              <div id="emotion-conf" class="fineprint">&nbsp;</div>
+            </div>
+          </div>
+          <div id="emotion-bars"></div>
+        </details>
+
+        <p class="fineprint" id="live-fineprint"></p>
+        <button id="stop-btn">Stop camera</button>
       </section>
     </main>
     <script type="module" src="/src/main.ts"></script>

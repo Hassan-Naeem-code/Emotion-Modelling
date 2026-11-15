@@ -19,6 +19,12 @@ Two deliverables, one model core:
 **Paper:** `paper_v2/` · **Live demo:** https://va-uncertainty-demo.vercel.app ·
 **Every result, per seed and per expression:** https://va-uncertainty-demo.vercel.app/results/
 
+The demo measures what a face *displays* (valence/arousal with the paper's
+calibrated 90% region) and what the body *signals* from the same video: heart
+rate from skin colour (rPPG, POS algorithm), blink rate and time looking at the
+screen, tracked over time. It says "not sure" instead of guessing, and it does
+not claim to read feelings. All processing is on-device.
+
 Findings (AffectNet-VA, 5 uncertainty methods × 5 seeds):
 
 1. Per-axis 90% conformal intervals contain the true VA *point* only 85–86% of

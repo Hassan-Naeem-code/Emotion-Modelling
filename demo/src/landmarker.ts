@@ -22,6 +22,8 @@ export interface FaceInfo {
   bbox: [number, number, number, number] | null;
   /** Normalized landmark points (subset used for crop + motion). */
   landmarks: { x: number; y: number }[] | null;
+  /** Blendshape scores (eyeBlinkLeft, eyeLookOutRight, ...) in 0..1. */
+  blendshapes?: Record<string, number> | null;
 }
 
 export async function createLandmarker(): Promise<FaceLandmarker> {
@@ -30,7 +32,7 @@ export async function createLandmarker(): Promise<FaceLandmarker> {
     baseOptions: { modelAssetPath: MODEL_URL, delegate: "GPU" },
     runningMode: "VIDEO",
     numFaces: 1,
-    outputFaceBlendshapes: false,
+    outputFaceBlendshapes: true, // blinks + gaze (physio/eyes.ts)
   });
 }
 
@@ -42,7 +44,7 @@ export function detect(
   const res: FaceLandmarkerResult = lm.detectForVideo(video, tsMs);
   const pts = res.faceLandmarks?.[0];
   if (!pts || pts.length === 0) {
-    return { present: false, bbox: null, landmarks: null };
+    return { present: false, bbox: null, landmarks: null, blendshapes: null };
   }
   let minX = 1,
     minY = 1,
@@ -58,6 +60,9 @@ export function detect(
     present: true,
     bbox: [minX, minY, maxX - minX, maxY - minY],
     landmarks: pts.map((p) => ({ x: p.x, y: p.y })),
+    blendshapes: res.faceBlendshapes?.[0]
+      ? Object.fromEntries(res.faceBlendshapes[0].categories.map((c) => [c.categoryName, c.score]))
+      : null,
   };
 }
 

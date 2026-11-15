@@ -7,10 +7,12 @@
 export const PRIVACY = {
   consentTitle: "This analyzes YOUR camera on YOUR device. Nothing is uploaded.",
   consentBody:
-    "This tool estimates your own valence (pleasant–unpleasant) and arousal " +
-    "(calm–activated) from your front camera. All processing happens in this " +
-    "browser. No frames or biometric signals ever leave your machine. Press " +
-    "start when you're ready.",
+    "This tool measures what your face displays (valence: pleasant–unpleasant; " +
+    "arousal: calm–activated) and what your body signals (pulse from skin " +
+    "colour, blinks, gaze), each with an honest uncertainty, and tracks them " +
+    "over time. It cannot read your feelings: a smile is not proof of " +
+    "happiness. Everything runs in this browser; no frames or biometric " +
+    "signals leave your machine.",
   points: [
     "On-device. No frames or biometrics leave this browser.",
     "Estimates your own state at your request. Not a diagnostic tool.",
