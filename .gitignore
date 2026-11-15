@@ -74,3 +74,6 @@ paper_v2/*.blg
 /main.aux
 /main.log
 /main.out
+
+# runtime wasm copied from node_modules at build time (scripts/copy-vendor.mjs)
+demo/public/vendor/

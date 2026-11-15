@@ -3,247 +3,261 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Joint VA Coverage Results</title>
+<title>Results · Face &amp; Pulse</title>
 <meta name="description" content="Every number behind 'Two Axes, One Guarantee': per method, per seed, per expression." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect x=%223%22 y=%223%22 width=%2210%22 height=%2210%22 rx=%222%22 fill=%22none%22 stroke=%22%2358a6ff%22 stroke-width=%222%22/%3E%3C/svg%3E" />
+<script>document.documentElement.classList.add("js")</script>
 <style>
+/* Same palette and motion language as the landing page (src/landing.css). */
 :root {
-  --bg: #ffffff; --surface: #f6f8fa; --border: #d0d7de; --text: #1f2328;
-  --muted: #59636e; --accent: #0969da; --accent-soft: rgba(9,105,218,.14);
-  --grey: #8c959f; --bad: #cf222e; --good: #1a7f37; --line: #1f2328;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3;
-    --muted: #8b949e; --accent: #58a6ff; --accent-soft: rgba(88,166,255,.16);
-    --grey: #6e7681; --bad: #f85149; --good: #3fb950; --line: #e6edf3;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3;
-  --muted: #8b949e; --accent: #58a6ff; --accent-soft: rgba(88,166,255,.16);
-  --grey: #6e7681; --bad: #f85149; --good: #3fb950; --line: #e6edf3;
+  color-scheme: dark;
+  --bg: #02040a; --card: rgba(13,17,23,.72); --card2: rgba(22,27,34,.7);
+  --border: rgba(240,246,252,.1); --border-strong: rgba(240,246,252,.18);
+  --text: #c9d1d9; --strong: #f0f6fc; --muted: #8b949e;
+  --accent: #58a6ff; --accent2: #d2a8ff; --pulse: #ff7b72; --warn: #e3b341; --ok: #3fb950;
+  --bad: #ff7b72; --grey: #6e7681; --line: #f0f6fc;
+  --grad: linear-gradient(100deg,#58a6ff 0%,#d2a8ff 45%,#ff7b72 80%,#58a6ff 100%);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text);
-  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
-main { max-width: 1040px; margin: 0 auto; padding: 32px 16px 64px; }
-h1 { font-size: 26px; line-height: 1.25; margin: 0 0 8px; }
-h2 { font-size: 18px; margin: 40px 0 8px; }
-p { margin: 8px 0; }
-.lede { color: var(--muted); max-width: 70ch; }
-.links { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
-.links a { color: var(--accent); text-decoration: none; border: 1px solid var(--border);
-  border-radius: 6px; padding: 4px 10px; font-size: 14px; }
-.links a:hover { background: var(--accent-soft); }
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 12px; margin-top: 24px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-  padding: 14px 16px; }
-.card .big { font-size: 28px; font-weight: 650; font-variant-numeric: tabular-nums; }
-.card .sub { color: var(--muted); font-size: 13px; }
-.scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
-table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums;
-  font-size: 13.5px; }
-th, td { padding: 7px 7px; text-align: right; white-space: nowrap;
-  border-bottom: 1px solid var(--border); }
-th:first-child, td:first-child { text-align: left; }
-thead th { background: var(--surface); font-weight: 600; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; overflow-x: hidden; }
+a { color: var(--accent); text-decoration: none; }
+h1, h2, h3 { color: var(--strong); letter-spacing: -.02em; line-height: 1.15; }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+
+/* Backdrop */
+.backdrop { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+#mesh { position: absolute; inset: 0; width: 100%; height: 100%; }
+.aurora { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .32; mix-blend-mode: screen; }
+.a1 { width: 620px; height: 620px; background: #1f6feb; top: -220px; left: -160px; animation: d1 22s ease-in-out infinite alternate; }
+.a2 { width: 520px; height: 520px; background: #8957e5; top: 35%; right: -200px; animation: d2 26s ease-in-out infinite alternate; }
+.a3 { width: 460px; height: 460px; background: #da3633; bottom: -260px; left: 30%; opacity: .16; animation: d3 30s ease-in-out infinite alternate; }
+@keyframes d1 { to { transform: translate(180px,140px) scale(1.15); } }
+@keyframes d2 { to { transform: translate(-160px,120px) scale(.9); } }
+@keyframes d3 { to { transform: translate(-120px,-160px) scale(1.2); } }
+#progress { position: fixed; top: 0; left: 0; height: 2px; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: var(--grad); z-index: 50; }
+
+/* Nav (matches landing) */
+.nav { position: sticky; top: 0; z-index: 40; backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); background: rgba(2,4,10,.6); border-bottom: 1px solid transparent; transition: border-color .3s, background .3s; }
+.nav.scrolled { border-bottom-color: var(--border); background: rgba(2,4,10,.82); }
+.nav-in { display: flex; justify-content: space-between; align-items: center; gap: 16px; height: 64px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--strong); font-weight: 700; white-space: nowrap; }
+.logo { width: 22px; height: 22px; border: 2px solid var(--accent); border-radius: 6px; display: grid; place-items: center; animation: logo 4s ease-in-out infinite; }
+.logo i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+@keyframes logo { 50% { transform: rotate(90deg); border-radius: 50%; } }
+.nav nav { display: flex; align-items: center; gap: 24px; }
+.nav nav a:not(.btn) { color: var(--muted); font-size: .92rem; }
+.nav nav a:not(.btn):hover, .nav nav a.here { color: var(--strong); }
+.btn { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 10px; font-weight: 650; font-size: .9rem; color: var(--strong); border: 1px solid var(--border-strong); background: rgba(22,27,34,.6); transition: transform .2s, border-color .2s, background .2s; overflow: hidden; }
+.btn:hover { transform: translateY(-2px); border-color: rgba(240,246,252,.35); background: rgba(88,166,255,.08); }
+.btn.primary { background: var(--accent); color: #041222; border-color: transparent; }
+.btn.primary::before { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%); transform: translateX(-100%); animation: shine 3.5s ease-in-out infinite; }
+@keyframes shine { 60%,100% { transform: translateX(100%); } }
+
+/* Reveal */
+.js .reveal { opacity: 0; transform: translateY(26px); filter: blur(6px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1), filter .9s; transition-delay: var(--d,0s); }
+.js .reveal.in { opacity: 1; transform: none; filter: none; }
+
+/* Header */
+header.hero { padding: 72px 0 24px; }
+.kicker { color: var(--accent); font-weight: 700; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 12px; }
+h1 { font-size: clamp(2.1rem, 5vw, 3.6rem); margin: 0 0 18px; font-weight: 800; letter-spacing: -.035em; }
+.grad { background: var(--grad); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gm 8s linear infinite; }
+@keyframes gm { to { background-position: 300% 0; } }
+.lede { font-size: 1.08rem; max-width: 72ch; margin: 0; }
+.lede em { color: var(--strong); }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border-strong); background: rgba(13,17,23,.6); color: var(--text); font-size: .88rem; transition: border-color .2s, color .2s, transform .2s; }
+.chip:hover { border-color: var(--accent); color: var(--strong); transform: translateY(-2px); }
+.chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+/* Stat cards */
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 40px; }
+.card { position: relative; overflow: hidden; padding: 24px; border-radius: 18px; background: var(--card); border: 1px solid var(--border); backdrop-filter: blur(8px); }
+.card::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--grad); background-size: 300% 100%; transform: scaleX(0); transform-origin: left; transition: transform 1.4s .4s cubic-bezier(.2,.7,.2,1); animation: gm 6s linear infinite; }
+.card.in::after { transform: scaleX(1); }
+.card .big { font-size: clamp(2rem, 3.6vw, 2.7rem); font-weight: 800; color: var(--strong); font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
+.card.warn { border-color: rgba(227,179,65,.4); }
+.card.warn .big { color: var(--warn); }
+.card.warn::after { background: var(--warn); }
+.card.bad .big { color: var(--bad); }
+.card .sub { color: var(--muted); font-size: .92rem; margin-top: 6px; }
+
+/* Sections */
+section.block { margin-top: 28px; padding: 28px; border-radius: 20px; background: var(--card); border: 1px solid var(--border); backdrop-filter: blur(8px); }
+section.block h2 { font-size: clamp(1.3rem, 2.4vw, 1.7rem); margin: 0 0 8px; display: flex; align-items: center; gap: 12px; }
+section.block h2 .n { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .85rem; color: var(--strong); background: var(--grad); background-size: 300% 100%; animation: gm 6s linear infinite; }
+.note { color: var(--muted); font-size: .92rem; max-width: 90ch; margin: 6px 0; }
+.controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin: 16px 0 14px; }
+
+/* Toggle switch */
+.switch { display: inline-flex; align-items: center; gap: 10px; color: var(--text); font-size: .9rem; cursor: pointer; user-select: none; }
+.switch input { appearance: none; -webkit-appearance: none; width: 38px; height: 22px; border-radius: 999px; background: #21262d; border: 1px solid var(--border-strong); position: relative; cursor: pointer; transition: background .25s; margin: 0; }
+.switch input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--muted); transition: transform .25s, background .25s; }
+.switch input:checked { background: rgba(88,166,255,.35); border-color: var(--accent); }
+.switch input:checked::after { transform: translateX(16px); background: var(--strong); }
+select { font: inherit; font-size: .9rem; color: var(--strong); background: #0d1117; border: 1px solid var(--border-strong); border-radius: 10px; padding: 7px 12px; cursor: pointer; }
+select:focus, .switch input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+label.lab { color: var(--muted); font-size: .9rem; }
+
+/* Tables */
+.scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: rgba(2,4,10,.45); }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: .86rem; }
+th, td { padding: 10px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--border); }
+th:first-child, td:first-child { text-align: left; color: var(--strong); }
+thead th { background: rgba(22,27,34,.9); color: var(--muted); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; position: sticky; top: 0; }
+tbody tr { transition: background .2s; }
+tbody tr:hover { background: rgba(88,166,255,.06); }
 tbody tr:last-child td { border-bottom: 0; }
-td .sd { color: var(--muted); font-size: 11.5px; margin-left: 2px; }
-tr.seed td { color: var(--muted); font-size: 12.5px; }
-tr.seed td:first-child { padding-left: 24px; }
-.below { color: var(--bad); }
-.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 8px 0 12px; }
-select, button { font: inherit; font-size: 14px; color: var(--text); background: var(--surface);
-  border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; }
-label { color: var(--muted); font-size: 14px; }
-.legend { display: flex; gap: 16px; color: var(--muted); font-size: 13px; flex-wrap: wrap; }
-.sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px;
-  vertical-align: -1px; margin-right: 5px; }
-svg text { fill: var(--muted); font: 12px system-ui, sans-serif; }
-pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-  padding: 12px; overflow-x: auto; font-size: 13px; }
-.note { color: var(--muted); font-size: 13px; }
-footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
+td .sd { color: var(--muted); font-size: .74rem; margin-left: 3px; }
+tr.seed td { color: var(--muted); font-size: .8rem; background: rgba(2,4,10,.35); }
+tr.seed td:first-child { padding-left: 28px; color: var(--muted); }
+tr.fresh { animation: rowin .5s both; }
+@keyframes rowin { from { opacity: 0; transform: translateY(6px); } }
+.below { color: var(--bad); font-weight: 600; }
+.ours td:first-child::after { content: "ours"; margin-left: 8px; font-size: .68rem; padding: 1px 7px; border-radius: 999px; color: var(--accent); border: 1px solid rgba(88,166,255,.4); }
+
+/* Chart */
+.legend { display: flex; gap: 18px; color: var(--muted); font-size: .85rem; flex-wrap: wrap; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+.chart-box { padding: 12px; }
+svg text { fill: var(--muted); font: 12px ui-sans-serif, system-ui, sans-serif; }
+svg .bar { transform-box: fill-box; transform-origin: 50% 100%; animation: grow .9s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes grow { from { transform: scaleY(0); } }
+svg .bar:hover { filter: brightness(1.3); }
+svg .whisk { animation: fade .6s .8s both; }
+@keyframes fade { from { opacity: 0; } }
+
+/* Terminal */
+.term { border-radius: 14px; overflow: hidden; border: 1px solid var(--border-strong); background: #05080f; margin-top: 14px; }
+.term-top { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(22,27,34,.9); border-bottom: 1px solid var(--border); }
+.term-top i { width: 11px; height: 11px; border-radius: 50%; }
+.term-top i:nth-child(1) { background: #ff5f57; } .term-top i:nth-child(2) { background: #febc2e; } .term-top i:nth-child(3) { background: #28c840; }
+.term-top span { margin-left: 8px; color: var(--muted); font-size: .8rem; flex: 1; }
+.copy { font: inherit; font-size: .8rem; color: var(--strong); background: rgba(88,166,255,.12); border: 1px solid rgba(88,166,255,.4); border-radius: 8px; padding: 4px 10px; cursor: pointer; transition: background .2s; }
+.copy:hover { background: rgba(88,166,255,.25); }
+pre { margin: 0; padding: 16px 18px; overflow-x: auto; font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--text); }
+pre .c { color: var(--muted); } pre .p { color: var(--ok); user-select: none; }
+
+footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 56px; padding: 28px 0 40px; border-top: 1px solid var(--border); color: var(--muted); font-size: .88rem; }
+
+@media (max-width: 860px) {
+  .cards { grid-template-columns: 1fr; }
+  .nav nav a:not(.btn) { display: none; }
+  section.block { padding: 20px 16px; }
+}
+@media (max-width: 520px) { .wrap { padding: 0 16px; } header.hero { padding-top: 44px; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .js .reveal { opacity: 1; transform: none; filter: none; }
+  .card::after { transform: scaleX(1); }
+}
 </style>
 </head>
 <body>
-<main>
-  <h1>Two Axes, One Guarantee: every result, checkable</h1>
-  <p class="lede">Valence–arousal estimators on AffectNet with five uncertainty methods,
-  five seeds each. Per-axis 90% intervals cover the true VA <em>point</em> only ~86% of
-  the time; a single joint score restores 90% with smaller regions; and an expression
-  absent from calibration breaks every guarantee. Below is every number behind the
-  paper, per method, per seed and per expression.</p>
-  <div class="links">
-    <a href="/emotion-modeling">Live demo</a>
-    <a href="https://github.com/Hassan-Naeem-code/Emotion-Modelling">Code &amp; data</a>
-    <a href="https://github.com/Hassan-Naeem-code/Emotion-Modelling/tree/main/results/v2/preds_public">Per-sample predictions</a>
-    <a href="/emotion-modeling/results/data.json">This page's data (JSON)</a>
+<div class="backdrop" aria-hidden="true">
+  <canvas id="mesh"></canvas>
+  <div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div>
+</div>
+<div id="progress" aria-hidden="true"></div>
+
+<div class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/emotion-modeling/"><span class="logo" aria-hidden="true"><i></i></span>Face &amp; Pulse, Honestly</a>
+    <nav>
+      <a href="/emotion-modeling/">Home</a>
+      <a class="here" href="/emotion-modeling/results/">Results</a>
+      <a href="https://github.com/Hassan-Naeem-code/Emotion-Modelling" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a class="btn primary" href="/emotion-modeling/app/">Launch demo</a>
+    </nav>
   </div>
+</div>
+
+<main class="wrap">
+  <header class="hero">
+    <p class="kicker reveal">Research results</p>
+    <h1 class="reveal" style="--d:.08s">Two Axes, One Guarantee.<br><span class="grad">Every number, checkable.</span></h1>
+    <p class="lede reveal" style="--d:.16s">Valence–arousal estimators on AffectNet with five uncertainty methods,
+    five seeds each. Per-axis 90% intervals cover the true VA <em>point</em> only ~86% of
+    the time; a single joint score restores 90% with smaller regions; and an expression
+    absent from calibration breaks every guarantee. Below is every number, per method, per seed and per expression.</p>
+    <div class="chips reveal" style="--d:.24s">
+      <a class="chip" href="#coverage">Coverage</a>
+      <a class="chip" href="#per-expression">Per expression</a>
+      <a class="chip" href="#accuracy">Accuracy</a>
+      <a class="chip" href="#novelty">Unseen expression</a>
+      <a class="chip" href="#verify">Verify it yourself</a>
+      <a class="chip" href="https://github.com/Hassan-Naeem-code/Emotion-Modelling/tree/main/results/v2/preds_public" target="_blank" rel="noopener noreferrer">Per-sample predictions</a>
+      <a class="chip" href="/emotion-modeling/results/data.json">Raw data (JSON)</a>
+    </div>
+  </header>
 
   <div class="cards" id="cards"></div>
 
-  <h2>Coverage at nominal 90%</h2>
-  <p class="note">Joint = fraction of seen test faces whose true (valence, arousal) lies
-  in the region. Area in VA units (the square is 4). Worst = lowest joint coverage over
-  the seven seen expressions. Shift = joint coverage on corrupted images, calibrated on
-  clean data. Red = below nominal.</p>
-  <div class="controls"><label><input type="checkbox" id="seeds-cov"> show every seed</label></div>
-  <div class="scroll"><table id="cov"></table></div>
+  <section class="block reveal" id="coverage">
+    <h2><span class="n">1</span>Coverage at nominal 90%</h2>
+    <p class="note">Joint = fraction of seen test faces whose true (valence, arousal) lies
+    in the region. Area in VA units (the square is 4). Worst = lowest joint coverage over
+    the seven seen expressions. Shift = joint coverage on corrupted images, calibrated on
+    clean data. <span class="below">Red</span> = below nominal.</p>
+    <div class="controls"><label class="switch"><input type="checkbox" id="seeds-cov"> Show every seed</label></div>
+    <div class="scroll"><table id="cov"></table></div>
+  </section>
 
-  <h2>Coverage per expression</h2>
-  <div class="controls">
-    <label for="method">Method</label><select id="method"></select>
-    <span class="legend">
-      <span><span class="sw" style="background:var(--grey)"></span>Per-axis</span>
-      <span><span class="sw" style="background:var(--accent)"></span>Joint (ours)</span>
-      <span>– – nominal 90%</span>
-    </span>
-  </div>
-  <div class="scroll" style="padding:8px"><svg id="chart" viewBox="0 0 900 300" width="100%" role="img"
-    aria-label="Joint coverage by expression"></svg></div>
-  <p class="note">Bars are means over seeds; whiskers ±1 std. Contempt never appears in
-  training or calibration.</p>
+  <section class="block reveal" id="per-expression">
+    <h2><span class="n">2</span>Coverage per expression</h2>
+    <div class="controls">
+      <label class="lab" for="method">Method</label><select id="method"></select>
+      <span class="legend">
+        <span><span class="sw" style="background:var(--grey)"></span>Per-axis</span>
+        <span><span class="sw" style="background:linear-gradient(180deg,#58a6ff,#1f6feb)"></span>Joint (ours)</span>
+        <span>– – nominal 90%</span>
+      </span>
+    </div>
+    <div class="scroll chart-box"><svg id="chart" viewBox="0 0 900 300" width="100%" role="img"
+      aria-label="Joint coverage by expression"></svg></div>
+    <p class="note">Bars are means over seeds; whiskers ±1 std. Contempt never appears in
+    training or calibration.</p>
+  </section>
 
-  <h2>Accuracy and probabilistic quality</h2>
-  <p class="note">CCC higher is better; RMSE, NLL, CRPS, ECE, AURC lower is better.
-  Ensembles combine the five seeds, so they have one value.</p>
-  <div class="controls"><label><input type="checkbox" id="seeds-acc"> show every seed</label></div>
-  <div class="scroll"><table id="acc"></table></div>
+  <section class="block reveal" id="accuracy">
+    <h2><span class="n">3</span>Accuracy and probabilistic quality</h2>
+    <p class="note">CCC higher is better; RMSE, NLL, CRPS, ECE, AURC lower is better.
+    Ensembles combine the five seeds, so they have one value.</p>
+    <div class="controls"><label class="switch"><input type="checkbox" id="seeds-acc"> Show every seed</label></div>
+    <div class="scroll"><table id="acc"></table></div>
+  </section>
 
-  <h2>Can anything flag the unseen expression?</h2>
-  <p class="note">AUROC for separating contempt from seen test faces (0.5 = chance),
-  and the share of contempt flagged at a threshold set on validation data so that
-  ~5% of seen faces are flagged. Feature-space detectors use the network's penultimate
-  features.</p>
-  <div class="scroll"><table id="nov"></table></div>
-  <p class="note" id="nov-note"></p>
+  <section class="block reveal" id="novelty">
+    <h2><span class="n">4</span>Can anything flag the unseen expression?</h2>
+    <p class="note">AUROC for separating contempt from seen test faces (0.5 = chance),
+    and the share of contempt flagged at a threshold set on validation data so that
+    ~5% of seen faces are flagged. Feature-space detectors use the network's penultimate
+    features.</p>
+    <div class="scroll" style="margin-top:14px"><table id="nov"></table></div>
+    <p class="note" id="nov-note"></p>
+  </section>
 
-  <h2>Check it yourself</h2>
-  <pre>git clone https://github.com/Hassan-Naeem-code/Emotion-Modelling
-cd Emotion-Modelling &amp;&amp; pip install numpy scipy matplotlib
-# predictions ship without AffectNet labels (licence): put the dataset in data/raw, then
-make v2-labels PY=python3   # re-attaches labels, checking image ids
-make v2-verify PY=python3   # recomputes the paper's tables from the predictions and diffs them
-make v2-tables PY=python3   # regenerates every table and figure</pre>
+  <section class="block reveal" id="verify">
+    <h2><span class="n">5</span>Check it yourself</h2>
+    <p class="note">Predictions ship without AffectNet labels (licence). Put the dataset in <code>data/raw</code> and these commands rebuild every table from scratch.</p>
+    <div class="term">
+      <div class="term-top"><i></i><i></i><i></i><span>terminal</span><button class="copy" id="copy">Copy</button></div>
+<pre id="cmds"><span class="p">$ </span>git clone https://github.com/Hassan-Naeem-code/Emotion-Modelling
+<span class="p">$ </span>cd Emotion-Modelling &amp;&amp; pip install numpy scipy matplotlib
+<span class="p">$ </span>make v2-labels PY=python3   <span class="c"># re-attaches labels, checking image ids</span>
+<span class="p">$ </span>make v2-verify PY=python3   <span class="c"># recomputes the paper's tables and diffs them</span>
+<span class="p">$ </span>make v2-tables PY=python3   <span class="c"># regenerates every table and figure</span></pre>
+    </div>
+  </section>
 
-  <footer>Research artefact. Valence–arousal labels are annotators' perceptions of a
-  displayed expression, not a person's felt emotion.</footer>
+  <footer>
+    <span>© 2026 Hassan Naeem</span>
+    <span><a href="/emotion-modeling/">Home</a> · <a href="/emotion-modeling/app/">Live demo</a> · <a href="https://github.com/Hassan-Naeem-code/Emotion-Modelling" target="_blank" rel="noopener noreferrer">Code &amp; data</a></span>
+    <span>Labels are annotators' perceptions of a displayed expression, not a person's felt emotion.</span>
+  </footer>
 </main>
-<script>
-const $ = (id) => document.getElementById(id);
-const f3 = (x) => (x == null ? "–" : x.toFixed(3));
-const sd = (x) => (x == null ? "" : `<span class="sd">±${x.toFixed(3)}</span>`);
-const NOM = 0.9;
-
-function cell(v, s, opt = {}) {
-  if (v == null) return "<td>–</td>";
-  const cls = opt.cov && v < NOM ? ' class="below"' : "";
-  return `<td${cls}>${f3(v)}${s != null && opt.sd !== false ? sd(s) : ""}</td>`;
-}
-
-function table(el, cols, data, showSeeds) {
-  const head = "<thead><tr><th>Method</th>" + cols.map((c) => `<th>${c.h}</th>`).join("") + "</tr></thead>";
-  let body = "";
-  for (const m of data.methods) {
-    body += "<tr><td>" + m.label + (m.n > 1 ? ` <span class="sd">n=${m.n}</span>` : "") + "</td>" +
-      cols.map((c) => { const v = m.summary[c.k]; return v ? cell(v[0], m.n > 1 ? v[1] : null, c) : "<td>–</td>"; }).join("") + "</tr>";
-    if (showSeeds && m.n > 1) {
-      for (const [s, r] of Object.entries(m.per_seed)) {
-        body += `<tr class="seed"><td>seed ${s}</td>` + cols.map((c) => cell(r[c.k], null, c)).join("") + "</tr>";
-      }
-    }
-  }
-  el.innerHTML = head + "<tbody>" + body + "</tbody>";
-}
-
-const COV = [
-  { h: "Per-axis joint", k: "cov_perdim_joint", cov: true }, { h: "Per-axis area", k: "area_perdim" },
-  { h: "Bonferroni joint", k: "cov_bonf", cov: true }, { h: "Bonferroni area", k: "area_bonf" },
-  { h: "Joint (ours)", k: "cov_joint", cov: true }, { h: "Area (ours)", k: "area_joint" },
-  { h: "Worst expr.", k: "worst_seen_joint", cov: true }, { h: "Shift", k: "shift_cov_joint", cov: true },
-  { h: "Contempt", k: "contempt_cov_joint", cov: true },
-];
-const ACC = [
-  { h: "CCC-V", k: "ccc_v" }, { h: "CCC-A", k: "ccc_a" }, { h: "RMSE", k: "rmse" },
-  { h: "NLL", k: "nll" }, { h: "CRPS", k: "crps" }, { h: "ECE", k: "ece" }, { h: "AURC", k: "aurc" },
-  { h: "Shift CCC", k: "shift_ccc" },
-];
-
-function chart(data, key) {
-  const m = data.methods.find((x) => x.key === key);
-  const svg = $("chart");
-  const W = 900, H = 300, L = 44, B = 40, T = 12;
-  const em = data.emotions, n = em.length, gw = (W - L - 8) / n, bw = gw * 0.34;
-  const y = (v) => T + (1 - v) * (H - T - B);
-  let s = "";
-  for (const t of [0, 0.25, 0.5, 0.75, 1]) {
-    s += `<line x1="${L}" x2="${W - 8}" y1="${y(t)}" y2="${y(t)}" stroke="var(--border)"/>`;
-    s += `<text x="${L - 6}" y="${y(t) + 4}" text-anchor="end">${t.toFixed(2)}</text>`;
-  }
-  const series = [["cov_perdim_by_emotion", "var(--grey)"], ["cov_joint_by_emotion", "var(--accent)"]];
-  em.forEach((e, i) => {
-    series.forEach(([k, col], j) => {
-      const d = m.by_emotion[k]?.[e];
-      if (!d) return;
-      const x = L + i * gw + gw / 2 - bw + j * bw + 1;
-      s += `<rect x="${x}" y="${y(d[0])}" width="${bw - 2}" height="${y(0) - y(d[0])}" fill="${col}" rx="2"><title>${e}: ${d[0].toFixed(3)} ± ${d[1].toFixed(3)}</title></rect>`;
-      if (d[1] > 0) {
-        const cx = x + (bw - 2) / 2;
-        s += `<line x1="${cx}" x2="${cx}" y1="${y(Math.min(1, d[0] + d[1]))}" y2="${y(d[0] - d[1])}" stroke="var(--line)" opacity=".6"/>`;
-      }
-    });
-    s += `<text x="${L + i * gw + gw / 2}" y="${H - B + 18}" text-anchor="middle">${e}${e === "contempt" ? " (unseen)" : ""}</text>`;
-  });
-  s += `<line x1="${L}" x2="${W - 8}" y1="${y(NOM)}" y2="${y(NOM)}" stroke="var(--line)" stroke-dasharray="5 4"/>`;
-  svg.innerHTML = s;
-}
-
-function cards(data) {
-  const ev = data.methods.find((m) => m.key === "v2_evidential").summary;
-  const all = data.methods.filter((m) => m.summary.cov_perdim_joint);
-  const lo = Math.min(...all.map((m) => m.summary.cov_perdim_joint[0]));
-  const hi = Math.max(...all.map((m) => m.summary.cov_perdim_joint[0]));
-  const c = all.map((m) => m.summary.contempt_cov_joint[0]);
-  const shrink = 1 - ev.area_joint[0] / ev.area_bonf[0];
-  $("cards").innerHTML = [
-    [`${(lo * 100).toFixed(1)}–${(hi * 100).toFixed(1)}%`, "Per-axis 90% intervals: how often the true VA point is inside both, across all methods"],
-    [`${(ev.cov_joint[0] * 100).toFixed(1)}%`, `Our joint region (evidential), ${(shrink * 100).toFixed(0)}% smaller than Bonferroni for the same guarantee`],
-    [`${(Math.min(...c) * 100).toFixed(0)}–${(Math.max(...c) * 100).toFixed(0)}%`, "Coverage on contempt, the expression no model saw in training or calibration"],
-  ].map(([b, t]) => `<div class="card"><div class="big">${b}</div><div class="sub">${t}</div></div>`).join("");
-}
-
-function novelty(data) {
-  const nv = data.novelty, el = $("nov");
-  if (!nv) { el.innerHTML = "<tbody><tr><td>Novelty results not included in this build.</td></tr></tbody>"; return; }
-  const NAMES = { sigma: "Predictive uncertainty (Σσ)", maha: "Mahalanobis", maha_cls: "Class-cond. Mahalanobis", knn: "k-NN (k=50)" };
-  const MN = { v2_evidential: "Evidential", v2_gaussian_nll: "Gaussian", v2_baseline: "Deterministic" };
-  let body = "";
-  for (const [mk, ml] of Object.entries(MN)) {
-    const r = nv[mk]; if (!r) continue;
-    for (const [dk, dl] of Object.entries(NAMES)) {
-      const d = r[dk]; if (!d) continue;
-      body += `<tr><td>${ml} · ${dl}</td>${cell(d.auroc[0], d.auroc[1])}${cell(d.tpr[0], d.tpr[1])}${cell(d.fpr[0], d.fpr[1])}${cell(d.shift_auroc[0], d.shift_auroc[1])}</tr>`;
-    }
-  }
-  el.innerHTML = "<thead><tr><th>Model · detector</th><th>Contempt AUROC</th><th>Contempt flagged</th><th>Seen flagged</th><th>Corruption AUROC</th></tr></thead><tbody>" + body + "</tbody>";
-  $("nov-note").textContent = "Contempt faces' nearest training images are mostly neutral and happy: they look in-distribution, so detectors that only look at the input cannot single them out.";
-}
-
-fetch("/emotion-modeling/results/data.json").then((r) => r.json()).then((data) => {
-  cards(data);
-  const draw = () => {
-    table($("cov"), COV, data, $("seeds-cov").checked);
-    table($("acc"), ACC, data, $("seeds-acc").checked);
-  };
-  $("seeds-cov").onchange = draw; $("seeds-acc").onchange = draw; draw();
-  const sel = $("method");
-  sel.innerHTML = data.methods.map((m) => `<option value="${m.key}">${m.label}</option>`).join("");
-  sel.value = "v2_evidential";
-  sel.onchange = () => chart(data, sel.value); chart(data, sel.value);
-  novelty(data);
-}).catch((e) => { document.querySelector("main").insertAdjacentHTML("beforeend", `<p class="below">Could not load data.json: ${e}</p>`); });
-</script>
+<script src="/emotion-modeling/results/app.js" defer></script>
 </body>
 </html>

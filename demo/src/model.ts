@@ -11,10 +11,9 @@ import { THRESHOLDS } from "./config";
 
 // ONNX Runtime Web needs its WebAssembly runtime files. Without this, session
 // creation throws and the whole demo silently falls back to the placeholder.
-// Load the wasm from a CDN and run single-threaded so we don't require the
-// SharedArrayBuffer / cross-origin-isolation headers a dev server lacks.
-ort.env.wasm.wasmPaths =
-  "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/";
+// The wasm is served from our own origin (copied by scripts/copy-vendor.mjs) so the page's CSP can stay
+// 'self'-only; run single-threaded so we don't require the SharedArrayBuffer / cross-origin-isolation headers.
+ort.env.wasm.wasmPaths = `${import.meta.env.BASE_URL}vendor/ort/`;
 ort.env.wasm.numThreads = 1;
 
 export interface ModelMeta {
