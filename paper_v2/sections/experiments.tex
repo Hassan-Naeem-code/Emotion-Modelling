@@ -1,0 +1,61 @@
+\section{Experimental Setup}
+\label{sec:experiments}
+
+\paragraph{Data.} We use a public redistribution of the AffectNet VA
+annotations~\cite{mollahosseini2017affectnet} with its own partition:
+$58{,}803$ training, $3{,}500$ validation, and $5{,}000$ test images, each with
+continuous VA in $[-1,1]^2$ and a categorical expression label. The partition
+differs from the official one in two ways that matter here. First, the training
+and validation splits are class-balanced (validation has $500$ images of each of
+seven expressions), while the test split follows the natural, heavily imbalanced
+distribution (from $2{,}354$ \emph{happy} down to $59$ \emph{disgust}). Second,
+\emph{contempt} appears only in the test split ($n=70$). We exploit both: the
+first is a label shift between calibration and test data, and the second gives
+an unseen expression. All seen-data metrics exclude contempt, which is reported
+separately.
+
+\paragraph{Protocol.} We hold out a fixed $5\%$ of the training split
+($2{,}940$ images, identical for every run) for checkpoint selection. The
+validation split is used \emph{only} for conformal calibration and is never seen
+during training or selection, so that calibration and test data are
+exchangeable up to the label shift above. (Using one split for both purposes, as
+is common, weakens the conformal guarantee.) We set $\alpha=0.1$ throughout.
+
+\paragraph{Training.} All heads share the recipe: AdamW (learning rate
+$3\times10^{-4}$, weight decay $10^{-4}$), batch size $64$, gradient clipping at
+$1.0$, $6$ epochs with $5\%$ linear warm-up and cosine decay, at
+$224\times224$. Augmentation is label-preserving: random resized crops (scale
+$0.8$--$1$), horizontal flips, rotations up to $10^\circ$, and mild colour jitter.
+It contains no blur, noise, or compression, so the corruptions used at test time
+remain unseen. The checkpoint with the lowest held-out training loss is kept (NLL
+for the probabilistic heads and MSE for the deterministic one, both proper
+scores). Each head is trained with five seeds ($1$--$5$). Training one model
+takes about $70$ minutes on an Apple M3 Pro.
+
+\paragraph{Distribution shift.} As a covariate shift with fixed labels, we apply
+Gaussian blur, Gaussian noise, brightness, contrast, and JPEG compression to the
+test images at severity $3$, cycling through the five types by image index in the
+spirit of ImageNet-C~\cite{hendrycks2019benchmarking}. The conformal quantile is
+calibrated on clean validation data and applied unchanged to corrupted inputs.
+
+\paragraph{Metrics.} \emph{Accuracy:} CCC per axis and RMSE.
+\emph{Probabilistic quality:} NLL and CRPS (proper scoring
+rules~\cite{gneiting2007strictly}; CRPS uses the Gaussian with the predicted mean
+and variance), and quantile calibration error
+(ECE)~\cite{kuleshov2018calibrated}. \emph{Selective prediction:} area under the
+risk--coverage curve (AURC). \emph{Coverage:} joint coverage of the true VA point
+and mean region area, overall and per expression. \emph{Detection:} AUROC of the
+uncertainty for clean versus corrupted inputs, and for seen versus contempt.
+Single models are reported as mean $\pm$ standard deviation over five seeds;
+ensembles combine the five seeds and are reported once.
+
+\paragraph{Reproducibility.} Each model's per-sample predictions are saved once
+(\texttt{eval/dump\_preds.py}), and every number in this paper is computed from
+them by one script (\texttt{eval/analyze.py}). The per-sample predictions of all
+$20$ model files are released with the code (model outputs and image ids only;
+the labels are re-attached from the user's copy of the dataset, which we do not
+redistribute), so every table and figure can be recomputed without a GPU
+(\texttt{make v2-tables}), and
+\texttt{make v2-verify} checks the tables in this paper against them. Code,
+configs, predictions, and checkpoints:
+\url{https://github.com/Hassan-Naeem-code/Emotion-Modelling}.

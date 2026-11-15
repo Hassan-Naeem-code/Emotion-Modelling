@@ -1,0 +1,22 @@
+\section{Conclusion}
+
+A VA estimate is one point in the plane, so its uncertainty should be one region
+in the plane. Calibrating valence and arousal separately, as is common, leaves
+the guarantee on the wrong event and under-covers the VA point by about
+four to five points at nominal $90\%$. One max-normalised score fixes this with a
+finite-sample joint guarantee and smaller regions than the Bonferroni correction.
+It costs a single line of code, and we recommend it as the default.
+
+The harder finding is where guarantees end. An expression absent from the
+calibration data loses coverage under every method we tried, and none of the
+uncertainty estimators reliably notices. Conformal methods cannot fix this by
+construction, so a deployed affect estimator needs either calibration data that
+spans the expressions it will meet or an uncertainty signal that actually rises
+on novel ones. We found neither in the standard toolkit.
+
+\paragraph{Limitations.} We study still images from one dataset family. A
+cross-dataset shift (AFEW-VA, Aff-Wild2) and annotator-level labels would test
+whether the uncertainty tracks human disagreement. Our unseen expression has only
+$70$ examples, so its coverage estimates carry wide intervals (we report them).
+The categorical labels used for the per-expression audit are themselves noisy
+annotations of a continuous state.

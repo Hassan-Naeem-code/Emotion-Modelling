@@ -1,0 +1,39 @@
+\section{Ethical Considerations}
+\label{sec:ethics}
+
+Facial affect inference is a dual-use technology. Much of its deployed use
+involves inferring the internal states of people who have not asked for it, which
+is what our design is meant to resist. We state our position explicitly.
+
+\paragraph{What the system claims.} It estimates a \emph{perceived} affective
+display along valence and arousal, as annotated by human raters. It does not
+recover a person's felt emotion, intent, or truthfulness, and the dimensional
+target is not a diagnosis. The scientific premise that discrete internal
+emotional states can be read off a face is contested~\cite{russell1980circumplex};
+we therefore predict the continuous, annotator-defined quantity our labels
+actually contain, and attach an interval to every prediction rather than a
+confident point.
+
+\paragraph{Intended and excluded uses.} The demonstrator estimates the user's own
+state, on their own device, at their request. We explicitly exclude monitoring of
+people who are not the operator (employee, student, candidate, or suspect
+assessment) and any deception-detection or mental-health screening
+application. Abstention is a first-class outcome for exactly this reason: a
+system that must always answer invites use in settings where it should not be
+used at all.
+
+\paragraph{Privacy.} No imagery or biometric signal leaves the device in the
+demonstrator; inference runs in the browser and no frames are transmitted or
+stored. We do not redistribute AffectNet, which is registration-gated, and we
+commit no image data to the public repository, only metrics and rendered
+figures.
+
+\paragraph{Bias and unequal performance.} We report aggregate accuracy and
+calibration only. AffectNet's demographic composition is not balanced, and
+expression annotation is known to carry cultural and racial bias; aggregate
+calibration can therefore hide substantially worse calibration for
+under-represented groups. We make no fairness claim, and we regard per-group
+calibration as the most important extension of this work: an abstention threshold
+calibrated on a population that does not represent the user is a threshold that
+fails silently for that user, which is the exact failure mode this paper argues
+against.

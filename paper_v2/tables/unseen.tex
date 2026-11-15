@@ -1,0 +1,13 @@
+\begin{tabular}{lccc}
+\toprule
+Method & RMSE$\downarrow$ & Joint cov. & AUROC$\uparrow$ \\
+\midrule
+Deterministic & 0.659$_{\pm.020}$ & 0.386$_{\pm.024}$ & -- \\
+Gaussian & 0.654$_{\pm.014}$ & 0.369$_{\pm.046}$ & 0.594$_{\pm.037}$ \\
+Evidential & 0.681$_{\pm.013}$ & 0.386$_{\pm.039}$ & 0.583$_{\pm.011}$ \\
+MC-dropout & 0.681$_{\pm.013}$ & 0.383$_{\pm.037}$ & 0.583$_{\pm.011}$ \\
+Gaussian ens. & \textbf{0.650} & 0.300 & \textbf{0.602} \\
+Evidential ens. & 0.678 & 0.343 & 0.583 \\
+\bottomrule
+\end{tabular}
+% Wilson 95% half-width at p=0.4, n=70: 0.112

@@ -1,0 +1,62 @@
+% v2 (resubmission). Build: pdflatex main.tex && bibtex main && pdflatex main.tex x2
+% Every \tbd{} is a number that comes from `python -m eval.analyze` over the
+% 5-seed v2 run; none may remain at submission (grep -n tbd sections/*.tex).
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\newcommand{\tbd}[1]{\textcolor{red}{#1}}
+\newtheorem{proposition}{Proposition}
+
+\title{Two Axes, One Guarantee:\\
+       Joint Conformal Uncertainty for Valence--Arousal Estimation,\\
+       and Where It Breaks}
+\author{Hassan Naeem\\
+        \normalsize Independent Researcher\\
+        \normalsize \texttt{https://hassan-naeem.com}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Uncertainty-aware affect estimators increasingly attach prediction intervals to
+their valence and arousal (VA) outputs, typically by calibrating each axis
+separately. We show that this common practice gives a guarantee about the wrong
+object. A VA estimate is a single point on the circumplex, but per-axis
+intervals at a nominal $90\%$ jointly contain the true point only
+$86\%$ of the time on AffectNet, and the shortfall is not evenly
+spread: the worst-covered expression falls to $78$--$84\%$. We replace the
+per-axis score with a single variance-normalised max-score that yields a
+rectangular VA region with a finite-sample joint guarantee. It restores nominal
+joint coverage and is up to $13\%$ smaller than the Bonferroni correction
+that achieves the same guarantee. We then ask where any such guarantee breaks.
+AffectNet's \emph{contempt} expression is absent from the training and
+calibration data of the release we study, which makes it a natural unseen
+expression. On it, every method we evaluate loses its guarantee (joint coverage
+$30$--$39\%$), and none of five uncertainty estimators (heteroscedastic
+Gaussian, deep evidential regression, MC-dropout, and deep ensembles of each)
+flags it reliably (AUROC $\le0.60$); ensembles even lower its coverage. Results are over five seeds with
+proper scoring rules, a calibration split that is never used for model selection,
+and a corruption shift. Joint coverage is cheap to obtain and should be the
+default; detecting unseen expressions remains open.
+\end{abstract}
+
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/method}
+\input{sections/experiments}
+\input{sections/results}
+\input{sections/ethics}
+\input{sections/conclusion}
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}

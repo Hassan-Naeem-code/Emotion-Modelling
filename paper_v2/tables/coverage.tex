@@ -1,0 +1,13 @@
+\begin{tabular}{lcccccccc}
+\toprule
+ & \multicolumn{2}{c}{Per-axis} & \multicolumn{2}{c}{Bonferroni} & \multicolumn{2}{c}{Max-score (ours)} & \multicolumn{2}{c}{Worst / Shift (ours)} \\
+Method & Joint & Area & Joint & Area & Joint & Area & Worst & Shift \\
+\midrule
+Deterministic & 0.860$_{\pm.005}$ & 0.991$_{\pm.015}$ & 0.922$_{\pm.005}$ & 1.561$_{\pm.028}$ & 0.920$_{\pm.005}$ & 1.517$_{\pm.023}$ & 0.868$_{\pm.014}$ & 0.809$_{\pm.047}$ \\
+Gaussian & 0.853$_{\pm.007}$ & 0.792$_{\pm.021}$ & 0.929$_{\pm.007}$ & 1.281$_{\pm.048}$ & 0.921$_{\pm.005}$ & 1.186$_{\pm.039}$ & 0.879$_{\pm.019}$ & 0.879$_{\pm.066}$ \\
+Evidential & 0.861$_{\pm.003}$ & 0.826$_{\pm.018}$ & 0.941$_{\pm.003}$ & 1.567$_{\pm.057}$ & 0.930$_{\pm.005}$ & 1.388$_{\pm.048}$ & \textbf{0.905}$_{\pm.007}$ & 0.920$_{\pm.023}$ \\
+MC-dropout & 0.860$_{\pm.004}$ & 0.822$_{\pm.016}$ & 0.941$_{\pm.003}$ & 1.566$_{\pm.052}$ & 0.929$_{\pm.004}$ & 1.376$_{\pm.049}$ & 0.904$_{\pm.007}$ & 0.920$_{\pm.023}$ \\
+Gaussian ens. & 0.855 & 0.717 & 0.928 & 1.124 & 0.917 & \textbf{1.024} & 0.883 & 0.924 \\
+Evidential ens. & 0.860 & 0.721 & 0.937 & 1.348 & 0.924 & 1.178 & \textbf{0.905} & 0.934 \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,74 @@
+\section{Method}
+\label{sec:method}
+
+\subsection{Predictors}
+A shared ImageNet-pretrained EfficientNet-B0 encoder maps a face crop to a feature
+vector, followed by one of three heads predicting VA in $[-1,1]^2$. The
+\textbf{deterministic} head is trained with MSE and has no uncertainty. The
+\textbf{Gaussian} head predicts a mean $\hat\mu_d$ and variance $\hat\sigma^2_d$
+per axis $d\in\{v,a\}$ and is trained with the Gaussian NLL. The
+\textbf{evidential} head~\cite{amini2020evidential} predicts
+Normal--Inverse-Gamma parameters $(\gamma,\nu,\alpha,\beta)$ per axis, with
+predictive mean $\gamma$ and predictive variance
+$\beta(1+\nu)/(\nu(\alpha-1))$, the sum of its aleatoric term $\beta/(\alpha-1)$
+and epistemic term $\beta/(\nu(\alpha-1))$. Its predictive distribution is a
+Student-$t$ with $2\alpha$ degrees of freedom, which we use for its NLL.
+
+From these we form two further methods without additional training.
+\textbf{MC-dropout}~\cite{gal2016dropout} keeps the encoder's dropout ($p=0.2$,
+the training rate) active for $20$ passes of the evidential model; its variance is
+the mean predicted variance plus the variance of the pass means.
+\textbf{Deep ensembles}~\cite{lakshminarayanan2017simple} combine the five
+independently seeded models of one head, moment-matched in the same way. All
+methods thus output a mean $\hat\mu(x)\in\mathbb{R}^2$ and a scale
+$\hat\sigma(x)\in\mathbb{R}^2_{>0}$; for the deterministic head we set
+$\hat\sigma\equiv 1$, which reduces every construction below to plain
+absolute-residual conformal prediction.
+
+\subsection{Per-axis conformal intervals (the common practice)}
+Given a calibration set $\{(x_i,y_i)\}_{i=1}^n$ exchangeable with the test data,
+the per-axis construction computes normalised scores
+$s_{i,d}=|y_{i,d}-\hat\mu_d(x_i)|/\hat\sigma_d(x_i)$, takes
+$q_d$ as the $\lceil(n{+}1)(1-\alpha)\rceil$-th smallest $s_{i,d}$, and outputs
+$C_d(x)=\hat\mu_d(x)\pm q_d\,\hat\sigma_d(x)$. Each axis is covered with
+probability at least $1-\alpha$. The VA point is covered when \emph{both} are,
+which the union bound only guarantees with probability $1-2\alpha$.
+
+\subsection{Joint conformal region}
+We use one score per sample, the larger of the two normalised residuals,
+\begin{equation}
+  s_i=\max_{d\in\{v,a\}}\frac{|y_{i,d}-\hat\mu_d(x_i)|}{\hat\sigma_d(x_i)},
+  \label{eq:maxscore}
+\end{equation}
+take $q$ as its $\lceil(n{+}1)(1-\alpha)\rceil$-th smallest value, and output the
+rectangle $C(x)=\prod_{d}[\hat\mu_d(x)\pm q\,\hat\sigma_d(x)]$.
+
+\begin{proposition}\label{prop:joint}
+If the calibration and test pairs are exchangeable, then
+$\Pr\{y\in C(x)\}\ge 1-\alpha$.
+\end{proposition}
+\begin{proof}
+$y\in C(x)$ if and only if $s(x,y)\le q$, where $s$ is the scalar score of
+Eq.~\eqref{eq:maxscore}. The standard split-conformal argument for a scalar score
+then applies unchanged~\cite{lei2018distribution}.
+\end{proof}
+
+The \textbf{Bonferroni} alternative runs the per-axis construction at level
+$\alpha/2$. It has the same guarantee but ignores that the two normalised
+residuals are dependent, so it is conservative. The max-score adapts to that
+dependence without modelling it, unlike copula
+approaches~\cite{messoudi2021copula}. The region inherits the predictor's
+heteroscedasticity through $\hat\sigma$, so uncertain inputs get larger regions,
+and it is the same object our on-device demonstrator uses as its abstention
+signal.\footnote{Live in-browser demo, with the region drawn on the VA plane:
+\url{https://va-uncertainty-demo.vercel.app}. No frames leave the device.}
+
+\subsection{Group coverage and unseen expressions}
+Marginal coverage can hide groups that are under-covered~\cite{romano2020malice}.
+We report joint coverage separately for each AffectNet expression category and
+summarise it by the worst seen category. The categorical labels are used only for
+this audit; no model sees them. For inputs whose kind is absent from the
+calibration data, no conformal method can promise coverage, so the remaining
+safeguard is the uncertainty itself. We measure whether it rises on such inputs by
+the AUROC of the total predictive standard deviation
+$\sum_d\hat\sigma_d$ for separating them from the seen test inputs.

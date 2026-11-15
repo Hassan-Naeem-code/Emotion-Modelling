@@ -21,6 +21,7 @@ help:
 	@echo "make v2-verify   - recompute into a temp dir and diff against the committed tables"
 	@echo "make arxiv-v2    - build + verify the paper_v2 arXiv tarball into arxiv/v2/"
 	@echo "make test        - run the Python unit tests"
+	@echo "make demo-deploy - test, build locally and deploy the demo to Vercel"
 	@echo "make demo        - run the in-browser demo (cd demo && npm run dev)"
 
 install:
@@ -90,6 +91,12 @@ demo-install:
 
 demo:
 	cd demo && npm run dev
+
+# Deploy the demo + results explorer. Built locally and uploaded prebuilt: the
+# ONNX models are not in git, and Vercel's uploader would apply the repo-level
+# `results/*` ignore rule to demo/public/results. Git-triggered builds are off.
+demo-deploy:
+	cd demo && npm test && vercel build --prod --yes && vercel deploy --prebuilt --prod --yes
 
 clean:
 	rm -rf results/*/ paper/*.png paper/*.tex

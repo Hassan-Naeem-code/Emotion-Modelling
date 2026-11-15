@@ -14,6 +14,40 @@ Two deliverables, one model core:
 > continuous VA in [-1, 1], never the 7 discrete "basic emotions" (an optional
 > coarse readout may be derived from VA *for display only*).
 
+## v2: "Two Axes, One Guarantee" (current paper)
+
+**Paper:** `paper_v2/` · **Live demo:** https://va-uncertainty-demo.vercel.app ·
+**Every result, per seed and per expression:** https://va-uncertainty-demo.vercel.app/results/
+
+Findings (AffectNet-VA, 5 uncertainty methods × 5 seeds):
+
+1. Per-axis 90% conformal intervals contain the true VA *point* only 85–86% of
+   the time, for every method.
+2. One max-normalised score gives a rectangular VA region with a finite-sample
+   joint guarantee: 92–93% coverage, up to 13% smaller than Bonferroni.
+3. Learned uncertainty keeps every seen expression near 90% and holds coverage
+   under corruption (0.92 vs 0.81 for a deterministic model at equal accuracy).
+4. *Contempt*, absent from training and calibration, drops to 30–39% coverage,
+   and nothing flags it: not predictive uncertainty, not ensembles, not
+   feature-space detectors, because it looks like neutral/happy faces.
+
+**Check every number without a GPU.** The per-sample predictions of all 20 model
+files are committed in `results/v2/preds_public/` (9 MB). AffectNet's licence
+forbids redistributing its labels, so they hold model outputs and image ids only;
+download the AffectNet-VA release (Kaggle `jishnusaravanan/affectnetvae`) into
+`data/raw/` and re-attach them:
+
+```bash
+pip install numpy scipy matplotlib
+make v2-labels PY=python3   # rebuild results/v2/preds from your dataset copy (ids are checked)
+make v2-verify PY=python3   # recompute the paper's tables and diff them against paper_v2/tables
+make v2-tables PY=python3   # regenerate every table and figure
+```
+
+**Retrain from scratch:** `bash scripts/run_v2.sh` (about 70 min per model on an
+M3 Pro; resumable). Checkpoints are attached to the GitHub release. Backbone
+check on Colab: `V2_BACKBONE_COLAB.md`.
+
 ## Quickstart (Track A)
 
 ```bash

@@ -1,0 +1,51 @@
+\section{Introduction}
+
+Facial affect is commonly estimated as a point in the two-dimensional
+valence--arousal (VA) plane of the circumplex model~\cite{russell1980circumplex},
+rather than as one of a few discrete categories. A growing line of work attaches
+uncertainty to these estimates, through heteroscedastic likelihoods, deep
+evidential regression~\cite{amini2020evidential,wu2023deer}, or ensembles, and
+converts that uncertainty into prediction intervals by split conformal
+calibration~\cite{vovk2005algorithmic,lei2018distribution}. The appeal is a
+finite-sample guarantee: on exchangeable data, a $90\%$ interval contains the
+truth at least $90\%$ of the time, whatever the model.
+
+That guarantee is only as useful as the event it is stated about. In practice
+the intervals are calibrated per axis, one for valence and one for arousal, and
+each comes with its own marginal guarantee. But a downstream consumer of a VA
+estimate (an abstention rule, a display, a decision) uses the \emph{pair}. The
+event that matters is that the true point lies in the predicted region, and two
+marginal $90\%$ guarantees imply only $80\%$ for that event. The question of
+which event the guarantee is about, and for whom it holds, is the subject of
+this paper.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+  \item \textbf{A diagnosis.} On AffectNet~\cite{mollahosseini2017affectnet},
+        per-axis conformal intervals at nominal $90\%$ jointly cover the true VA
+        point only $85$--$86\%$ of the time, across every uncertainty method we test.
+        Coverage is also uneven across expressions, with the worst seen expression
+        at $78$--$84\%$ depending on the predictor.
+  \item \textbf{A simple fix with a guarantee.} A single max-normalised
+        nonconformity score gives a rectangular VA region with finite-sample
+        joint coverage (Proposition~\ref{prop:joint}). It restores nominal joint
+        coverage, improves the worst-expression coverage, and is up to $13\%$ smaller
+        than the Bonferroni correction that gives the same guarantee.
+  \item \textbf{Where the guarantee breaks.} The AffectNet release we study
+        contains \emph{contempt} only in its test split, giving a natural unseen
+        expression. There the guarantee fails for every method
+        ($30$--$39\%$ coverage), and no uncertainty estimator we evaluate
+        flags it reliably. This is a concrete, reproducible instance of the
+        limits of distribution-free inference~\cite{barber2021limits} in affect.
+  \item \textbf{A clean, broader benchmark.} Five uncertainty methods
+        (deterministic, Gaussian, deep evidential regression, MC-dropout, deep
+        ensembles) over five seeds, scored with proper scoring
+        rules~\cite{gneiting2007strictly} as well as calibration error, with a
+        conformal calibration split that is never used for model selection.
+\end{enumerate}
+
+\paragraph{Scope.} We study still images and a single dataset family. The claims
+are about what calibrated VA uncertainty does and does not guarantee, not about
+state-of-the-art accuracy, and we position our predictor against published
+results in Section~\ref{sec:results}. The system is intended for estimating a
+consenting user's own state; Section~\ref{sec:ethics} discusses its limits.
