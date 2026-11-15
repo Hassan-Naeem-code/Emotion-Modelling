@@ -2,8 +2,45 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/emotion-modeling",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/emotion-modeling{/}?",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/emotion-modeling/results{/}?",
+      "destination": "/results/index.html"
+    },
+    {
+      "source": "/emotion-modeling/:path*",
+      "destination": "/:path*"
+    }
+  ],
   "headers": [
-    { "source": "/(.*).onnx", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }] },
-    { "source": "/(.*)", "headers": [{ "key": "Permissions-Policy", "value": "camera=(self)" }] }
+    {
+      "source": "/(.*).onnx",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(self)"
+        }
+      ]
+    }
   ]
 }

@@ -76,10 +76,10 @@ footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
   absent from calibration breaks every guarantee. Below is every number behind the
   paper, per method, per seed and per expression.</p>
   <div class="links">
-    <a href="/">Live demo</a>
+    <a href="/emotion-modeling">Live demo</a>
     <a href="https://github.com/Hassan-Naeem-code/Emotion-Modelling">Code &amp; data</a>
     <a href="https://github.com/Hassan-Naeem-code/Emotion-Modelling/tree/main/results/v2/preds_public">Per-sample predictions</a>
-    <a href="data.json">This page's data (JSON)</a>
+    <a href="/emotion-modeling/results/data.json">This page's data (JSON)</a>
   </div>
 
   <div class="cards" id="cards"></div>
@@ -231,7 +231,7 @@ function novelty(data) {
   $("nov-note").textContent = "Contempt faces' nearest training images are mostly neutral and happy: they look in-distribution, so detectors that only look at the input cannot single them out.";
 }
 
-fetch("data.json").then((r) => r.json()).then((data) => {
+fetch("/emotion-modeling/results/data.json").then((r) => r.json()).then((data) => {
   cards(data);
   const draw = () => {
     table($("cov"), COV, data, $("seeds-cov").checked);

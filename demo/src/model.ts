@@ -67,9 +67,9 @@ export class AffectPredictor {
 
   async load(): Promise<void> {
     try {
-      const metaResp = await fetch("/model_meta.json");
+      const metaResp = await fetch(`${import.meta.env.BASE_URL}model_meta.json`);
       if (metaResp.ok) this.meta = await metaResp.json();
-      this.session = await ort.InferenceSession.create("/model.onnx", {
+      this.session = await ort.InferenceSession.create(`${import.meta.env.BASE_URL}model.onnx`, {
         executionProviders: ["wasm"],
       });
       this.isReal = true;
@@ -165,13 +165,13 @@ export class EmotionPredictor {
 
   async load(): Promise<void> {
     try {
-      const meta = await (await fetch("/emotion_meta.json")).json();
+      const meta = await (await fetch(`${import.meta.env.BASE_URL}emotion_meta.json`)).json();
       this.classes = meta.classes;
       this.size = meta.image_size;
       this.mean = meta.norm_mean;
       this.std = meta.norm_std;
       this.valAcc = meta.val_acc ?? null;
-      this.session = await ort.InferenceSession.create("/emotion.onnx", {
+      this.session = await ort.InferenceSession.create(`${import.meta.env.BASE_URL}emotion.onnx`, {
         executionProviders: ["wasm"],
       });
       this.available = true;
