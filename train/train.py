@@ -51,6 +51,23 @@ def _evaluate(model, loader, device, loss_fn):
     return {"loss": float(np.mean(losses)), "mse": mse, "calibration": ece}
 
 
+def _scheduler(opt, cfg, total_steps: int):
+    """Linear warmup then cosine decay, stepped per batch. 'constant' keeps the
+    original fixed learning rate (what the v1 paper runs used)."""
+    kind = cfg["train"].get("schedule", "constant")
+    if kind == "constant" or total_steps <= 0:
+        return None
+    warm = max(1, int(cfg["train"].get("warmup_frac", 0.05) * total_steps))
+
+    def lr_lambda(step):
+        if step < warm:
+            return (step + 1) / warm
+        t = (step - warm) / max(1, total_steps - warm)
+        return 0.5 * (1.0 + np.cos(np.pi * min(1.0, t)))
+
+    return torch.optim.lr_scheduler.LambdaLR(opt, lr_lambda)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
@@ -88,12 +105,21 @@ def main():
                  f"training split (it's a test/shift-only set). Train on AffectNet "
                  f"or synthetic, and use this dataset via --ood-dataset at eval.")
     train_loader = _loader(train_ds, cfg, shuffle=True)
-    val_loader = _loader(val_ds, cfg, shuffle=False)
+    # Select checkpoints on a held-out slice of Train when the loader provides one
+    # (data.holdout_select), so Validation stays untouched for conformal calibration.
+    select_ds = getattr(train_ds, "select_ds", None)
+    val_loader = _loader(select_ds if select_ds is not None else val_ds, cfg, shuffle=False)
+    print(f"[{cfg['name']}] train={len(train_ds)} select="
+          f"{'held-out train slice' if select_ds is not None else 'Validation'}"
+          f"({len(val_loader.dataset)}) augment={cfg['train'].get('augment', False)}")
 
     model = AffectModel(cfg).to(device)
     loss_fn = build_loss(cfg["model"]["head"], cfg)
     opt = torch.optim.AdamW(model.parameters(), lr=cfg["train"]["lr"],
                             weight_decay=cfg["train"]["weight_decay"])
+    sched = _scheduler(opt, cfg, epochs * len(train_loader))
+    use_amp = device == "cuda"
+    scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
 
     select_by = cfg["train"]["select_by"]    # 'calibration' or 'mse'
     best = float("inf")
@@ -104,11 +130,18 @@ def main():
         for x, y in train_loader:
             x, y = x.to(device), y.to(device)
             opt.zero_grad()
-            out = model(x)
+            with torch.autocast("cuda", enabled=use_amp):
+                feats = model.backbone(x)
+            # Heads and losses in fp32: the NIG/Gaussian likelihoods are not fp16-safe.
+            out = model.head(feats.float())
             loss = loss_fn(out, y)
-            loss.backward()
+            scaler.scale(loss).backward()
+            scaler.unscale_(opt)
             torch.nn.utils.clip_grad_norm_(model.parameters(), cfg["train"]["grad_clip"])
-            opt.step()
+            scaler.step(opt)
+            scaler.update()
+            if sched is not None:
+                sched.step()
             ep_losses.append(loss.item())
 
         val = _evaluate(model, val_loader, device, loss_fn)
@@ -123,6 +156,9 @@ def main():
             best = score
             torch.save({"model": model.state_dict(), "cfg": cfg,
                         "epoch": ep, "val": val}, out_dir / "best.pt")
+        with open(out_dir / "history.json", "w") as f:   # survives an interrupted run
+            json.dump({"config": cfg, "history": history, "best": best,
+                       "select_by": select_by}, f, indent=2)
 
     with open(out_dir / "history.json", "w") as f:
         json.dump({"config": cfg, "history": history, "best": best,

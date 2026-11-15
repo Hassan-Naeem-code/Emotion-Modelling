@@ -1,0 +1,17 @@
+_inherit: gaussian_nll.yaml
+name: v2_gaussian_nll
+# v2 recipe (resubmission). Same model and head as v1; the training is fixed:
+# augmentation + warmup/cosine schedule, and checkpoints are selected on a 5%
+# held-out slice of Train by held-out loss (a proper score), so the Validation
+# split is never touched in training and stays clean for conformal calibration.
+data:
+  name: affectnet_va
+  holdout_select: 0.05
+model:
+  backbone: efficientnet_b0
+train:
+  epochs: 6
+  augment: true
+  schedule: cosine
+  warmup_frac: 0.05
+  select_by: loss

@@ -1,0 +1,9 @@
+_inherit: v2_baseline.yaml
+name: v2c_baseline
+# Backbone-robustness check: same v2 recipe and protocol, ConvNeXt-Tiny
+# (ImageNet-22k pretrained, 28M params) instead of EfficientNet-B0 (5M).
+# ConvNeXt is trained at a lower peak learning rate, as is standard for it.
+model:
+  backbone: convnext_tiny.fb_in22k_ft_in1k
+train:
+  lr: 0.0001
