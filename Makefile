@@ -2,7 +2,7 @@
 PY ?= python
 SEED ?= 1337
 
-.PHONY: v2-labels v2-tables v2-verify arxiv-v2 help install test dryrun train-all eval-all ensemble shift aggregate paper-table paper-figures arxiv repro demo-install demo clean
+.PHONY: tmlr v2-labels v2-tables v2-verify arxiv-v2 help install test dryrun train-all eval-all ensemble shift aggregate paper-table paper-figures arxiv repro demo-install demo clean
 
 help:
 	@echo "make install     - pip install pinned requirements"
@@ -106,23 +106,35 @@ clean:
 # Every number in paper_v2 is computed from the per-sample predictions committed
 # under results/v2/preds (one .npz per model and seed); no GPU is needed.
 V2_PREDS ?= results/v2/preds
+V2C_PREDS ?= results/v2c/preds
 # The public prediction files carry no AffectNet labels (licence); this rebuilds
 # the full files from your own copy of the dataset under data/raw/AffectNetVA.
 v2-labels:
 	$(PY) -m eval.labels attach --src results/v2/preds_public --dst $(V2_PREDS) --data-root data/raw
+	$(PY) -m eval.labels attach --src results/v2c/preds_public --dst $(V2C_PREDS) --data-root data/raw
 
 v2-tables:
 	$(PY) -m eval.analyze --preds $(V2_PREDS) --out results/summary/v2 \
 		--ensemble-of gaussian_nll,evidential --tables paper_v2/tables
+	$(PY) -m eval.analyze --preds $(V2C_PREDS) --out results/summary/v2c \
+		--ensemble-of gaussian_nll,evidential
+	$(PY) -m eval.backbone --summaries results/summary/v2 results/summary/v2c --tables paper_v2/tables
 	@if [ -d results/v2/feats ]; then $(PY) -m eval.novelty --feats results/v2/feats \
 		--preds $(V2_PREDS) --out results/summary/v2 --tables paper_v2/tables; \
 	else echo "(results/v2/feats absent: novelty table kept as committed; regenerate with eval.dump_feats)"; fi
+
+tmlr:
+	bash scripts/make_tmlr.sh
 
 v2-verify:
 	@T=$$(mktemp -d); \
 	$(PY) -m eval.analyze --preds $(V2_PREDS) --out $$T/out \
 		--ensemble-of gaussian_nll,evidential --tables $$T/tables >/dev/null && \
-	for f in main coverage unseen; do \
+	$(PY) -m eval.analyze --preds $(V2C_PREDS) --out $$T/v2c \
+		--ensemble-of gaussian_nll,evidential >/dev/null && \
+	mv $$T/out $$T/v2 && \
+	$(PY) -m eval.backbone --summaries $$T/v2 $$T/v2c --tables $$T/tables >/dev/null && \
+	for f in main coverage unseen backbone; do \
 		diff -q $$T/tables/$$f.tex paper_v2/tables/$$f.tex >/dev/null \
 		&& echo "OK   tables/$$f.tex matches the predictions" \
 		|| { echo "DIFF tables/$$f.tex"; diff $$T/tables/$$f.tex paper_v2/tables/$$f.tex; exit 1; }; \

@@ -37,6 +37,9 @@ results/*
 !results/v2/
 results/v2/*
 !results/v2/preds_public/
+!results/v2c/
+results/v2c/*
+!results/v2c/preds_public/
 
 # Paper: track only hand-written source; figures/tables are generated artifacts.
 paper/comparison_table.*
@@ -77,3 +80,6 @@ paper_v2/*.blg
 
 # runtime wasm copied from node_modules at build time (scripts/copy-vendor.mjs)
 demo/public/vendor/
+
+# TMLR build outputs (rebuild with `make tmlr`)
+tmlr/

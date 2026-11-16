@@ -1,3 +1,10 @@
+> **STOP: do not resubmit to arXiv (status as of 2026-11-15).**
+> arXiv moderation declined v1 ("would benefit from additional review and revision")
+> and will reconsider only via **appeal**, once the paper is published in a
+> peer-reviewed journal, with a DOI or a link to the journal's page. Resubmitting
+> the same work without that can hurt the account's standing. Plan: publish in a
+> journal first, then appeal using the steps below with the published version.
+
 # arXiv v2: replace the existing entry
 
 Upload the new paper as a **replacement** of your v1 entry. It keeps the same

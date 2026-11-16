@@ -32,6 +32,14 @@ for the probabilistic heads and MSE for the deterministic one, both proper
 scores). Each head is trained with five seeds ($1$--$5$). Training one model
 takes about $70$ minutes on an Apple M3 Pro.
 
+\paragraph{Second backbone.} To check that the findings are not specific to
+EfficientNet-B0 ($5$M parameters), we repeat the deterministic, Gaussian,
+evidential, and MC-dropout runs with ConvNeXt-Tiny~\cite{liu2022convnet}
+($28$M parameters, ImageNet-22k pretraining) under the same recipe, protocol,
+and analysis, changing only the peak learning rate to $10^{-4}$, as is standard
+for ConvNeXt. We train three seeds ($1$--$3$) per head; one model takes about
+$12$ minutes on an NVIDIA A100.
+
 \paragraph{Distribution shift.} As a covariate shift with fixed labels, we apply
 Gaussian blur, Gaussian noise, brightness, contrast, and JPEG compression to the
 test images at severity $3$, cycling through the five types by image index in the
@@ -52,10 +60,8 @@ ensembles combine the five seeds and are reported once.
 \paragraph{Reproducibility.} Each model's per-sample predictions are saved once
 (\texttt{eval/dump\_preds.py}), and every number in this paper is computed from
 them by one script (\texttt{eval/analyze.py}). The per-sample predictions of all
-$20$ model files are released with the code (model outputs and image ids only;
+$32$ model files ($20$ EfficientNet, $12$ ConvNeXt) are released with the code (model outputs and image ids only;
 the labels are re-attached from the user's copy of the dataset, which we do not
 redistribute), so every table and figure can be recomputed without a GPU
 (\texttt{make v2-tables}), and
-\texttt{make v2-verify} checks the tables in this paper against them. Code,
-configs, predictions, and checkpoints:
-\url{https://github.com/Hassan-Naeem-code/Emotion-Modelling}.
+\texttt{make v2-verify} checks the tables in this paper against them. \codestatement

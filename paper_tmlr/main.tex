@@ -1,0 +1,65 @@
+% TMLR version of paper_v2. Built by scripts/make_tmlr.sh, which copies the
+% shared sections/tables from paper_v2 and sets \anontrue (review) or \anonfalse
+% (camera-ready / preprint). Do not edit sections here: edit paper_v2/sections.
+\documentclass[10pt]{article}
+\newif\ifanon
+\input{mode.tex}  % written by the build script: \anontrue or \anonfalse
+\ifanon
+  \usepackage{tmlr}
+\else
+  \usepackage[preprint]{tmlr} % switch to [accepted] once accepted
+\fi
+
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{xcolor}
+
+\newcommand{\tbd}[1]{\textcolor{red}{#1}}
+\newtheorem{proposition}{Proposition}
+
+\ifanon
+  \newcommand{\demourl}{(link withheld for anonymous review)}
+  \newcommand{\codestatement}{Code, configs, and the per-sample predictions are
+  provided as anonymised supplementary material; trained checkpoints will be
+  released with the final version.}
+\else
+  \newcommand{\demourl}{\url{https://hassan-naeem.com/emotion-modeling}}
+  \newcommand{\codestatement}{Code, configs, predictions, and checkpoints:
+  \url{https://github.com/Hassan-Naeem-code/Emotion-Modelling}.}
+\fi
+
+\title{Two Axes, One Guarantee: Joint Conformal Uncertainty for\\
+       Valence--Arousal Estimation, and Where It Breaks}
+
+% Hidden automatically by tmlr.sty in the anonymous build.
+\author{\name Hassan Naeem \email hassan.naeem.engineer@gmail.com \\
+        \addr Independent Researcher}
+
+\def\month{MM}  % camera-ready only
+\def\year{YYYY} % camera-ready only
+\def\openreview{\url{https://openreview.net/forum?id=XXXX}} % camera-ready only
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/method}
+\input{sections/experiments}
+\input{sections/results}
+\input{sections/ethics}
+\input{sections/conclusion}
+
+\bibliography{refs}
+\bibliographystyle{tmlr}
+
+\end{document}

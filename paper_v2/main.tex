@@ -13,6 +13,11 @@
 
 \newcommand{\tbd}[1]{\textcolor{red}{#1}}
 \newtheorem{proposition}{Proposition}
+% Identifying links live here so the anonymous TMLR build (paper_tmlr/) can
+% withhold them while sharing these section files.
+\newcommand{\demourl}{\url{https://va-uncertainty-demo.vercel.app}}
+\newcommand{\codestatement}{Code, configs, predictions, and checkpoints:
+\url{https://github.com/Hassan-Naeem-code/Emotion-Modelling}.}
 
 \title{Two Axes, One Guarantee:\\
        Joint Conformal Uncertainty for Valence--Arousal Estimation,\\
@@ -45,7 +50,7 @@ Gaussian, deep evidential regression, MC-dropout, and deep ensembles of each)
 flags it reliably (AUROC $\le0.60$); ensembles even lower its coverage.
 Feature-space novelty detectors fail as well, because contempt is not an unusual
 input: its nearest training faces are mostly happy and neutral, and only its
-label is new. Results are over five seeds with
+label is new. Results are over five seeds and hold on a second backbone, with
 proper scoring rules, a calibration split that is never used for model selection,
 and a corruption shift. Joint coverage is cheap to obtain and should be the
 default; detecting unseen expressions remains open.

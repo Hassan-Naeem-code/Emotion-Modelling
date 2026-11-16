@@ -1,0 +1,44 @@
+# Submitting to TMLR
+
+Build everything first:
+
+```bash
+make tmlr
+```
+
+That writes `tmlr/submission/` (what you upload now) and `tmlr/camera_ready/`
+(named version, used only after acceptance). The build fails if anything
+identifying (your name, GitHub, demo or site URL) appears in the anonymous PDF,
+its metadata, or the code zip.
+
+## Steps (OpenReview)
+
+1. Log in at https://openreview.net (create a profile with your real name and
+   email if you have none; profiles can take a day or two to be activated).
+2. Go to the TMLR venue page (linked from https://jmlr.org/tmlr/) and click
+   **Submission**.
+3. Fill in:
+   - **Title:** Two Axes, One Guarantee: Joint Conformal Uncertainty for Valence–Arousal Estimation, and Where It Breaks
+   - **Abstract:** paste `arxiv/v2/abstract.txt`
+   - **Authors:** yourself (OpenReview keeps this hidden from reviewers)
+   - **PDF:** `tmlr/submission/paper_anonymous.pdf`
+   - **Supplementary material:** `tmlr/submission/supplementary_code.zip`
+   - **Submission length:** regular (main text is under 12 pages)
+4. Answer the checklist and conflict-of-interest questions, then submit.
+
+## Rules while under review
+
+- Do not put the paper's TMLR status or OpenReview link on the website,
+  LinkedIn or GitHub while it is under review.
+- The public GitHub repo and live site may stay up (TMLR allows preprints and
+  public code); just never link them from the submission.
+- Respond to reviewers on OpenReview within the discussion window; revisions are
+  uploaded as new anonymous PDFs (`make tmlr` again).
+
+## After acceptance
+
+1. In `paper_tmlr/main.tex`, change `[preprint]` to `[accepted]` and fill in
+   `\month`, `\year` and `\openreview`.
+2. `make tmlr` and upload `tmlr/camera_ready/paper_named.pdf` (and its source).
+3. Then appeal the arXiv decision with the published TMLR link
+   (see `arxiv/v2/SUBMIT.md`).
