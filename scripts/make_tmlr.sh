@@ -54,6 +54,17 @@ if pdfinfo "$OUT/build_anon/main.pdf" | grep -i -E "$IDENT"; then
   echo "FAIL: identifying PDF metadata"; exit 1
 fi
 cp "$OUT/build_anon/main.pdf" "$OUT/submission/paper_anonymous.pdf"
+# Plain-text abstract for the OpenReview form, from the same source as the PDF.
+python3 - "$OUT/build_anon/abstract.tex" "$OUT/submission/abstract.txt" <<'PY2'
+import re, sys
+t = open(sys.argv[1]).read()
+for a, b in [(r"\$\\le\$?", "≤"), (r"\\le", "≤"), (r"\\%", "%"), ("--", "–"), ("~", " ")]:
+    t = re.sub(a, b, t)
+t = re.sub(r"\\emph\{([^}]*)\}", r"\1", t)
+t = t.replace("$", "")
+t = re.sub(r"\s+", " ", t).strip()
+open(sys.argv[2], "w").write(t + "\n")
+PY2
 cp "$OUT/build_named/main.pdf" "$OUT/camera_ready/paper_named.pdf"
 (cd "$OUT/build_named" && zip -q -r "$OUT/camera_ready/source_named.zip" main.tex mode.tex abstract.tex main.bbl tmlr.sty tmlr.bst fancyhdr.sty sections tables refs.bib)
 
