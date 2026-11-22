@@ -6,7 +6,8 @@ Layout under <data.root>/AffectNetVA/:
         images/<id>.jpg
         valence/<id>_val.npy     # scalar in [-1,1]
         arousal/<id>_aro.npy     # scalar in [-1,1]
-        emotion/<id>_exp.npy     # categorical (unused; VA is the target)
+        emotion/<id>_exp.npy     # categorical; not a target, used for per-expression
+                                 # analysis and data.holdout_expression (LOEO)
 
 Kaggle: https://www.kaggle.com/datasets/jishnusaravanan/affectnetvae
 Get it with: python -m kaggle datasets download jishnusaravanan/affectnetvae
@@ -83,16 +84,39 @@ def _ids_for_split(split_dir: Path, dry_run: bool) -> list[str]:
     return ids[:100] if dry_run else ids
 
 
+def _expression(split_dir: Path, i: str) -> int:
+    f = split_dir / "emotion" / f"{i}_exp.npy"
+    return int(np.load(f)) if f.exists() else -1
+
+
+def _drop_expression(split_dir: Path, ids: list[str], k: int | None) -> list[str]:
+    """Remove every image whose AffectNet expression label is k.
+
+    Used for the leave-one-expression-out study: the held-out expression is
+    removed from Train (incl. the selection slice) and from Validation (the
+    conformal calibration set), but kept in Test, so on Test it plays the same
+    role as contempt does in the main experiments: a label never seen in
+    training or calibration.
+    """
+    if k is None or k < 0:
+        return ids
+    return [i for i in ids if _expression(split_dir, i) != k]
+
+
 def build(cfg: dict, dry_run: bool = False):
     root = Path(cfg["data"]["root"]) / "AffectNetVA"
     d = cfg["data"]
     augment = bool(cfg.get("train", {}).get("augment", False))
+    held = d.get("holdout_expression")
+    held = None if held is None else int(held)
     mk = lambda name, ids=None, aug=False: AffectNetVADataset(
         root / name, ids if ids is not None else _ids_for_split(root / name, dry_run),
         d["image_size"], d["norm_mean"], d["norm_std"], align=d.get("align", False),
         augment=aug,
     )
-    train_ids = _ids_for_split(root / "Train", dry_run)
+    # Filter before the selection split so the slice is still a fixed fraction
+    # of what the model is allowed to see.
+    train_ids = _drop_expression(root / "Train", _ids_for_split(root / "Train", dry_run), held)
     select_ids = None
     frac = float(d.get("holdout_select", 0) or 0)
     if frac > 0:
@@ -106,7 +130,8 @@ def build(cfg: dict, dry_run: bool = False):
     train = mk("Train", train_ids, aug=augment)
     if select_ids is not None:
         train.select_ds = mk("Train", select_ids)
-    val = mk("Validation")
+    val = mk("Validation", _drop_expression(root / "Validation",
+                                            _ids_for_split(root / "Validation", dry_run), held))
     test = mk("Test")
     # AffectNet is in-distribution; AFEW-VA is the shift set (use --ood-dataset).
     return train, val, test, None
