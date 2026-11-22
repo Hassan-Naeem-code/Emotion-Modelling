@@ -128,9 +128,12 @@ def ensemble(members: list[dict]) -> dict:
     """Uniform mixture, moment-matched: mean of means; var = mean var + var of means."""
     means = np.stack([m["mean"] for m in members])
     vars_ = np.stack([m["var"] for m in members])
-    return {"mean": means.mean(0), "var": vars_.mean(0) + means.var(0),
-            "epistemic": means.var(0), "target": members[0]["target"],
-            "emotion": members[0]["emotion"]}
+    out = {"mean": means.mean(0), "var": vars_.mean(0) + means.var(0),
+           "epistemic": means.var(0), "target": members[0]["target"],
+           "emotion": members[0]["emotion"]}
+    if "group" in members[0]:
+        out["group"] = members[0]["group"]
+    return out
 
 
 # ------------------------------------------------------------- metrics -----
@@ -165,12 +168,22 @@ def evaluate(splits: dict[str, dict], head: str) -> dict:
     m["area_joint"] = float(t["joint_area"][seen].mean())
     m["cov_bonf"] = float(t["bonf"][seen].mean())
     m["area_bonf"] = float(t["bonf_area"][seen].mean())
+    if "group" in test:
+        # Video data: frames of one clip are correlated, so also report coverage
+        # averaged per clip (each clip counts once), alongside the frame average.
+        g = test["group"]
+        clip_mean = lambda c: float(np.mean([c[g == k].mean() for k in np.unique(g)]))
+        m["cov_joint_clip"] = clip_mean(t["joint"])
+        m["cov_perdim_joint_clip"] = clip_mean(t["perdim_joint"])
+        m["cov_bonf_clip"] = clip_mean(t["bonf"])
+        m["n_clips"] = float(len(np.unique(g)))
     per = {EMOTIONS[k]: float(t["joint"][e == k].mean()) for k in range(8) if (e == k).any()}
     per_v1 = {EMOTIONS[k]: float(t["perdim_joint"][e == k].mean()) for k in range(8) if (e == k).any()}
-    m["cov_joint_by_emotion"] = per
-    m["cov_perdim_by_emotion"] = per_v1
-    m["worst_seen_joint"] = min(v for k, v in per.items() if k != "contempt")
-    m["worst_seen_perdim"] = min(v for k, v in per_v1.items() if k != "contempt")
+    if per:                       # datasets without expression labels skip these
+        m["cov_joint_by_emotion"] = per
+        m["cov_perdim_by_emotion"] = per_v1
+        m["worst_seen_joint"] = min(v for k, v in per.items() if k != "contempt")
+        m["worst_seen_perdim"] = min(v for k, v in per_v1.items() if k != "contempt")
     if (e == UNSEEN).any():
         m["contempt_cov_joint"] = per["contempt"]
         m["contempt_rmse"] = float(np.sqrt(np.mean((test["mean"][e == UNSEEN] - y[e == UNSEEN]) ** 2)))
@@ -292,12 +305,22 @@ def write_paper_tables(table, results, d: Path):
 HEADS = {"baseline": "regression", "gaussian_nll": "gaussian", "evidential": "evidential"}
 
 
+def base_method(method: str) -> str:
+    """'v2_evidential', 'v2c_evidential', 'v2_afew_evidential' -> 'evidential'."""
+    for name in (*HEADS, "mcdropout"):
+        if method.endswith("_" + name) or method == name:
+            return name
+    return re.sub(r"^v\d+[a-z]*_", "", method)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--preds", required=True, help="dir of <method>_s<seed>.npz")
     ap.add_argument("--out", required=True)
     ap.add_argument("--ensemble-of", default="gaussian_nll,evidential",
                     help="methods whose seeds are also combined into a deep ensemble")
+    ap.add_argument("--prefix", default="v2",
+                    help="method-name prefix for the paper tables, e.g. v2c or v2_afew")
     ap.add_argument("--tables", default=None,
                     help="also write the paper's LaTeX tables + figure into this dir")
     args = ap.parse_args()
@@ -313,10 +336,10 @@ def main():
 
     results: dict[str, dict] = {}
     for method, seeds in sorted(runs.items()):
-        head = HEADS.get(re.sub(r"^v\d+[a-z]*_", "", method), method)
+        base = base_method(method)
+        head = HEADS.get(base, base)
         per_seed = {s: evaluate(sp, head) for s, sp in sorted(seeds.items())}
         results[method] = {"seeds": per_seed, "n": len(per_seed)}
-        base = re.sub(r"^v\d+[a-z]*_", "", method)
         if base in args.ensemble_of.split(",") and len(seeds) >= 2:
             ens = {sp: ensemble([seeds[s][sp] for s in sorted(seeds)])
                    for sp in ("val", "test", "corrupt") if all(sp in seeds[s] for s in seeds)}
@@ -338,7 +361,7 @@ def main():
     cols = ["ccc", "ccc_v", "ccc_a", "nll", "crps", "ece", "aurc", "cov_perdim_joint",
             "area_perdim", "cov_joint", "area_joint", "cov_bonf", "area_bonf", "worst_seen_perdim", "worst_seen_joint",
             "contempt_cov_joint", "contempt_auroc", "shift_ccc", "shift_cov_joint",
-            "shift_auroc"]
+            "shift_auroc", "cov_perdim_joint_clip", "cov_joint_clip", "cov_bonf_clip"]
     with open(out / "analysis.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["method", "n"] + cols)
@@ -352,6 +375,9 @@ def main():
             f"{row[c][0]:11.3f}" if c in row else f"{'-':>11s}" for c in cols))
     print(f"\nwrote {out/'analysis.json'} and analysis.csv")
     if args.tables:
+        if args.prefix != "v2":   # point the table rows at this run's method names
+            global ROWS
+            ROWS = [(k.replace("v2_", args.prefix + "_", 1), n) for k, n in ROWS]
         write_paper_tables(table, results, Path(args.tables))
 
 

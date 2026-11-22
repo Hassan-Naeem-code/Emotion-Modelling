@@ -1,0 +1,10 @@
+_inherit: v2_baseline.yaml
+name: v2_afew_baseline
+# Second-dataset replication: same v2 recipe, trained, calibrated and tested on
+# AFEW-VA alone. Clips (not frames) are split 60/20/20 into Train/Validation/
+# Test; 10% of the Train clips are held out for model selection, so Validation
+# stays clean for conformal calibration. See AFEW_COLAB.md.
+data:
+  name: afew_va
+  afew_protocol: within
+  holdout_select: 0.1

@@ -7,6 +7,7 @@
 #   METHODS="evidential" SEEDS="1 2" bash scripts/run_v2.sh
 #   OUT=/content/drive/MyDrive/emotion_v2 bash scripts/run_v2.sh   # persist on Drive
 #   PREFIX=v2c SEEDS="1 2 3" bash scripts/run_v2.sh  # ConvNeXt backbone check
+#   PREFIX=v2_afew CORRUPT= bash scripts/run_v2.sh    # AFEW-VA second dataset
 #
 # Then:  python -m eval.analyze --preds $OUT/preds --out results/summary/v2
 set -euo pipefail
@@ -19,6 +20,8 @@ OUT=${OUT:-results/v2}
 MC_SAMPLES=${MC_SAMPLES:-20}
 # Config/tag prefix: v2 (EfficientNet-B0) or v2c (ConvNeXt-Tiny backbone check).
 PREFIX=${PREFIX:-v2}
+# The corruption split is built from AffectNet; set CORRUPT= for other datasets.
+CORRUPT=${CORRUPT---corrupt}
 mkdir -p "$OUT/preds" "$OUT/ckpt"
 
 for seed in $SEEDS; do
@@ -34,12 +37,12 @@ for seed in $SEEDS; do
       touch "$ckdir/DONE"
     fi
     echo "=== predict $tag"
-    $PY -m eval.dump_preds --ckpt "$ckdir/best.pt" --out "$pred" --corrupt
+    $PY -m eval.dump_preds --ckpt "$ckdir/best.pt" --out "$pred" $CORRUPT
     # MC-dropout from the same evidential weights: a separate method row at no
     # training cost. (Evaluated at the training dropout rate, 0.2.)
     if [[ "$m" == "evidential" ]]; then
       $PY -m eval.dump_preds --ckpt "$ckdir/best.pt" --mc-samples "$MC_SAMPLES" \
-        --out "$OUT/preds/${PREFIX}_mcdropout_s${seed}.npz" --corrupt
+        --out "$OUT/preds/${PREFIX}_mcdropout_s${seed}.npz" $CORRUPT
     fi
   done
 done

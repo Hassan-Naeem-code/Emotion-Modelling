@@ -118,6 +118,9 @@ def main():
             continue
         rec = _collect(model, ds, cfg, device, args.mc_samples)
         rec["emotion"] = _emotions(ds)
+        groups = getattr(getattr(ds, "base", ds), "groups", None)
+        if groups is not None:            # video datasets: clip id per frame
+            rec["group"] = np.asarray(groups)
         for k, v in rec.items():
             out[f"{name}_{k}"] = v
         print(f"{name}: {len(ds)} samples")

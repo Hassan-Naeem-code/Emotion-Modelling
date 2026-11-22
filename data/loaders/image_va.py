@@ -18,11 +18,17 @@ from torch.utils.data import Dataset
 
 class ImageVADataset(Dataset):
     def __init__(self, root: str, manifest: list[tuple[str, float, float]],
-                 image_size: int, norm_mean, norm_std, align: bool = False):
+                 image_size: int, norm_mean, norm_std, align: bool = False,
+                 augment: bool = False):
         self.root = Path(root)
         self.manifest = manifest
         self.image_size = image_size
         self.align = align
+        if augment:
+            from .affectnet_va import _augmenter   # same label-preserving ops
+            self.augment = _augmenter(image_size)
+        else:
+            self.augment = None
         self.mean = np.array(norm_mean, dtype=np.float32).reshape(3, 1, 1)
         self.std = np.array(norm_std, dtype=np.float32).reshape(3, 1, 1)
 
@@ -37,6 +43,8 @@ class ImageVADataset(Dataset):
             img = align_face(img, self.image_size)
         else:
             img = img.resize((self.image_size, self.image_size), Image.BILINEAR)
+        if self.augment is not None:
+            img = self.augment(img)
         arr = np.asarray(img, dtype=np.float32).transpose(2, 0, 1) / 255.0
         arr = (arr - self.mean) / self.std
         target = np.array([val, aro], dtype=np.float32)

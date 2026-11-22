@@ -12,7 +12,7 @@ loaders (loads only 100 samples).
 |---|---|---|---|
 | **AffectNet** | Primary training set | Continuous V/A in [-1,1] | http://mohammadmahoor.com/affectnet/ |
 | **AffectNet-VA (Kaggle)** | Primary training set — instant download, keeps V/A | Continuous V/A in [-1,1] | `kaggle datasets download jishnusaravanan/affectnetvae` |
-| **AFEW-VA** | OOD / distribution-shift test | Per-frame V/A in [-10,10] → rescaled | https://ibug.doc.ic.ac.uk/resources/afew-va-database/ |
+| **AFEW-VA** | Second benchmark (`afew_protocol: within`, clip-level split) and image→video shift test | Per-frame V/A in [-10,10] → rescaled | https://ibug.doc.ic.ac.uk/resources/afew-va-database/ |
 | **RAF-DB** | Robustness check (secondary) | Categorical → heuristic VA prototypes | http://www.whdeng.cn/raf/model1.html |
 | **DEAP** (optional) | Physiological / rPPG fusion | EEG/peripheral signals | https://www.eecs.qmul.ac.uk/mmv/datasets/deap/ |
 
