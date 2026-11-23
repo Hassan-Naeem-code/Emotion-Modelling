@@ -29,7 +29,7 @@ the AFEW-VA predictor is weak (CCC $0.30$--$0.33$) because we kept the AffectNet
 protocol unchanged. We treat video frames independently; a temporal model and
 clip-level calibration are natural extensions, as is a third dataset with
 expression labels (Aff-Wild2~\cite{kollias2019affwild2}). The held-out-expression
-experiment uses the evidential head and \tbd{one seed}. The naturally unseen
+experiment uses the evidential head (and MC-dropout from the same weights) with three seeds. The naturally unseen
 expression has only $70$ examples, so its coverage estimates carry wide intervals
 (we report them). The categorical labels used for the per-expression audit are
 themselves noisy annotations of a continuous state, and annotator-level labels

@@ -38,12 +38,12 @@ this paper.
   \item \textbf{Where the guarantee breaks, systematically.} We hold each of
         AffectNet's seven expressions out of training and calibration in turn.
         Coverage on the held-out expression falls for every one of them, to
-        \tbd{$27\%$} for \emph{happy} and \tbd{$33\%$} for \emph{sad}, while
+        $28\%$ for \emph{happy} and $32\%$ for \emph{sad}, while
         coverage on the remaining expressions stays near nominal, so a marginal
         audit would not notice. The cause is visible in the predictions: the
         model maps an unseen expression onto the VA of expressions it has seen.
         The predictive uncertainty does not flag the held-out faces (AUROC
-        \tbd{$0.47$--$0.80$}), and Bonferroni's larger regions do not prevent
+        $0.47$--$0.81$), and Bonferroni's larger regions do not prevent
         the failure. AffectNet's \emph{contempt}, absent from training and
         calibration in the release we study, is a natural instance of the same
         failure, and there feature-space novelty detectors fail too, because

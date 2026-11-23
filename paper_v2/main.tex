@@ -45,10 +45,10 @@ method with learned uncertainty, is $7$--$13\%$ smaller than the Bonferroni
 correction that achieves the same guarantee. We then ask where any such
 guarantee breaks. Holding each of AffectNet's seven expressions out of training
 and calibration in turn, coverage on the held-out expression falls to
-\tbd{$27$--$81\%$} (\tbd{$27\%$} for \emph{happy}), while coverage on the other
-expressions stays at \tbd{$91$--$93\%$}, so the aggregate number hides the failure.
+$28$--$82\%$ ($28\%$ for \emph{happy}), while coverage on the other
+expressions stays at $91$--$93\%$, so the aggregate number hides the failure.
 Bonferroni does not prevent it, and the predictive uncertainty does not flag
-it (AUROC \tbd{$0.47$--$0.80$}). The naturally unseen \emph{contempt} expression
+it (AUROC $0.47$--$0.81$). The naturally unseen \emph{contempt} expression
 shows the same pattern, and there feature-space novelty detectors fail too,
 because contempt is not an unusual input: its nearest training faces are mostly
 happy and neutral, and only its label is new. Results are over multiple seeds,

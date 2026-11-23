@@ -150,29 +150,29 @@ see is calibration data that contains the expression.
 Contempt is one expression with $70$ test faces. Table~\ref{tab:loeo} shows that
 its failure is not special to it. Each row removes one seen expression from
 training and calibration. Coverage on that expression falls for all seven, from
-\tbd{$90$--$97\%$} when it was seen to \tbd{$27\%$} (\emph{happy}), \tbd{$33\%$}
-(\emph{sad}), \tbd{$54$--$65\%$} (\emph{disgust}, \emph{surprise},
-\emph{anger}), and \tbd{$78$--$81\%$} (\emph{fear}, \emph{neutral}). Coverage on
-the remaining expressions stays at \tbd{$91$--$93\%$} in every run, so the
+$90$--$97\%$ when it was seen to $28\%$ (\emph{happy}), $32\%$
+(\emph{sad}), $53$--$64\%$ (\emph{disgust}, \emph{surprise},
+\emph{anger}), and $74$--$82\%$ (\emph{fear}, \emph{neutral}). Coverage on
+the remaining expressions stays at $91$--$93\%$ in every run, so the
 marginal number a practitioner would check looks healthy while one expression
-is covered a third of the time. These are not small groups: \emph{happy} is
+is covered less than a third of the time. These are not small groups: \emph{happy} is
 $2{,}354$ test faces, almost half the test set. Bonferroni's larger regions add
-only \tbd{one to five} points, and per-axis intervals are worse still
-(\tbd{$11\%$} on \emph{happy}).
+only one to five points, and per-axis intervals are worse still
+($12\%$ on \emph{happy}).
 
 The predictions show why. A model that has never seen an expression places its
 faces among the expressions it has seen. With \emph{happy} held out, the mean
-prediction on happy faces is \tbd{$(+0.03,+0.35)$} against labels at
-\tbd{$(+0.66,+0.07)$}; with \emph{sad} held out it is \tbd{$(-0.20,+0.37)$}
-against \tbd{$(-0.65,-0.25)$}. These two expressions are the only ones occupying
+prediction on happy faces is $(+0.04,+0.38)$ against labels at
+$(+0.66,+0.07)$; with \emph{sad} held out it is $(-0.19,+0.37)$
+against $(-0.65,-0.25)$. These two expressions are the only ones occupying
 their region of the VA plane (clearly positive valence, and negative valence with
 low arousal), and they fail worst; with seven expressions we do not claim a
 more precise relation between an expression's position and its loss. As with
 contempt, the
 predictive uncertainty barely responds: the AUROC for separating held-out from
-seen faces is \tbd{$0.47$} for \emph{happy}, below chance, and at most
-\tbd{$0.80$} (\emph{neutral}). MC-dropout gives the same coverage to within
-\tbd{about two} points and the same AUROC (released with the code).
+seen faces is $0.47$ for \emph{happy}, below chance, and at most
+$0.81$ (\emph{neutral}). MC-dropout gives the same coverage to within
+about one point and the same AUROC (released with the code).
 Seven expressions and about $4{,}900$ test faces thus support the conclusion the
 single contempt experiment suggested: conformal coverage does not transfer to an
 expression absent from the calibration data, and the model's uncertainty does
@@ -187,7 +187,7 @@ not warn that it has not.
   Per-axis, Bonferroni, Max-score: joint coverage on the held-out expression.
   Others: max-score coverage on the remaining seen expressions. AUROC: total
   predictive standard deviation, held-out versus seen faces (0.5 = chance).
-  \tbd{One seed; three-seed means pending.}}
+  Mean$\pm$std over three seeds; AUROC is the mean.}
   \label{tab:loeo}
 \end{table}
 
@@ -291,7 +291,7 @@ expression from $0.868$ to $0.905$ and, when the backbone degrades under
 corruption, holds coverage there ($0.920$ versus $0.809$) at equal accuracy.
 Third, none of this extends to an expression absent from the calibration data.
 This holds for all seven AffectNet expressions when each is held out (coverage
-\tbd{$27$--$81\%$}) and for the naturally unseen contempt ($30$--$39\%$), while
+$28$--$82\%$) and for the naturally unseen contempt ($30$--$39\%$), while
 coverage on the other expressions stays near nominal. Nothing flags these
 faces: not the predictive uncertainty, nor ensembles, nor feature-space
 detectors, because an unseen expression is mapped onto the expressions the
