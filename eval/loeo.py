@@ -57,6 +57,11 @@ def evaluate(val: dict, test: dict, held: int) -> dict:
         "held_cov_joint": float(t["joint"][is_held].mean()),
         "held_cov_bonf": float(t["bonf"][is_held].mean()),
         "held_rmse": float(np.sqrt(np.mean((test["mean"][is_held] - test["target"][is_held]) ** 2))),
+        # Where the held-out faces are, and where the model puts them (VA).
+        "held_true_v": float(test["target"][is_held, 0].mean()),
+        "held_true_a": float(test["target"][is_held, 1].mean()),
+        "held_pred_v": float(test["mean"][is_held, 0].mean()),
+        "held_pred_a": float(test["mean"][is_held, 1].mean()),
     }
     if np.any(test["var"] > 0):
         u = np.sqrt(test["var"]).sum(1)
@@ -97,15 +102,15 @@ def latex(rows: list[dict], method: str) -> str:
                                               if k + "_std" in r else "")) if k in r else "--"
     num = lambda r, k: f"{r[k]:.2f}" if k in r else "--"
     has_ref = any("held_cov_ref" in r for r in rows if r["method"] == method)
-    cols = "lr" + "r" * (5 if has_ref else 4)
-    head = ["Held out", "$n$"] + (["Seen in train"] if has_ref else []) + \
-           ["Per-axis", "Max-score", "Seen (others)", "AUROC"]
+    cols = "lr" + "r" * (6 if has_ref else 5)
+    head = ["Held out", "$n$"] + (["In training"] if has_ref else []) + \
+           ["Per-axis", "Bonferroni", "Max-score", "Others", "AUROC"]
     out = [f"\\begin{{tabular}}{{{cols}}}", r"\toprule", " & ".join(head) + r" \\", r"\midrule"]
     for r in rows:
         if r["method"] != method:
             continue
         cells = [r["held"], str(int(r["n_held"]))] + ([pct(r, "held_cov_ref")] if has_ref else []) + \
-                [pct(r, "held_cov_perdim"), pct(r, "held_cov_joint"),
+                [pct(r, "held_cov_perdim"), pct(r, "held_cov_bonf"), pct(r, "held_cov_joint"),
                  pct(r, "seen_cov_joint"), num(r, "held_auroc")]
         out.append(" & ".join(cells) + r" \\")
     out += [r"\bottomrule", r"\end{tabular}"]
@@ -117,6 +122,8 @@ def main():
     ap.add_argument("--preds", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--ref", default=None, help="Main-run preds dir (v2_<method>_s<seed>.npz).")
+    ap.add_argument("--tables", default=None,
+                    help="Also write the evidential table here as loeo.tex (paper_v2/tables).")
     args = ap.parse_args()
 
     runs: dict = defaultdict(list)
@@ -146,6 +153,9 @@ def main():
         w.writerows(rows)
     for method in sorted({r["method"] for r in rows}):
         (out / f"loeo_{method}.tex").write_text(latex(rows, method))
+    if args.tables:
+        Path(args.tables).mkdir(parents=True, exist_ok=True)
+        (Path(args.tables) / "loeo.tex").write_text(latex(rows, "evidential"))
     print(f"wrote {out}/loeo.json, loeo.csv and one .tex table per method")
 
 

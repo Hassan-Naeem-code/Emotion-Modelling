@@ -145,6 +145,52 @@ see is calibration data that contains the expression.
   \label{tab:novelty}
 \end{table}
 
+\subsection{Every expression, once held out, loses its guarantee}
+\label{sec:loeo}
+Contempt is one expression with $70$ test faces. Table~\ref{tab:loeo} shows that
+its failure is not special to it. Each row removes one seen expression from
+training and calibration. Coverage on that expression falls for all seven, from
+\tbd{$90$--$97\%$} when it was seen to \tbd{$27\%$} (\emph{happy}), \tbd{$33\%$}
+(\emph{sad}), \tbd{$54$--$65\%$} (\emph{disgust}, \emph{surprise},
+\emph{anger}), and \tbd{$78$--$81\%$} (\emph{fear}, \emph{neutral}). Coverage on
+the remaining expressions stays at \tbd{$91$--$93\%$} in every run, so the
+marginal number a practitioner would check looks healthy while one expression
+is covered a third of the time. These are not small groups: \emph{happy} is
+$2{,}354$ test faces, almost half the test set. Bonferroni's larger regions add
+only \tbd{one to five} points, and per-axis intervals are worse still
+(\tbd{$11\%$} on \emph{happy}).
+
+The predictions show why. A model that has never seen an expression places its
+faces among the expressions it has seen. With \emph{happy} held out, the mean
+prediction on happy faces is \tbd{$(+0.03,+0.35)$} against labels at
+\tbd{$(+0.66,+0.07)$}; with \emph{sad} held out it is \tbd{$(-0.20,+0.37)$}
+against \tbd{$(-0.65,-0.25)$}. These two expressions are the only ones occupying
+their region of the VA plane (clearly positive valence, and negative valence with
+low arousal), and they fail worst; with seven expressions we do not claim a
+more precise relation between an expression's position and its loss. As with
+contempt, the
+predictive uncertainty barely responds: the AUROC for separating held-out from
+seen faces is \tbd{$0.47$} for \emph{happy}, below chance, and at most
+\tbd{$0.80$} (\emph{neutral}). MC-dropout gives the same coverage to within
+\tbd{about two} points and the same AUROC (released with the code).
+Seven expressions and about $4{,}900$ test faces thus support the conclusion the
+single contempt experiment suggested: conformal coverage does not transfer to an
+expression absent from the calibration data, and the model's uncertainty does
+not warn that it has not.
+
+\begin{table}[h]
+  \centering\small
+  \input{tables/loeo.tex}
+  \caption{Holding out one expression from training and calibration (evidential
+  head, nominal $90\%$, coverage in \%). In training: max-score joint coverage
+  on the same test faces in the main runs, where the expression was seen.
+  Per-axis, Bonferroni, Max-score: joint coverage on the held-out expression.
+  Others: max-score coverage on the remaining seen expressions. AUROC: total
+  predictive standard deviation, held-out versus seen faces (0.5 = chance).
+  \tbd{One seed; three-seed means pending.}}
+  \label{tab:loeo}
+\end{table}
+
 \subsection{Corruption shift}
 Under corruption at severity $3$, the evidential model's CCC drops from $0.720$
 to $0.595$. The max-score region keeps joint coverage at $0.920$ without
@@ -191,15 +237,62 @@ predictor.
   \label{tab:backbone}
 \end{table}
 
+\subsection{The coverage findings replicate on a second dataset}
+\label{sec:afew}
+Table~\ref{tab:afew} repeats the coverage analysis on AFEW-VA, trained,
+calibrated and tested on AFEW-VA alone. The pattern is the same as on AffectNet.
+Per-axis intervals jointly cover the VA point only $84$--$86\%$ of the time for
+every predictor. The max-score region restores nominal coverage per frame
+($0.906$--$0.911$) for all single models and the evidential ensemble, and for
+every method with learned uncertainty it is smaller than Bonferroni: by $8\%$ for
+the evidential head ($1.31$ versus $1.43$), $12\%$ for the Gaussian head, $7\%$
+for MC-dropout, and $8$--$9\%$ for the ensembles. For the deterministic head,
+whose constant scale leaves nothing for the max-score to exploit, the two
+regions have the same area ($1.13$ versus $1.12$), as on AffectNet.
+
+Three caveats apply, and we report them rather than tune them away. First,
+accuracy is much lower than on AffectNet (CCC $0.30$--$0.33$). With near-duplicate
+frames in each training clip, the probabilistic heads become overconfident
+within an epoch or two: held-out NLL rises while MSE keeps falling, so loss-based
+selection keeps an early checkpoint. We kept the AffectNet protocol unchanged
+rather than adapt it to this dataset, and make no accuracy claim on AFEW-VA.
+Second, clip-averaged coverage is about two points below the per-frame
+figure ($0.885$--$0.893$ for the single models). The guarantee is stated per
+exchangeable sample, and frames are not independent samples of clips; with only
+$120$ test clips, the clip-level estimate is also noisier. Third, the
+three-member Gaussian ensemble reaches $0.893$ per frame, just below nominal.
+That is one calibration and test split, on which per-frame coverage varies by
+up to $\pm0.016$ across seeds for the single Gaussian model, so it is within the
+variation we observe; but it is a reminder that the guarantee holds in
+expectation over calibration sets, not on every one. The conclusion that matters
+for practice carries over: on a second dataset with different sources,
+annotators and modality, per-axis intervals again under-cover the VA point and
+the max-score region again fixes this with smaller regions than Bonferroni.
+
+\begin{table}[h]
+  \centering\small
+  \resizebox{\linewidth}{!}{\input{tables/afew.tex}}
+  \caption{AFEW-VA, trained, calibrated and tested within the dataset, split by
+  clip (nominal $90\%$; mean$_{\pm\text{std}}$ over three seeds; ensembles
+  combine the three seeds). Joint: fraction of test frames whose true VA point
+  lies in the region. Area: mean region area. Joint/clip: max-score coverage
+  averaged per clip, so that each of the $120$ test clips counts once.}
+  \label{tab:afew}
+\end{table}
+
 \subsection{Summary}
-Across five predictors, five seeds and two backbones, three findings are stable. First,
-per-axis intervals miss the VA point about $14\%$ of the time at nominal $10\%$,
-for every predictor; the max-score region fixes this at no cost and with regions
-up to $13\%$ smaller than Bonferroni. Second, learned uncertainty is what makes
+Across five predictors, two backbones and two datasets, three findings are
+stable. First, per-axis intervals miss the VA point about $14\%$ of the time at
+nominal $10\%$, on AffectNet and on AFEW-VA alike; the max-score region fixes
+this at no cost and, whenever the uncertainty is learned, with regions
+$7$--$13\%$ smaller than Bonferroni. Second, learned uncertainty is what makes
 the guarantee useful beyond its marginal form: it lifts the worst seen
 expression from $0.868$ to $0.905$ and, when the backbone degrades under
-corruption, holds coverage there ($0.920$ versus $0.809$) at equal accuracy. Third, none of this extends to an
-expression absent from the calibration data: coverage there is $30$--$39\%$, and
-nothing flags it, neither the predictive uncertainty, nor ensembles, nor
-feature-space detectors (AUROC $\le0.60$), because the expression looks like
-faces the model has seen.
+corruption, holds coverage there ($0.920$ versus $0.809$) at equal accuracy.
+Third, none of this extends to an expression absent from the calibration data.
+This holds for all seven AffectNet expressions when each is held out (coverage
+\tbd{$27$--$81\%$}) and for the naturally unseen contempt ($30$--$39\%$), while
+coverage on the other expressions stays near nominal. Nothing flags these
+faces: not the predictive uncertainty, nor ensembles, nor feature-space
+detectors, because an unseen expression is mapped onto the expressions the
+model has seen.

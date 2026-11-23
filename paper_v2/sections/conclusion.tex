@@ -3,24 +3,34 @@
 A VA estimate is one point in the plane, so its uncertainty should be one region
 in the plane. Calibrating valence and arousal separately, as is common, leaves
 the guarantee on the wrong event and under-covers the VA point by about
-four to five points at nominal $90\%$. One max-normalised score fixes this with a
-finite-sample joint guarantee and smaller regions than the Bonferroni correction.
-It costs a single line of code, and we recommend it as the default.
+four to six points at nominal $90\%$, on AffectNet and on AFEW-VA alike. One
+max-normalised score fixes this with a finite-sample joint guarantee and,
+whenever the uncertainty is learned, smaller regions than the Bonferroni
+correction. It costs a single line of code, and we recommend it as the default.
 
 The harder finding is where guarantees end. An expression absent from the
-calibration data loses coverage under every method we tried, and none of the
+calibration data loses coverage under every method we tried, for every one of
+AffectNet's seven expressions when held out and for the naturally unseen
+contempt, while coverage on the other expressions stays near nominal. None of the
 uncertainty estimators reliably notices. Conformal methods cannot fix this by
 construction, so a deployed affect estimator needs either calibration data that
 spans the expressions it will meet or an uncertainty signal that actually rises
 on novel ones. We found neither in the standard toolkit, and the reason is
-instructive: contempt is not an unusual input but a familiar-looking face with an
-unfamiliar meaning, so no signal computed from the input alone can be expected
-to flag it.
+instructive: the model maps an unseen expression onto the expressions it has
+seen, and contempt in particular is not an unusual input but a familiar-looking
+face with an unfamiliar meaning, so no signal computed from the input alone can
+be expected to flag it. For practice, this argues for auditing coverage per
+expression, not only overall, and for treating the set of expressions in the
+calibration data as part of the system's specification.
 
-\paragraph{Limitations.} We study still images from one dataset family and two
-backbones (the second with three seeds). A
-cross-dataset shift (AFEW-VA, Aff-Wild2) and annotator-level labels would test
-whether the uncertainty tracks human disagreement. Our unseen expression has only
-$70$ examples, so its coverage estimates carry wide intervals (we report them).
-The categorical labels used for the per-expression audit are themselves noisy
-annotations of a continuous state.
+\paragraph{Limitations.} Our second dataset, AFEW-VA, has no expression labels,
+so the per-expression and held-out-expression analyses are on AffectNet only, and
+the AFEW-VA predictor is weak (CCC $0.30$--$0.33$) because we kept the AffectNet
+protocol unchanged. We treat video frames independently; a temporal model and
+clip-level calibration are natural extensions, as is a third dataset with
+expression labels (Aff-Wild2~\cite{kollias2019affwild2}). The held-out-expression
+experiment uses the evidential head and \tbd{one seed}. The naturally unseen
+expression has only $70$ examples, so its coverage estimates carry wide intervals
+(we report them). The categorical labels used for the per-expression audit are
+themselves noisy annotations of a continuous state, and annotator-level labels
+would test whether the uncertainty tracks human disagreement.

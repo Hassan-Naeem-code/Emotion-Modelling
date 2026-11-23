@@ -40,6 +40,36 @@ and analysis, changing only the peak learning rate to $10^{-4}$, as is standard
 for ConvNeXt. We train three seeds ($1$--$3$) per head; one model takes about
 $12$ minutes on an NVIDIA A100.
 
+\paragraph{Holding out each expression.} Contempt is a single unseen
+expression with $70$ test images. To test whether its failure is general, we
+repeat the evidential run seven times, each time removing one seen expression
+$k$ from the training split (including the selection slice) and from the
+calibration split, and keeping the test split unchanged. Contempt remains unseen
+in every run and is excluded from all groups. For each run we report joint
+coverage on the test faces of expression $k$; as a reference, coverage on the
+same faces in the main runs, where $k$ was seen; and coverage on the remaining
+seen expressions. MC-dropout is evaluated from the same weights. Because the
+training split caps most classes at $10{,}000$ images, removing one expression
+leaves $46{,}363$--$52{,}250$ training images. We report \tbd{one seed} per held-out
+expression (\tbd{three seeds pending}); one model takes about $35$ minutes on an
+NVIDIA T4.
+
+\paragraph{Second dataset.} AFEW-VA~\cite{kossaifi2017afew,dhall2012afew}
+contains $600$ video clips from films with per-frame VA annotations
+($30{,}051$ frames), given as integers in $[-10,10]$, which we divide by $10$. It
+differs from AffectNet in source (film rather than web images), modality (video
+frames), and annotators, and it has no expression labels. We train, calibrate,
+and test on AFEW-VA alone, with the same recipe and protocol as above. Because
+the frames of one clip are near-duplicates, we split by clip, never by frame:
+$60\%$ of clips for training ($10\%$ of these held out for checkpoint selection),
+$20\%$ for calibration, and $20\%$ for testing ($16{,}294$ / $1{,}925$ /
+$6{,}061$ / $5{,}771$ frames). The split is fixed across seeds. Since frames
+within a clip are correlated, we report coverage both per frame and averaged per
+clip, so that each of the $120$ test clips counts once. We train the
+deterministic, Gaussian, and evidential heads with three seeds each (MC-dropout
+and three-member ensembles are formed from them as before); one model takes
+about $45$ minutes on an NVIDIA T4.
+
 \paragraph{Distribution shift.} As a covariate shift with fixed labels, we apply
 Gaussian blur, Gaussian noise, brightness, contrast, and JPEG compression to the
 test images at severity $3$, cycling through the five types by image index in the
@@ -54,8 +84,9 @@ and variance), and quantile calibration error
 risk--coverage curve (AURC). \emph{Coverage:} joint coverage of the true VA point
 and mean region area, overall and per expression. \emph{Detection:} AUROC of the
 uncertainty for clean versus corrupted inputs, and for seen versus contempt.
-Single models are reported as mean $\pm$ standard deviation over five seeds;
-ensembles combine the five seeds and are reported once.
+Single models are reported as mean $\pm$ standard deviation over seeds (five
+on AffectNet, three on AFEW-VA); ensembles combine those seeds and are reported
+once.
 
 \paragraph{Reproducibility.} Each model's per-sample predictions are saved once
 (\texttt{eval/dump\_preds.py}), and every number in this paper is computed from
@@ -64,4 +95,7 @@ $32$ model files ($20$ EfficientNet, $12$ ConvNeXt) are released with the code (
 the labels are re-attached from the user's copy of the dataset, which we do not
 redistribute), so every table and figure can be recomputed without a GPU
 (\texttt{make v2-tables}), and
-\texttt{make v2-verify} checks the tables in this paper against them. \codestatement
+\texttt{make v2-verify} checks the tables in this paper against them. The
+held-out-expression and AFEW-VA tables are produced by the same scripts
+(\texttt{eval/loeo.py}, \texttt{eval/analyze.py}) from their own prediction
+files. \codestatement

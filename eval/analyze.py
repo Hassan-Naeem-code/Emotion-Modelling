@@ -209,9 +209,20 @@ ROWS = [  # (method key, display name)
     ("v2_gaussian_nll", "Gaussian"),
     ("v2_evidential", "Evidential"),
     ("v2_mcdropout", "MC-dropout"),
-    ("v2_gaussian_nll_ensemble5", "Gaussian ens."),
-    ("v2_evidential_ensemble5", "Evidential ens."),
+    ("v2_gaussian_nll_ensemble", "Gaussian ens."),   # matches ..._ensemble<k>
+    ("v2_evidential_ensemble", "Evidential ens."),
 ]
+
+
+def _rows(table):
+    """ROWS resolved against the table; an ensemble row matches any ensemble size."""
+    out = []
+    for k, name in ROWS:
+        if k.endswith("_ensemble"):
+            k = next((t for t in table if t[len(k):].isdigit() and t.startswith(k)), k)
+        if k in table:
+            out.append((k, name))
+    return out
 
 
 def _cell(row, key, best=None, digits=3):
@@ -228,7 +239,7 @@ def _cell(row, key, best=None, digits=3):
 
 def _tabular(table, spec, header, cols):
     """cols: list of (metric key, lower_is_better or None)."""
-    rows = [(k, n) for k, n in ROWS if k in table]
+    rows = _rows(table)
     best = {}
     for key, low in cols:
         vals = [table[k][key][0] for k, _ in rows if key in table[k]]
@@ -272,6 +283,16 @@ def write_paper_tables(table, results, d: Path):
     lo, hi = _wilson(0.4, n_con)
     t += rf"% Wilson 95% half-width at p=0.4, n={n_con}: {(hi-lo)/2:.3f}" + "\n"
     (d / "unseen.tex").write_text(t)
+    if any("cov_joint_clip" in table[k] for k, _ in _rows(table)):
+        # Second-dataset table (AFEW-VA): no expression labels, but clips.
+        (d / "afew.tex").write_text(_tabular(
+            table, "lccccccc",
+            r" & & Per-axis & \multicolumn{2}{c}{Bonferroni} & "
+            r"\multicolumn{3}{c}{Max-score (ours)} \\"
+            "\n" r"Method & CCC$\uparrow$ & Joint & Joint & Area & Joint & Area & Joint/clip",
+            [("ccc", False), ("cov_perdim_joint", None), ("cov_bonf", None),
+             ("area_bonf", None), ("cov_joint", None), ("area_joint", True),
+             ("cov_joint_clip", None)]))
 
     # Per-expression joint coverage figure (evidential, averaged over seeds).
     import matplotlib

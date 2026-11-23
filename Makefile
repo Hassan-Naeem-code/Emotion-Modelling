@@ -122,6 +122,14 @@ v2-tables:
 	@if [ -d results/v2/feats ]; then $(PY) -m eval.novelty --feats results/v2/feats \
 		--preds $(V2_PREDS) --out results/summary/v2 --tables paper_v2/tables; \
 	else echo "(results/v2/feats absent: novelty table kept as committed; regenerate with eval.dump_feats)"; fi
+	@if [ -d results/afew/preds ]; then $(PY) -m eval.analyze --preds results/afew/preds \
+		--out results/summary/afew --prefix v2_afew --tables results/summary/afew/tables >/dev/null && \
+		cp results/summary/afew/tables/afew.tex paper_v2/tables/afew.tex && echo "wrote tables/afew.tex"; \
+	else echo "(results/afew/preds absent: AFEW-VA table kept as committed)"; fi
+	@if [ -d results/loeo/preds ]; then $(PY) -m eval.loeo --preds results/loeo/preds \
+		--out results/summary/loeo --ref $(V2_PREDS) --tables paper_v2/tables >/dev/null && \
+		echo "wrote tables/loeo.tex"; \
+	else echo "(results/loeo/preds absent: LOEO table kept as committed)"; fi
 
 tmlr:
 	bash scripts/make_tmlr.sh

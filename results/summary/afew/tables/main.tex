@@ -1,0 +1,12 @@
+\begin{tabular}{lccccccc}
+\toprule
+Method & CCC-V$\uparrow$ & CCC-A$\uparrow$ & RMSE$\downarrow$ & NLL$\downarrow$ & CRPS$\downarrow$ & ECE$\downarrow$ & AURC$\downarrow$ \\
+\midrule
+Deterministic & \textbf{0.354}$_{\pm.010}$ & 0.307$_{\pm.007}$ & \textbf{0.246}$_{\pm.001}$ & -- & -- & -- & -- \\
+Gaussian & 0.312$_{\pm.019}$ & 0.297$_{\pm.030}$ & 0.256$_{\pm.002}$ & 1.105$_{\pm.265}$ & 0.151$_{\pm.000}$ & 0.187$_{\pm.022}$ & 0.056$_{\pm.002}$ \\
+Evidential & 0.322$_{\pm.019}$ & 0.276$_{\pm.023}$ & 0.260$_{\pm.002}$ & 0.792$_{\pm.216}$ & 0.156$_{\pm.001}$ & 0.222$_{\pm.025}$ & 0.056$_{\pm.002}$ \\
+MC-dropout & 0.322$_{\pm.020}$ & 0.278$_{\pm.023}$ & 0.259$_{\pm.003}$ & 1.569$_{\pm.626}$ & 0.155$_{\pm.001}$ & 0.214$_{\pm.026}$ & 0.056$_{\pm.002}$ \\
+Gaussian ens. & 0.323 & \textbf{0.313} & 0.249 & \textbf{0.505} & \textbf{0.143} & \textbf{0.140} & \textbf{0.050} \\
+Evidential ens. & 0.332 & 0.288 & 0.253 & 0.855 & 0.148 & 0.174 & \textbf{0.050} \\
+\bottomrule
+\end{tabular}

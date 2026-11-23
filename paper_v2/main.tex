@@ -36,24 +36,26 @@ their valence and arousal (VA) outputs, typically by calibrating each axis
 separately. We show that this common practice gives a guarantee about the wrong
 object. A VA estimate is a single point on the circumplex, but per-axis
 intervals at a nominal $90\%$ jointly contain the true point only
-$86\%$ of the time on AffectNet, and the shortfall is not evenly
-spread: the worst-covered expression falls to $78$--$84\%$. We replace the
-per-axis score with a single variance-normalised max-score that yields a
-rectangular VA region with a finite-sample joint guarantee. It restores nominal
-joint coverage and is up to $13\%$ smaller than the Bonferroni correction
-that achieves the same guarantee. We then ask where any such guarantee breaks.
-AffectNet's \emph{contempt} expression is absent from the training and
-calibration data of the release we study, which makes it a natural unseen
-expression. On it, every method we evaluate loses its guarantee (joint coverage
-$30$--$39\%$), and none of five uncertainty estimators (heteroscedastic
-Gaussian, deep evidential regression, MC-dropout, and deep ensembles of each)
-flags it reliably (AUROC $\le0.60$); ensembles even lower its coverage.
-Feature-space novelty detectors fail as well, because contempt is not an unusual
-input: its nearest training faces are mostly happy and neutral, and only its
-label is new. Results are over five seeds and hold on a second backbone, with
-proper scoring rules, a calibration split that is never used for model selection,
-and a corruption shift. Joint coverage is cheap to obtain and should be the
-default; detecting unseen expressions remains open.
+$85$--$86\%$ of the time on AffectNet and $84$--$86\%$ on the video dataset
+AFEW-VA, and on AffectNet the shortfall is uneven: the worst-covered expression falls to
+$78$--$84\%$. We replace the per-axis score with a single variance-normalised
+max-score that yields a rectangular VA region with a finite-sample joint
+guarantee. It restores nominal joint coverage on both datasets and, for every
+method with learned uncertainty, is $7$--$13\%$ smaller than the Bonferroni
+correction that achieves the same guarantee. We then ask where any such
+guarantee breaks. Holding each of AffectNet's seven expressions out of training
+and calibration in turn, coverage on the held-out expression falls to
+\tbd{$27$--$81\%$} (\tbd{$27\%$} for \emph{happy}), while coverage on the other
+expressions stays at \tbd{$91$--$93\%$}, so the aggregate number hides the failure.
+Bonferroni does not prevent it, and the predictive uncertainty does not flag
+it (AUROC \tbd{$0.47$--$0.80$}). The naturally unseen \emph{contempt} expression
+shows the same pattern, and there feature-space novelty detectors fail too,
+because contempt is not an unusual input: its nearest training faces are mostly
+happy and neutral, and only its label is new. Results are over multiple seeds,
+two backbones and two datasets, with proper scoring rules, a calibration split
+that is never used for model selection, and a corruption shift. Joint coverage
+is cheap to obtain and should be the default; covering expressions absent from
+the calibration data remains open.
 \end{abstract}
 
 \input{sections/introduction}
