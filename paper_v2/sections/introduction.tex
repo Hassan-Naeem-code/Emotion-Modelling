@@ -1,14 +1,26 @@
 \section{Introduction}
 
-Facial affect is commonly estimated as a point in the two-dimensional
-valence--arousal (VA) plane of the circumplex model~\cite{russell1980circumplex},
-rather than as one of a few discrete categories. A growing line of work attaches
-uncertainty to these estimates, through heteroscedastic likelihoods, deep
-evidential regression~\cite{amini2020evidential,wu2023deer}, or ensembles, and
-converts that uncertainty into prediction intervals by split conformal
-calibration~\cite{vovk2005algorithmic,lei2018distribution}. The appeal is a
-finite-sample guarantee: on exchangeable data, a $90\%$ interval contains the
-truth at least $90\%$ of the time, whatever the model.
+Split conformal prediction~\cite{vovk2005algorithmic,lei2018distribution} is
+now a standard way to attach a finite-sample guarantee to a deep regressor: on
+exchangeable data, a $90\%$ interval contains the truth at least $90\%$ of the
+time, whatever the model. The guarantee is marginal, and two practical ways in
+which a marginal guarantee misleads are easy to miss. First, when the target has
+several outputs and each output is calibrated separately, the guarantee is about
+the wrong event: a consumer of the prediction uses all outputs together. Second,
+when a group of inputs is absent from the calibration data, coverage on that
+group can collapse while the aggregate coverage still reads as nominal. This
+paper measures both, in a setting where they arise naturally and can be audited
+with real labels.
+
+The setting is facial affect estimated as a point in the two-dimensional
+valence--arousal (VA) plane of the circumplex model~\cite{russell1980circumplex}.
+A growing line of work attaches uncertainty to these estimates, through
+heteroscedastic likelihoods, deep evidential
+regression~\cite{amini2020evidential,wu2023deer}, or ensembles, and converts it
+into prediction intervals by split conformal calibration. VA estimation suits the
+question for two reasons: the target is genuinely two-dimensional, and the
+datasets also carry categorical expression labels, which define natural groups
+that can be removed from training and calibration one at a time.
 
 That guarantee is only as useful as the event it is stated about. In practice
 the intervals are calibrated per axis, one for valence and one for arousal, and
