@@ -16,6 +16,10 @@ the two per-axis thresholds (q_v, q_a) are chosen:
   empirical cop. each axis at level t, t the conformal quantile of the max of
                 the two calibration ranks (Messoudi et al.'s empirical copula)
   max-score     one threshold on max_d s_d (ours; finite-sample joint guarantee)
+  ellipsoid     Mahalanobis score sqrt(r' S^-1 r) on the signed normalised
+                residuals r (Messoudi et al., 2022). S is estimated on one half
+                of the calibration split and the threshold on the other, so the
+                guarantee is exact; the region is an ellipse, not a rectangle.
 
 The empirical-copula region uses ranks computed on the calibration set itself,
 so its guarantee is approximate (error O(1/n)); max-score is exact.
@@ -35,7 +39,8 @@ from scipy import stats
 from eval.analyze import ALPHA, EMOTIONS, UNSEEN, load_split, scale_of, _q
 
 REGIONS = [("perdim", "Per-axis"), ("bonf", "Bonferroni"), ("indep", "Indep.\\ copula"),
-           ("gauss", "Gaussian copula"), ("empcop", "Empirical copula"), ("max", "Max-score (ours)")]
+           ("gauss", "Gaussian copula"), ("empcop", "Empirical copula"), ("max", "Max-score (ours)"),
+           ("ellip", "Ellipsoid")]
 
 
 def _level_q(s: np.ndarray, level: float) -> float:
@@ -76,6 +81,22 @@ def thresholds(s_cal: np.ndarray) -> dict[str, np.ndarray]:
     return out
 
 
+def ellipsoid(val: dict, test: dict, seed: int = 0):
+    """Split the calibration set: half estimates the residual covariance, half
+    sets the threshold on the Mahalanobis score. Returns (covered, area)."""
+    r_cal = (val["target"] - val["mean"]) / scale_of(val)
+    perm = np.random.default_rng(seed).permutation(len(r_cal))
+    a, b = perm[: len(perm) // 2], perm[len(perm) // 2:]
+    S = np.cov(r_cal[a].T)
+    Si = np.linalg.inv(S)
+    maha = lambda r: np.sqrt(np.einsum("ni,ij,nj->n", r, Si, r))
+    q = _q(maha(r_cal[b]))
+    sc = scale_of(test)
+    covered = maha((test["target"] - test["mean"]) / sc) <= q
+    area = np.pi * q ** 2 * np.sqrt(np.linalg.det(S)) * np.prod(sc, 1)
+    return covered, area
+
+
 def evaluate(val: dict, test: dict) -> dict:
     s_cal = np.abs(val["target"] - val["mean"]) / scale_of(val)
     sc = scale_of(test)
@@ -84,11 +105,15 @@ def evaluate(val: dict, test: dict) -> dict:
     seen = e != UNSEEN
     th = thresholds(s_cal)
     m = {"rho": float(th["_rho"][0])}
+    ell_cov, ell_area = ellipsoid(val, test)
     for key, _ in REGIONS:
-        q = th[key]
-        cov = (s <= q).all(1)
+        if key == "ellip":
+            cov, area = ell_cov, ell_area
+        else:
+            q = th[key]
+            cov, area = (s <= q).all(1), np.prod(2 * q * sc, 1)
         m[f"cov_{key}"] = float(cov[seen].mean())
-        m[f"area_{key}"] = float(np.prod(2 * q * sc, 1)[seen].mean())
+        m[f"area_{key}"] = float(area[seen].mean())
         if "group" in test:
             g = test["group"]
             m[f"clip_{key}"] = float(np.mean([cov[g == k].mean() for k in np.unique(g)]))

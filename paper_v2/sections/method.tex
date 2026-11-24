@@ -64,7 +64,12 @@ empirical copula of the calibration ranks; we compare against all three in
 Section~\ref{sec:copula}. The empirical copula is the closest relative: with
 ranks in place of $\hat\sigma$-normalised residuals it is a max-score region,
 but since the ranks are computed on the calibration set itself its guarantee is
-approximate rather than exact. The region inherits the predictor's
+approximate rather than exact. We also compare with the ellipsoidal region of
+Messoudi et al.~\cite{messoudi2022ellipsoidal}, a Mahalanobis score on the signed
+normalised residuals; we estimate its covariance on one half of the calibration
+split and its threshold on the other, so its guarantee is exact. An ellipse
+does not factor into one interval per axis, so it cannot report a range for
+valence and a range for arousal, which the rectangles can. The region inherits the predictor's
 heteroscedasticity through $\hat\sigma$, so uncertain inputs get larger regions,
 and it is the same object our on-device demonstrator uses as its abstention
 signal.\footnote{Live in-browser demo, with the region drawn on the VA plane:

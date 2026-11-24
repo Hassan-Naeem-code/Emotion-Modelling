@@ -86,6 +86,14 @@ region is tighter than the empirical copula. What it offers is an exact
 finite-sample guarantee, from one scalar score with no rank estimation, at
 essentially the same size; the empirical copula's guarantee holds only
 approximately, because its ranks are computed on the calibration set itself.
+The ellipsoidal region~\cite{messoudi2022ellipsoidal} is $4$--$9\%$ smaller than
+the max-score rectangle on AffectNet at the same coverage ($0.911$--$0.922$),
+and between $4\%$ smaller and $7\%$ larger on AFEW-VA. Part of that saving is
+geometric: for comparable error distributions an ellipse spends less area on
+the corners than a rectangle does. The price is that an ellipse is not a pair of
+intervals; it cannot be reported as ``valence in $[a,b]$, arousal in $[c,d]$'',
+which is how a VA region is read and displayed in practice. Where a joint region
+need not be read per axis, the ellipse is a reasonable choice.
 
 \begin{table}[h]
   \centering\small
@@ -93,7 +101,8 @@ approximately, because its ranks are computed on the calibration set itself.
   \caption{Max-score against copula regions on AffectNet (nominal $90\%$, mean
   over five seeds; ensembles combine the five seeds). All regions are
   rectangles on the same $\hat\sigma$-normalised residuals and differ only in
-  how the two per-axis thresholds are chosen (Section~\ref{sec:method}). The
+  how the two per-axis thresholds are chosen (Section~\ref{sec:method}), except
+  the ellipsoid, a Mahalanobis region on the signed residuals. The
   AFEW-VA comparison is in the text and released with the code.}
   \label{tab:copula}
 \end{table}

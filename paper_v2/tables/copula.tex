@@ -1,28 +1,28 @@
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{lrrrrrrr}
 \toprule
-Joint coverage (\%) & Per-axis & Bonferroni & Indep.\ copula & Gaussian copula & Empirical copula & Max-score (ours) \\
+Joint coverage (\%) & Per-axis & Bonferroni & Indep.\ copula & Gaussian copula & Empirical copula & Max-score (ours) & Ellipsoid \\
 \midrule
-Deterministic & 86.0 & 92.2 & 92.1 & 91.9 & 91.8 & 92.0 \\
-Gaussian & 85.3 & 92.9 & 92.8 & 92.6 & 92.0 & 92.1 \\
-Evidential & 86.1 & 94.1 & 94.0 & 93.7 & 92.8 & 93.0 \\
-MC-dropout & 86.0 & 94.1 & 94.0 & 93.7 & 92.8 & 92.9 \\
-Gaussian ens. & 85.5 & 92.8 & 92.7 & 92.5 & 91.9 & 91.7 \\
-Evidential ens. & 86.0 & 93.7 & 93.6 & 93.5 & 92.5 & 92.4 \\
+Deterministic & 86.0 & 92.2 & 92.1 & 91.9 & 91.8 & 92.0 & 91.6 \\
+Gaussian & 85.3 & 92.9 & 92.8 & 92.6 & 92.0 & 92.1 & 91.4 \\
+Evidential & 86.1 & 94.1 & 94.0 & 93.7 & 92.8 & 93.0 & 92.2 \\
+MC-dropout & 86.0 & 94.1 & 94.0 & 93.7 & 92.8 & 92.9 & 92.2 \\
+Gaussian ens. & 85.5 & 92.8 & 92.7 & 92.5 & 91.9 & 91.7 & 91.1 \\
+Evidential ens. & 86.0 & 93.7 & 93.6 & 93.5 & 92.5 & 92.4 & 91.9 \\
 \midrule
-\multicolumn{7}{l}{\emph{Area relative to max-score}} \\
-Deterministic & 0.65 & 1.03 & 1.01 & 1.00 & 0.98 & 1.00 \\
-Gaussian & 0.67 & 1.08 & 1.07 & 1.05 & 1.00 & 1.00 \\
-Evidential & 0.60 & 1.13 & 1.11 & 1.09 & 1.00 & 1.00 \\
-MC-dropout & 0.60 & 1.14 & 1.12 & 1.09 & 1.00 & 1.00 \\
-Gaussian ens. & 0.70 & 1.10 & 1.09 & 1.07 & 1.02 & 1.00 \\
-Evidential ens. & 0.61 & 1.14 & 1.13 & 1.12 & 1.01 & 1.00 \\
+\multicolumn{8}{l}{\emph{Area relative to max-score}} \\
+Deterministic & 0.65 & 1.03 & 1.01 & 1.00 & 0.98 & 1.00 & 0.92 \\
+Gaussian & 0.67 & 1.08 & 1.07 & 1.05 & 1.00 & 1.00 & 0.93 \\
+Evidential & 0.60 & 1.13 & 1.11 & 1.09 & 1.00 & 1.00 & 0.91 \\
+MC-dropout & 0.60 & 1.14 & 1.12 & 1.09 & 1.00 & 1.00 & 0.91 \\
+Gaussian ens. & 0.70 & 1.10 & 1.09 & 1.07 & 1.02 & 1.00 & 0.96 \\
+Evidential ens. & 0.61 & 1.14 & 1.13 & 1.12 & 1.01 & 1.00 & 0.91 \\
 \midrule
-\multicolumn{7}{l}{\emph{Worst seen expression, joint coverage (\%)}} \\
-Deterministic & 78.4 & 88.4 & 87.9 & 87.6 & 87.4 & 86.8 \\
-Gaussian & 78.6 & 89.5 & 89.3 & 89.2 & 88.0 & 87.9 \\
-Evidential & 83.6 & 91.9 & 91.8 & 91.6 & 90.6 & 90.5 \\
-MC-dropout & 83.4 & 91.8 & 91.6 & 91.4 & 90.6 & 90.4 \\
-Gaussian ens. & 79.0 & 89.4 & 89.4 & 89.0 & 88.1 & 88.3 \\
-Evidential ens. & 83.3 & 91.8 & 91.8 & 91.8 & 90.9 & 90.5 \\
+\multicolumn{8}{l}{\emph{Worst seen expression, joint coverage (\%)}} \\
+Deterministic & 78.4 & 88.4 & 87.9 & 87.6 & 87.4 & 86.8 & 86.7 \\
+Gaussian & 78.6 & 89.5 & 89.3 & 89.2 & 88.0 & 87.9 & 87.8 \\
+Evidential & 83.6 & 91.9 & 91.8 & 91.6 & 90.6 & 90.5 & 90.2 \\
+MC-dropout & 83.4 & 91.8 & 91.6 & 91.4 & 90.6 & 90.4 & 90.1 \\
+Gaussian ens. & 79.0 & 89.4 & 89.4 & 89.0 & 88.1 & 88.3 & 87.4 \\
+Evidential ens. & 83.3 & 91.8 & 91.8 & 91.8 & 90.9 & 90.5 & 89.8 \\
 \bottomrule
 \end{tabular}

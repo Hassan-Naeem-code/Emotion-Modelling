@@ -38,13 +38,25 @@ prediction~\cite{vovk2005algorithmic,lei2018distribution,angelopoulos2021gentle}
 gives finite-sample marginal coverage under exchangeability. For multi-output
 regression, per-output intervals with a union-bound (Bonferroni) correction are
 valid but conservative, and copula-based methods~\cite{messoudi2021copula} model
-the dependence between outputs to tighten the joint region. Our max-score region
-is a simpler member of this family, with no dependence model to fit. Conditional
+the dependence between outputs to tighten the joint region; ellipsoidal
+regions~\cite{messoudi2022ellipsoidal} use a Mahalanobis score, and
+representation-learning approaches~\cite{feldman2023calibrated} learn
+non-convex regions. Our max-score region is a simpler member of this family,
+with no dependence model to fit, and we compare against the copula and
+ellipsoidal constructions directly. Conditional
 coverage over groups can be obtained by Mondrian conformal
 prediction~\cite{vovk2012conditional} and is a fairness
-requirement~\cite{romano2020malice}, but exact conditional coverage for arbitrary
+requirement~\cite{romano2020malice}; with many groups and little data per
+group, groups can be clustered by their score
+distributions~\cite{ding2023class}, and coverage can be guaranteed over a
+whole class of covariate shifts or overlapping
+groups~\cite{gibbs2025conditional}. All of these need calibration data from
+the group, or at least a group that is defined in advance. Exact conditional coverage for arbitrary
 inputs is impossible without assumptions~\cite{barber2021limits}, and coverage
-under shift needs reweighting~\cite{tibshirani2019covariate}. An expression
+under shift needs reweighting, for covariate shift~\cite{tibshirani2019covariate}
+and for label shift~\cite{podkopaev2021label}, whose milder form is present in
+our data, where the calibration split is class-balanced and the test split is
+not. An expression
 absent from the calibration data is the extreme case: there is nothing to
 reweight or to calibrate a group on, which is the setting of our unseen-expression
 experiment.
