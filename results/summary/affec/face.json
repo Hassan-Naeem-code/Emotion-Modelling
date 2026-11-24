@@ -1,0 +1,117 @@
+{
+  "n_trials": 4980,
+  "n_people": 65,
+  "reps": 100,
+  "felt": {
+    "none": {
+      "coverage": 0.9106789038042211,
+      "area": 0.6965264634862949,
+      "corr_v": -1.0400303395351249e-18,
+      "corr_a": 7.641193523781392e-18
+    },
+    "none + personal k=20": {
+      "coverage": 0.9329827805347436,
+      "area": 0.6423530460326272,
+      "corr_v": NaN,
+      "corr_a": NaN
+    },
+    "none + personal k=40": {
+      "coverage": 0.9323831786842525,
+      "area": 0.6047527584021268,
+      "corr_v": NaN,
+      "corr_a": NaN
+    },
+    "stimulus": {
+      "coverage": 0.9039057147329075,
+      "area": 0.5311885326452465,
+      "corr_v": 0.5758413363225712,
+      "corr_a": 0.31418565767556567
+    },
+    "face": {
+      "coverage": 0.8909251099296921,
+      "area": 0.692905955463441,
+      "corr_v": 0.25939255761010244,
+      "corr_a": 0.05622252591796657
+    },
+    "face (person-normalised)": {
+      "coverage": 0.8975668130876384,
+      "area": 0.6885139064691747,
+      "corr_v": 0.28623365208604323,
+      "corr_a": 0.04339596648807418
+    },
+    "face (person-normalised) + personal k=20": {
+      "coverage": 0.9097181011292627,
+      "area": 0.676685174932866,
+      "corr_v": NaN,
+      "corr_a": NaN
+    },
+    "face (person-normalised) + personal k=40": {
+      "coverage": 0.9053130829437768,
+      "area": 0.6390462724630881,
+      "corr_v": NaN,
+      "corr_a": NaN
+    },
+    "face + stimulus": {
+      "coverage": 0.8978612001527401,
+      "area": 0.5815761961799517,
+      "corr_v": 0.5563751079453144,
+      "corr_a": 0.22882926007377155
+    }
+  },
+  "perceived": {
+    "none": {
+      "coverage": 0.9262554590126509,
+      "area": 0.8631944207491646,
+      "corr_v": 2.7672728989703435e-18,
+      "corr_a": -4.480130410722723e-18
+    },
+    "none + personal k=20": {
+      "coverage": 0.936131498415617,
+      "area": 0.8105353617819739,
+      "corr_v": NaN,
+      "corr_a": NaN
+    },
+    "none + personal k=40": {
+      "coverage": 0.9340247705809535,
+      "area": 0.793124140015488,
+      "corr_v": NaN,
+      "corr_a": NaN
+    },
+    "stimulus": {
+      "coverage": 0.9031642959043421,
+      "area": 0.3928792826742768,
+      "corr_v": 0.8137241330499974,
+      "corr_a": 0.5351320473880117
+    },
+    "face": {
+      "coverage": 0.8957248995653486,
+      "area": 0.8038630987620143,
+      "corr_v": 0.11518812416284473,
+      "corr_a": 0.05926986058479548
+    },
+    "face (person-normalised)": {
+      "coverage": 0.8976647392894829,
+      "area": 0.7975334671049294,
+      "corr_v": 0.1742635025305762,
+      "corr_a": 0.05297922246724287
+    },
+    "face (person-normalised) + personal k=20": {
+      "coverage": 0.908082111372133,
+      "area": 0.7827409071184426,
+      "corr_v": NaN,
+      "corr_a": NaN
+    },
+    "face (person-normalised) + personal k=40": {
+      "coverage": 0.9047418598415371,
+      "area": 0.7609214473911166,
+      "corr_v": NaN,
+      "corr_a": NaN
+    },
+    "face + stimulus": {
+      "coverage": 0.8960782823105938,
+      "area": 0.49616238346166197,
+      "corr_v": 0.7731489585553745,
+      "corr_a": 0.4692562544359538
+    }
+  }
+}

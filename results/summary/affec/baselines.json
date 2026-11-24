@@ -1,0 +1,49 @@
+{
+  "n_trials": 5807,
+  "n_people": 72,
+  "reps": 200,
+  "felt": {
+    "none": {
+      "coverage": 0.9130848215181575,
+      "area": 0.698307708485685
+    },
+    "stimulus": {
+      "coverage": 0.9001650522620989,
+      "area": 0.5362225402085272
+    },
+    "stimulus+personal_k20": {
+      "coverage": 0.9164714214101427,
+      "area": 0.5306067953742609
+    },
+    "stimulus+personal_k40": {
+      "coverage": 0.9130756668926313,
+      "area": 0.4914150801510123
+    }
+  },
+  "perceived": {
+    "none": {
+      "coverage": 0.9242206093095316,
+      "area": 0.8654003970090264
+    },
+    "stimulus": {
+      "coverage": 0.9073756992925461,
+      "area": 0.3949768725044877
+    },
+    "stimulus+personal_k20": {
+      "coverage": 0.9154035846731157,
+      "area": 0.4339329470583476
+    },
+    "stimulus+personal_k40": {
+      "coverage": 0.9119574183935213,
+      "area": 0.38820368230293817
+    }
+  },
+  "felt_vs_perceived_mean_abs_diff": [
+    0.30437403134148444,
+    0.37631307043223694
+  ],
+  "felt_perceived_corr": [
+    0.6357918031662559,
+    0.576662085871728
+  ]
+}
