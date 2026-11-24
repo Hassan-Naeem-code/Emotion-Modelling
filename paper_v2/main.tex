@@ -43,20 +43,25 @@ $78$--$84\%$. We replace the per-axis score with a single variance-normalised
 max-score that yields a rectangular VA region with a finite-sample joint
 guarantee. It restores nominal joint coverage on both datasets and, for every
 method with learned uncertainty, is $7$--$13\%$ smaller than the Bonferroni
-correction that achieves the same guarantee. We then ask where any such
+correction that achieves the same guarantee; it is also smaller than
+independence and Gaussian copula regions, and matches the empirical copula in
+size while keeping an exact guarantee. We then ask where any such
 guarantee breaks. Holding each of AffectNet's seven expressions out of training
 and calibration in turn, coverage on the held-out expression falls to
 $28$--$82\%$ ($28\%$ for \emph{happy}), while coverage on the other
 expressions stays at $91$--$93\%$, so the aggregate number hides the failure.
 Bonferroni does not prevent it, and the predictive uncertainty does not flag
-it (AUROC $0.47$--$0.81$). The naturally unseen \emph{contempt} expression
+it (AUROC $0.47$--$0.81$). Twenty labelled faces of the missing expression
+restore its coverage by group recalibration, but at three to nine times the
+usual region size; removing the expression's mean offset first halves that cost
+where the failure is worst. The naturally unseen \emph{contempt} expression
 shows the same pattern, and there feature-space novelty detectors fail too,
 because contempt is not an unusual input: its nearest training faces are mostly
 happy and neutral, and only its label is new. Results are over multiple seeds,
 two backbones and two datasets, with proper scoring rules, a calibration split
 that is never used for model selection, and a corruption shift. Joint coverage
-is cheap to obtain and should be the default; covering expressions absent from
-the calibration data remains open.
+is cheap to obtain and should be the default; for expressions absent from the
+calibration data, a guarantee has to be bought with labelled examples of them.
 \end{abstract}
 
 \input{sections/introduction}

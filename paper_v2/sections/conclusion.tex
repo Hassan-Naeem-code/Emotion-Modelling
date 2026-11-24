@@ -6,16 +6,21 @@ the guarantee on the wrong event and under-covers the VA point by about
 four to six points at nominal $90\%$, on AffectNet and on AFEW-VA alike. One
 max-normalised score fixes this with a finite-sample joint guarantee and,
 whenever the uncertainty is learned, smaller regions than the Bonferroni
-correction. It costs a single line of code, and we recommend it as the default.
+correction and the independence and Gaussian copulas, and the same size as the
+empirical copula with an exact rather than approximate guarantee. It costs a
+single line of code, and we recommend it as the default.
 
 The harder finding is where guarantees end. An expression absent from the
 calibration data loses coverage under every method we tried, for every one of
 AffectNet's seven expressions when held out and for the naturally unseen
 contempt, while coverage on the other expressions stays near nominal. None of the
-uncertainty estimators reliably notices. Conformal methods cannot fix this by
-construction, so a deployed affect estimator needs either calibration data that
-spans the expressions it will meet or an uncertainty signal that actually rises
-on novel ones. We found neither in the standard toolkit, and the reason is
+uncertainty estimators reliably notices. A guarantee can be bought back with
+data: twenty labelled faces of the missing expression restore its coverage by
+group recalibration, and removing its mean offset first halves the size of the
+resulting region for the expressions that fail worst. But that region is still
+two to nine times the usual size, and applying it requires knowing which faces
+belong to the new expression. We found no uncertainty signal in the standard
+toolkit that supplies this, and the reason is
 instructive: the model maps an unseen expression onto the expressions it has
 seen, and contempt in particular is not an unusual input but a familiar-looking
 face with an unfamiliar meaning, so no signal computed from the input alone can
@@ -29,7 +34,9 @@ the AFEW-VA predictor is weak (CCC $0.30$--$0.33$) because we kept the AffectNet
 protocol unchanged. We treat video frames independently; a temporal model and
 clip-level calibration are natural extensions, as is a third dataset with
 expression labels (Aff-Wild2~\cite{kollias2019affwild2}). The held-out-expression
-experiment uses the evidential head (and MC-dropout from the same weights) with three seeds. The naturally unseen
+experiment uses the evidential head (and MC-dropout from the same weights) with three seeds. The recalibration experiment draws its $k$
+examples from the test images of the held-out expression and assumes its
+membership is known at test time. The naturally unseen
 expression has only $70$ examples, so its coverage estimates carry wide intervals
 (we report them). The categorical labels used for the per-expression audit are
 themselves noisy annotations of a continuous state, and annotator-level labels

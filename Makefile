@@ -130,6 +130,14 @@ v2-tables:
 		--out results/summary/loeo --ref $(V2_PREDS) --tables paper_v2/tables >/dev/null && \
 		echo "wrote tables/loeo.tex"; \
 	else echo "(results/loeo/preds absent: LOEO table kept as committed)"; fi
+	$(PY) -m eval.joint_regions --preds $(V2_PREDS) --prefix v2 --out results/summary/joint_regions \
+		--tables paper_v2/tables --name copula >/dev/null && echo "wrote tables/copula.tex"
+	@if [ -d results/afew/preds ]; then $(PY) -m eval.joint_regions --preds results/afew/preds \
+		--prefix v2_afew --out results/summary/joint_regions --name copula_afew >/dev/null; fi
+	@if [ -d results/loeo/preds ]; then $(PY) -m eval.recalibrate --preds results/loeo/preds \
+		--out results/summary/recalibrate --tables paper_v2/tables >/dev/null && \
+		echo "wrote tables/recalibrate.tex"; \
+	else echo "(results/loeo/preds absent: recalibration table kept as committed)"; fi
 
 tmlr:
 	bash scripts/make_tmlr.sh

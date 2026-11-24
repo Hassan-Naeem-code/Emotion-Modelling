@@ -56,8 +56,15 @@ then applies unchanged~\cite{lei2018distribution}.
 The \textbf{Bonferroni} alternative runs the per-axis construction at level
 $\alpha/2$. It has the same guarantee but ignores that the two normalised
 residuals are dependent, so it is conservative. The max-score adapts to that
-dependence without modelling it, unlike copula
-approaches~\cite{messoudi2021copula}. The region inherits the predictor's
+dependence without modelling it. Copula
+methods~\cite{messoudi2021copula} instead choose a per-axis level $t$ so that
+the two calibration ranks fall below $t$ together with probability $1-\alpha$,
+assuming independent axes ($t=\sqrt{1-\alpha}$), a Gaussian copula, or the
+empirical copula of the calibration ranks; we compare against all three in
+Section~\ref{sec:copula}. The empirical copula is the closest relative: with
+ranks in place of $\hat\sigma$-normalised residuals it is a max-score region,
+but since the ranks are computed on the calibration set itself its guarantee is
+approximate rather than exact. The region inherits the predictor's
 heteroscedasticity through $\hat\sigma$, so uncertain inputs get larger regions,
 and it is the same object our on-device demonstrator uses as its abstention
 signal.\footnote{Live in-browser demo, with the region drawn on the VA plane:
@@ -72,3 +79,21 @@ calibration data, no conformal method can promise coverage, so the remaining
 safeguard is the uncertainty itself. We measure whether it rises on such inputs by
 the AUROC of the total predictive standard deviation
 $\sum_d\hat\sigma_d$ for separating them from the seen test inputs.
+
+\subsection{Recalibrating for a new expression}
+\label{sec:recal-method}
+If $k$ labelled examples of the new expression can be collected, coverage on it
+can be restored without retraining. \textbf{Group} recalibration (Mondrian
+conformal~\cite{vovk2012conditional}) computes a separate max-score threshold
+from those $k$ examples; by Proposition~\ref{prop:joint} applied within the
+group, it has joint coverage at least $1-\alpha$ on that expression whenever
+$k\ge\lceil 1/\alpha\rceil-1$ ($9$ at $\alpha=0.1$). Because an unseen
+expression's error is largely a systematic offset (Section~\ref{sec:loeo}), we
+also test \textbf{shift} recalibration: half of the $k$ examples estimate the
+mean residual $\bar r$ of the expression, which is subtracted from its
+predictions, and the other half calibrate the max-score threshold on the
+corrected residuals $|y-\hat\mu-\bar r|/\hat\sigma$. The two halves are
+disjoint, so this is again an exact split-conformal guarantee. Neither variant
+changes the region of any other expression. Both require knowing which
+expression a face belongs to at test time; we return to this limitation in
+Section~\ref{sec:recal}.

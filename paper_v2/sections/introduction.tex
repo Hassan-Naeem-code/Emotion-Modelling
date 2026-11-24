@@ -45,8 +45,11 @@ this paper.
         joint coverage (Proposition~\ref{prop:joint}). On both datasets it
         restores nominal joint coverage, and for every method with learned
         uncertainty it is $7$--$13\%$ smaller than the Bonferroni correction
-        that gives the same guarantee. On AffectNet it also raises the
-        worst-expression coverage.
+        that gives the same guarantee, and $2$--$13\%$ smaller than
+        independence and Gaussian copula regions. The empirical copula matches
+        it in size, but its guarantee is only approximate; we do not claim the
+        max-score is tighter than it. On AffectNet the max-score region also
+        raises the worst-expression coverage.
   \item \textbf{Where the guarantee breaks, systematically.} We hold each of
         AffectNet's seven expressions out of training and calibration in turn.
         Coverage on the held-out expression falls for every one of them, to
@@ -62,6 +65,13 @@ this paper.
         contempt looks like the happy and neutral faces the model has seen. This
         is a concrete, reproducible instance of the limits of distribution-free
         inference~\cite{barber2021limits} in affect.
+  \item \textbf{What it takes to repair.} Given $k$ labelled faces of the
+        missing expression, group (Mondrian) recalibration restores its
+        coverage to $90$--$91\%$ from $k=10$, at three to nine times the usual
+        region size. Since the failure is largely a systematic offset, removing
+        the expression's mean offset before calibrating, with an exact guarantee
+        kept by splitting the $k$ faces, halves that cost for \emph{happy} and
+        \emph{sad}, the expressions that fail worst.
   \item \textbf{A clean, broader benchmark.} Five uncertainty methods
         (deterministic, Gaussian, deep evidential regression, MC-dropout, deep
         ensembles) over multiple seeds, two backbones and two datasets, scored

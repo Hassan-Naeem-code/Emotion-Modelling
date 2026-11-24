@@ -67,6 +67,37 @@ over-represents \emph{happy}, an expression with narrow residuals.
   \label{tab:coverage}
 \end{table}
 
+\paragraph{Comparison with copula regions.}
+\label{sec:copula}
+Table~\ref{tab:copula} compares the max-score region with the three copula
+constructions of Messoudi et al.~\cite{messoudi2021copula}, all built on the
+same normalised residuals. The two parametric copulas cover the VA point but are
+larger: by $7$--$13\%$ for the independence copula and $5$--$12\%$ for the
+Gaussian copula on AffectNet for methods with learned uncertainty, and by
+$6$--$13\%$ and $2$--$9\%$ on AFEW-VA. The normalised residuals of valence and
+arousal are positively dependent (rank correlation $0.10$--$0.18$ on AffectNet,
+$0.28$--$0.39$ on AFEW-VA), which the independence copula ignores and the
+Gaussian copula models only approximately. The empirical copula is a different
+matter. On AffectNet its regions are within $2\%$ of the max-score region, with
+the same coverage; on AFEW-VA they are $1$--$7\%$ \emph{smaller} for single
+models (coverage $0.904$--$0.908$ against $0.906$--$0.909$), and the Gaussian
+ensemble covers $0.895$ under it. We therefore do not claim that the max-score
+region is tighter than the empirical copula. What it offers is an exact
+finite-sample guarantee, from one scalar score with no rank estimation, at
+essentially the same size; the empirical copula's guarantee holds only
+approximately, because its ranks are computed on the calibration set itself.
+
+\begin{table}[h]
+  \centering\small
+  \resizebox{\linewidth}{!}{\input{tables/copula.tex}}
+  \caption{Max-score against copula regions on AffectNet (nominal $90\%$, mean
+  over five seeds; ensembles combine the five seeds). All regions are
+  rectangles on the same $\hat\sigma$-normalised residuals and differ only in
+  how the two per-axis thresholds are chosen (Section~\ref{sec:method}). The
+  AFEW-VA comparison is in the text and released with the code.}
+  \label{tab:copula}
+\end{table}
+
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{tables/per_emotion.pdf}
@@ -191,6 +222,55 @@ not warn that it has not.
   \label{tab:loeo}
 \end{table}
 
+\subsection{Twenty labelled examples restore the guarantee, at a cost}
+\label{sec:recal}
+If the failure cannot be detected, can it be repaired? Table~\ref{tab:recal}
+gives the calibrator $k$ labelled faces of the held-out expression, drawn from
+its test images, and evaluates on the rest ($200$ random draws per run, three
+seeds). Group recalibration restores joint coverage on every held-out
+expression: $90$--$91\%$ already at $k=10$, and $90$--$91\%$ at $k=20$, as
+the guarantee predicts. The price is size. The recalibrated regions are
+$3.5$--$9.3$ times the average region of the seen expressions at $k=20$, and
+shrink only slowly with $k$ ($3.3$--$8.3$ times at $k=100$); when the same
+expressions were in training their regions were $0.7$--$1.4$ times that
+average. A conformal threshold can only widen the region around a prediction
+that is in the wrong place.
+
+Correcting that place first helps where the error is an offset. With shift
+recalibration the region for \emph{happy} falls from $5.1$ to $2.6$ times the
+seen average at $k=20$, and to $1.9$ times at $k=100$; for \emph{sad} from $9.3$
+to $2.4$ and $2.0$ times; for \emph{anger} and \emph{surprise} by a quarter to
+a half. It does not help for \emph{neutral} or \emph{fear}, whose errors are
+less a common offset than a wider spread, and at $k=20$ it is slightly larger
+for both, because each half has only ten examples. Coverage stays at
+$90$--$93\%$ throughout. MC-dropout gives the same pattern (released with the
+code).
+
+The remedy has a precondition that the detection results above make concrete:
+it needs to know which faces belong to the new expression, both to collect the
+$k$ examples and to apply the expression's own region at test time. In this
+experiment that membership comes from the label. In deployment it would have to
+come from the application (for example, a user who reports a state the system
+was not built for), since the model's uncertainty does not supply it. The
+practical reading is that a small, targeted labelling effort, about twenty
+faces, is enough to restore a guarantee for an expression the calibration set
+missed, and that the size of the recalibrated region is a direct measure of how
+much the predictor itself needs that expression in training.
+
+\begin{table}[h]
+  \centering\small
+  \resizebox{\linewidth}{!}{\input{tables/recalibrate.tex}}
+  \caption{Restoring coverage on a held-out expression from $k$ of its labelled
+  faces (evidential head, nominal $90\%$). None: max-score coverage without
+  recalibration (Table~\ref{tab:loeo}). Group: a separate max-score threshold
+  for the expression. +shift: half of the $k$ faces estimate and remove the
+  expression's mean VA offset, the other half calibrate. Each cell is joint
+  coverage in \% on the remaining faces of the expression and, in parentheses,
+  median region area relative to the mean region of the seen expressions. Mean
+  over three seeds and $200$ draws; -- where fewer than $20$ faces would remain.}
+  \label{tab:recal}
+\end{table}
+
 \subsection{Corruption shift}
 Under corruption at severity $3$, the evidential model's CCC drops from $0.720$
 to $0.595$. The max-score region keeps joint coverage at $0.920$ without
@@ -285,7 +365,9 @@ Across five predictors, two backbones and two datasets, three findings are
 stable. First, per-axis intervals miss the VA point about $14\%$ of the time at
 nominal $10\%$, on AffectNet and on AFEW-VA alike; the max-score region fixes
 this at no cost and, whenever the uncertainty is learned, with regions
-$7$--$13\%$ smaller than Bonferroni. Second, learned uncertainty is what makes
+$7$--$13\%$ smaller than Bonferroni and $2$--$13\%$ smaller than the
+independence and Gaussian copulas; the empirical copula matches it in size,
+with an approximate rather than exact guarantee. Second, learned uncertainty is what makes
 the guarantee useful beyond its marginal form: it lifts the worst seen
 expression from $0.868$ to $0.905$ and, when the backbone degrades under
 corruption, holds coverage there ($0.920$ versus $0.809$) at equal accuracy.
@@ -295,4 +377,7 @@ $28$--$82\%$) and for the naturally unseen contempt ($30$--$39\%$), while
 coverage on the other expressions stays near nominal. Nothing flags these
 faces: not the predictive uncertainty, nor ensembles, nor feature-space
 detectors, because an unseen expression is mapped onto the expressions the
-model has seen.
+model has seen. Twenty labelled faces of the missing expression restore its
+coverage by group recalibration, at three to nine times the usual region size;
+removing the expression's mean offset first halves that cost for the
+expressions that fail worst.
