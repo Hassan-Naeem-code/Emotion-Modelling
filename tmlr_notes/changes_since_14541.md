@@ -40,14 +40,20 @@
    0.20-0.57). 20 labelled sentences restore coverage. Reported honestly as a
    qualified replication.
 
-6. **Ellipsoidal regions and four further references** (Messoudi et al. 2022;
+6. **Fourth dataset, third modality (music).** DEAM (1,802 songs, openSMILE
+   features, 7 genres). Per-axis intervals cover 82% (averaged over re-splits);
+   max-score 90.0-90.1%. Held-out genres lose up to ~6 points (no collapse);
+   uncertainty again uninformative (AUROC 0.48-0.58). Reported as the mild end
+   of a gradient: severe on faces, severe for distinctive text, mild on music.
+
+7. **Ellipsoidal regions and four further references** (Messoudi et al. 2022;
    Feldman et al. 2023; Ding et al. 2023; Gibbs et al. 2025; Podkopaev &
    Ramdas 2021). The ellipse is 4-9% smaller than the max-score rectangle on
    AffectNet but cannot be read as one interval per axis; stated as such.
 
-7. **Framing.** Introduction and abstract now lead with the general point
+8. **Framing.** Introduction and abstract now lead with the general point
    (marginal conformal guarantees mislead for multi-output targets and for
    groups missing from calibration), with VA estimation as the test case.
 
-8. **Claims revised** to match the new evidence; limitations rewritten. All new
+9. **Claims revised** to match the new evidence; limitations rewritten. All new
    tables are computed from released predictions without a GPU, with tests.
