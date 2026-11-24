@@ -47,8 +47,8 @@ The camera/landmark/render path can only be verified by a person. Run
 
 ### Personal calibration ("Make the box yours")
 - [ ] Press **Personalise (20 taps)**: the chart gets a green outline and a
-      hint at the bottom ("Make an expression, then tap where it is (1/20)").
-- [ ] Make an expression, tap the matching point on the chart: a white cross
+      hint at the bottom ("How do you feel right now? Tap it on the chart (1/20)").
+- [ ] Ask yourself how you feel, tap that point on the chart: a white cross
       flashes and the bar advances. While the system says "Not sure", taps are
       ignored (the hint says it is waiting for a confident estimate).
 - [ ] After 20 taps: a **solid green box** (yours) and a **dashed blue box**

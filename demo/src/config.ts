@@ -98,18 +98,20 @@ export type AbstainReason =
 /** Copy for personal calibration (src/calibrate.ts), kept here with the rest. */
 export const CALIBRATION = {
   intro:
-    "The general box is calibrated on other people's faces, so it can miss " +
-    "yours. Make an expression, then tap the point on the chart that matches " +
-    "it. After 20 taps the demo learns your offset and resizes the box, the " +
-    "remedy from the paper. Only the 20 pairs of numbers are kept, in this " +
-    "browser; no images.",
-  hintTap: (n: number, k: number) => `Make an expression, then tap where it is (${n}/${k})`,
+    "The general box is calibrated on other people's faces, and on what " +
+    "their faces showed, so it can miss how you actually feel. Ask yourself " +
+    "\"How do I feel right now?\" and tap that point on the chart. After 20 " +
+    "taps the demo learns the gap between your face and your answer and " +
+    "resizes the box, the remedy from the paper. Only the 20 pairs of " +
+    "numbers are kept, in this browser; no images.",
+  hintTap: (n: number, k: number) => `How do you feel right now? Tap it on the chart (${n}/${k})`,
   hintAbstain: "Waiting for a confident estimate before you tap",
   done:
     "Calibrated. Green: your box. Dashed: the general box. Keep tapping to " +
     "check how often each one contains your answer.",
   caveat:
-    "Your box is valid for expressions like the ones you calibrated with, " +
-    "labelled the same way. New kinds of expression need new taps.",
+    "Your box covers how you say you feel, for moments like the ones you " +
+    "calibrated in (same person, similar light and moods). A very different " +
+    "situation or mood needs new taps.",
 };
 

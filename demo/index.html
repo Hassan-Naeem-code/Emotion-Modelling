@@ -76,11 +76,11 @@
           </ul>
         </div>
 
-        <!-- Live "scanner" preview (simulated) -->
-        <div class="scanner reveal" style="--d: 0.2s" aria-label="Animated preview of the demo (simulated data)">
+        <!-- Live "scanner" preview (example animation, not real data) -->
+        <div class="scanner reveal" style="--d: 0.2s" aria-label="Example animation of the demo, not your data">
           <div class="scanner-top">
             <span class="rec"><i></i> LIVE PREVIEW</span>
-            <span class="muted small">simulated</span>
+            <span class="muted small">example animation, not your data</span>
           </div>
           <div class="face-wrap">
             <canvas id="face"></canvas>
@@ -103,7 +103,7 @@
               <div class="ro-note" id="va-note">90% region</div>
             </div>
             <div class="ro">
-              <div class="ro-h">Pulse <span class="heart" id="heart">♥</span></div>
+              <div class="ro-h">Pulse <span class="heart" id="heart">♥</span> <span class="muted small">experimental</span></div>
               <div class="bpm"><span id="bpm">72</span><small>bpm</small></div>
               <canvas id="ecg"></canvas>
             </div>
@@ -174,9 +174,9 @@
             <div class="ico">
               <svg viewBox="0 0 24 24"><path d="M2 12h4l2.5-6 4 12 2.5-6H22" class="draw beat" /></svg>
             </div>
-            <h3>Pulse from video</h3>
-            <p>Each heartbeat changes your skin colour very slightly. The POS rPPG algorithm finds it in your forehead and cheeks, and stays blank when the signal is poor.</p>
-            <span class="tag">rPPG · quality-gated</span>
+            <h3>Pulse from video <span class="muted small">(experimental)</span></h3>
+            <p>Each heartbeat changes your skin colour very slightly. The POS rPPG algorithm finds it in your forehead and cheeks, and stays blank when the signal is poor. Experimental: not yet checked against a heart-rate monitor.</p>
+            <span class="tag">rPPG · quality-gated · experimental</span>
           </article>
           <article class="feature tilt reveal" style="--d: 0.24s; --c: var(--accent2)">
             <div class="ico">
