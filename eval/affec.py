@@ -333,10 +333,139 @@ def face(args):
     print(f"wrote {OUT / 'face.json'}")
 
 
+# ------------------------------------------------- body signals (not a camera) ---
+
+BODY = Path("results/affec/body_features.npz")
+SCR_LAG = 3.0       # skin conductance responds 1-3 s after the stimulus
+
+
+def _change(t, v, win, lag=0.0):
+    """Response of a slow signal in one trial: mean and peak change from the
+    pre-clip baseline, and slope while watching. None if too little data."""
+    ok = np.isfinite(v)
+    w = ok & (t >= win[0]) & (t <= win[1] + lag)
+    b = ok & (t >= win[2]) & (t <= win[3])
+    if w.sum() < 20 or b.sum() < 5:
+        return None
+    base = v[b].mean()
+    slope = np.polyfit(t[w] - t[w][0], v[w], 1)[0]
+    return [v[w].mean() - base, v[w].max() - base, slope, base]
+
+
+def _read_body(args):
+    import gzip
+    import zipfile
+    sub, run, events = args
+    wins = _windows(events)
+    streams = {}
+    for zf, mod in (("gsr.zip", "gsr"), ("pupil.zip", "pupil")):
+        z = zipfile.ZipFile(ZIP.parent / zf)
+        m = f"{sub}/beh/{sub}_task-fer_run-{run}_recording-{mod}_physio"
+        try:
+            cols = json.loads(z.read(m + ".json"))["Columns"]
+            with z.open(m + ".tsv.gz") as f:
+                a = np.loadtxt(gzip.open(f, "rt"), delimiter="\t", ndmin=2)
+        except (KeyError, EOFError, OSError, ValueError):
+            continue
+        t = a[:, cols.index("onset")]
+        if mod == "gsr":
+            v = a[:, cols.index("GSR_Conductance_cal")]
+        else:
+            # Pupil diameter in camera pixels (LPD/RPD). The calibrated LPUPILD/RPUPILD
+            # columns are all zero in this release; the AFFEC devkit also uses LPD/RPD.
+            # Distance to the camera scales pixels, hence the per-trial baseline change.
+            d = np.stack([a[:, cols.index("LPD")], a[:, cols.index("RPD")]], 1)
+            d = np.where(d > 0, d, np.nan)
+            with np.errstate(all="ignore"), __import__("warnings").catch_warnings():
+                __import__("warnings").simplefilter("ignore")     # blinks: both eyes NaN
+                v = np.nanmean(d, 1)
+        streams[mod] = (t, v)
+    out = []
+    for trial, win in wins.items():
+        feats = []
+        for mod, lag in (("pupil", 0.0), ("gsr", SCR_LAG)):
+            r = _change(*streams[mod], win, lag) if mod in streams else None
+            feats += r if r is not None else [np.nan] * 4
+        out.append((trial, np.array(feats, np.float32)))
+    return sub, run, out
+
+
+def body_features(args):
+    import re
+    import warnings
+    from multiprocessing import Pool
+    warnings.filterwarnings("ignore")
+    jobs = []
+    for ev in sorted(ROOT.glob("sub-*/sub-*_task-fer_run-*_events.tsv")):
+        k = re.match(r"(sub-[^_]+)_task-fer_run-(\d+)_events", ev.name)
+        jobs.append((k[1], int(k[2]), ev))
+    keys, xs = [], []
+    with Pool(args.workers) as pool:
+        for i, (sub, run, out) in enumerate(pool.imap_unordered(_read_body, jobs), 1):
+            for trial, x in out:
+                keys.append(f"{sub[4:]}|{run}|{trial}")
+                xs.append(x)
+            print(f"\r{i}/{len(jobs)} runs", end="", flush=True)
+    x = np.stack(xs)
+    np.savez_compressed(BODY, keys=np.array(keys), x=x)
+    print(f"\nwrote {BODY}: {len(keys)} trials; pupil present in {np.isfinite(x[:, 0]).sum()}, "
+          f"skin conductance in {np.isfinite(x[:, 4]).sum()}")
+
+
+def body(args):
+    """Face vs body signals vs both, on the trials that have all of them."""
+    import torch
+    torch.set_num_threads(4)
+    d, xf = _joined()
+    b = np.load(BODY)
+    bpos = {k: i for i, k in enumerate(b["keys"])}
+    keys = np.array([f"{s}|{r}|{t}" for s, r, t in zip(d["subject"], d["run"], d["trial"])])
+    xb = np.array([b["x"][bpos[k]] if k in bpos else np.full(b["x"].shape[1], np.nan) for k in keys], np.float32)
+    keep = np.isfinite(xb).all(1)
+    d, xf, xb = {k: v[keep] for k, v in d.items()}, xf[keep], xb[keep]
+    xf, xb = person_normalise(xf, d["subject"]), person_normalise(xb, d["subject"])
+    inputs = {"face": xf, "body (pupil + skin conductance)": xb, "face + body": np.c_[xf, xb]}
+    people = np.unique(d["subject"])
+    rng = np.random.default_rng(0)
+    print(f"{len(xf)} trials with face, pupil and skin conductance; {len(people)} people; "
+          f"{args.reps} person re-splits\n")
+    res = {"n_trials": int(len(xf)), "n_people": int(len(people)), "reps": args.reps}
+    for target in TARGETS:
+        y = d[target]
+        acc: dict[str, list] = {}
+        for rep in range(args.reps):
+            tr, ca, te = person_split(people, rng)
+            itr, ica, ite = (np.isin(d["subject"], list(g)) for g in (tr, ca, te))
+            preds = {"none": (np.tile(y[itr].mean(0), (len(y), 1)), np.tile(y[itr].std(0), (len(y), 1)))}
+            cc, ss = fit_stimulus(y[itr], d["cat"][itr])
+            preds["stimulus"] = (cc[d["cat"]], ss[d["cat"]])
+            for name, xi in inputs.items():
+                preds[name] = _fit_face(xi, y, itr, seed=rep)
+            for m, (c, s) in preds.items():
+                q = qhat(score(y[ica], c[ica], s[ica]))
+                acc.setdefault(m, []).append(
+                    [np.mean(score(y[ite], c[ite], s[ite]) <= q), box_area(c[ite], s[ite], q),
+                     *[np.corrcoef(c[ite, i], y[ite, i])[0, 1] if c[ite, i].std() > 0 else 0.0 for i in (0, 1)]])
+                if m in ("none", "face + body"):
+                    for k, (cv, ar) in personal(y[ite], c[ite], s[ite], d["subject"][ite], (40,), rng).items():
+                        acc.setdefault(f"{m} + personal k={k}", []).append([cv, ar, np.nan, np.nan])
+            print(f"\r{target}: {rep + 1}/{args.reps}", end="", flush=True)
+        res[target] = {m: dict(zip(("coverage", "area", "corr_v", "corr_a"), np.nanmean(v, 0).tolist()))
+                       for m, v in acc.items()}
+        print(f"\r{target:>9}: {'what the system knows':<36} cover  box   corr V / A")
+        for m, v in res[target].items():
+            cr = "" if np.isnan(v["corr_v"]) else f"{v['corr_v']:+.2f} / {v['corr_a']:+.2f}"
+            print(f"{'':>11}{m:<36} {v['coverage']:5.1%} {v['area']:5.1%}  {cr}")
+        print()
+    (OUT / "body.json").write_text(json.dumps(res, indent=2))
+    print(f"wrote {OUT / 'body.json'}")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["baselines", "features", "face"])
+    ap.add_argument("cmd", choices=["baselines", "features", "face", "body-features", "body"])
     ap.add_argument("--reps", type=int, default=200)
     ap.add_argument("--workers", type=int, default=8)
     a = ap.parse_args()
-    {"baselines": baselines, "features": features, "face": face}[a.cmd](a)
+    {"baselines": baselines, "features": features, "face": face,
+     "body-features": body_features, "body": body}[a.cmd](a)

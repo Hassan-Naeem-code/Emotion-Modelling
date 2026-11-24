@@ -41,3 +41,11 @@ def test_windows_pair_clip_with_preceding_fixation(tmp_path):
                   "11\t4\tsad\tvideo\ta\t1\t1\t0\tx\n"
                   "15\t1\tsad\tlast_frame_video\ta\t1\t1\t0\tx\n")
     assert affec._windows(ev) == {1: (11.0, 16.0, 10.0, 11.0)}
+
+
+def test_change_measures_response_from_baseline():
+    t = np.arange(0, 20, 0.1)
+    v = np.where(t >= 10, 2.0, 1.0)               # signal steps up when the clip starts
+    mean_change, peak_change, _, base = affec._change(t, v, (10.0, 15.0, 8.0, 9.9))
+    assert base == 1.0 and mean_change == 1.0 and peak_change == 1.0
+    assert affec._change(t, v, (10.0, 10.5, 8.0, 9.9)) is None   # too few samples
