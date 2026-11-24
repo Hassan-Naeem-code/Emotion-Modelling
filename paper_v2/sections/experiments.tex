@@ -70,6 +70,26 @@ deterministic, Gaussian, and evidential heads with three seeds each (MC-dropout
 and three-member ensembles are formed from them as before); one model takes
 about $45$ minutes on an NVIDIA T4.
 
+\paragraph{Third dataset: text.} To test whether the findings are specific to
+faces, we repeat them on a different modality. EmoBank~\cite{buechel2017emobank}
+contains $10{,}062$ English sentences rated for valence, arousal and dominance
+on a $1$--$5$ scale; we use valence and arousal, mapped to $[-1,1]$. The
+sentences come from seven kinds of text (blogs, essays, fiction, letters,
+newspapers, news headlines from SemEval, travel guides), which play the role
+the expressions play on AffectNet: they define the groups for the audit, and
+the held-out-group experiment removes one of them at a time from training and
+calibration. We use the official split ($8{,}062$ / $1{,}000$ / $1{,}000$
+sentences): training ($10\%$ held out for checkpoint selection), the
+development set for conformal calibration, and the test set. The text encoder
+(RoBERTa-base~\cite{liu2019roberta}) is frozen; each sentence is represented by
+the mean of its last hidden layer, and the same deterministic, Gaussian and
+evidential heads are trained on top of it, with input dropout $0.2$ for
+MC-dropout, five seeds for the main runs and three for each held-out genre.
+Embedding and all heads take a few minutes on a laptop. The calibration and test sets have
+only $1{,}000$ sentences each, so a single split carries about one point of
+sampling error in coverage; we therefore also report coverage averaged over
+$200$ random re-splits of the pooled development and test sentences.
+
 \paragraph{Distribution shift.} As a covariate shift with fixed labels, we apply
 Gaussian blur, Gaussian noise, brightness, contrast, and JPEG compression to the
 test images at severity $3$, cycling through the five types by image index in the
@@ -100,4 +120,5 @@ held-out-expression and AFEW-VA tables are produced by the same scripts
 (\texttt{eval/loeo.py}, \texttt{eval/analyze.py}) from their own prediction
 files, and the copula and recalibration comparisons by
 \texttt{eval/joint\_regions.py} and \texttt{eval/recalibrate.py}, also without
-a GPU. \codestatement
+a GPU. The EmoBank experiment, from download to table, is
+\texttt{eval/emobank.py}. \codestatement

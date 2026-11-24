@@ -138,6 +138,9 @@ v2-tables:
 		--out results/summary/recalibrate --tables paper_v2/tables >/dev/null && \
 		echo "wrote tables/recalibrate.tex"; \
 	else echo "(results/loeo/preds absent: recalibration table kept as committed)"; fi
+	@if [ -d results/emobank/preds ]; then $(PY) -m eval.emobank analyze --tables paper_v2/tables >/dev/null && \
+		echo "wrote tables/emobank.tex"; \
+	else echo "(results/emobank/preds absent: EmoBank table kept as committed; python -m eval.emobank embed && run)"; fi
 
 tmlr:
 	bash scripts/make_tmlr.sh

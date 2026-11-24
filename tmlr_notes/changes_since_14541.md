@@ -31,9 +31,23 @@
    5.1x -> 2.6x, sad 9.3x -> 2.4x at k=20). Its precondition (knowing which
    faces belong to the new expression) is stated as a limitation.
 
-5. **Framing.** Introduction and abstract now lead with the general point
+5. **Third dataset, second modality (text).** EmoBank (10,062 sentences,
+   7 kinds of text), frozen RoBERTa encoder, same heads. Per-axis intervals
+   cover the VA point only 82%; the max-score region covers 90.0% averaged
+   over 200 calibration/test re-splits. Holding out one kind of text at a time:
+   news headlines drop to 55% coverage, letters and fiction to 80-85%, the
+   other four are unaffected; uncertainty again fails to flag (AUROC
+   0.20-0.57). 20 labelled sentences restore coverage. Reported honestly as a
+   qualified replication.
+
+6. **Ellipsoidal regions and four further references** (Messoudi et al. 2022;
+   Feldman et al. 2023; Ding et al. 2023; Gibbs et al. 2025; Podkopaev &
+   Ramdas 2021). The ellipse is 4-9% smaller than the max-score rectangle on
+   AffectNet but cannot be read as one interval per axis; stated as such.
+
+7. **Framing.** Introduction and abstract now lead with the general point
    (marginal conformal guarantees mislead for multi-output targets and for
    groups missing from calibration), with VA estimation as the test case.
 
-6. **Claims revised** to match the new evidence; limitations rewritten. All new
+8. **Claims revised** to match the new evidence; limitations rewritten. All new
    tables are computed from released predictions without a GPU, with tests.

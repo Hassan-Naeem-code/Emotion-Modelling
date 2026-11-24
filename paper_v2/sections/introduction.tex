@@ -36,8 +36,8 @@ this paper.
   \item \textbf{A diagnosis.} On AffectNet~\cite{mollahosseini2017affectnet},
         per-axis conformal intervals at nominal $90\%$ jointly cover the true VA
         point only $85$--$86\%$ of the time, across every uncertainty method we
-        test, and $84$--$86\%$ on the video dataset
-        AFEW-VA~\cite{kossaifi2017afew}. On AffectNet coverage is also uneven
+        test, $84$--$86\%$ on the video dataset
+        AFEW-VA~\cite{kossaifi2017afew}, and $82\%$ on text. On AffectNet coverage is also uneven
         across expressions, with the worst seen expression at $78$--$84\%$
         depending on the predictor.
   \item \textbf{A simple fix with a guarantee.} A single max-normalised
@@ -83,7 +83,9 @@ this paper.
 \end{enumerate}
 
 \paragraph{Scope.} We study still images from AffectNet and video frames from
-AFEW-VA, treating each frame independently. The claims are about what
+AFEW-VA, treating each frame independently, and repeat the main findings on
+sentences from the EmoBank text corpus~\cite{buechel2017emobank} to show that
+they are not specific to faces. The claims are about what
 calibrated VA uncertainty does and does not guarantee, not about
 state-of-the-art accuracy, and we position our predictor against published
 results in Section~\ref{sec:results}. The system is intended for estimating a

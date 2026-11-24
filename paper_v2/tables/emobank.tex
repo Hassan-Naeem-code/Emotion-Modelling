@@ -1,0 +1,23 @@
+\begin{tabular}{lrrrrrr}
+\toprule
+ & & Per-axis & \multicolumn{2}{c}{Bonferroni} & \multicolumn{2}{c}{Max-score (ours)} \\
+Method & CCC & Joint & Joint & Area & Joint & Worst genre \\
+\midrule
+Deterministic & 0.544 & 0.816 & 0.893 & 1.05$\times$ & 0.891 & 0.845 \\
+Gaussian & 0.531 & 0.819 & 0.904 & 1.03$\times$ & 0.901 & 0.866 \\
+Evidential & 0.524 & 0.815 & 0.894 & 1.02$\times$ & 0.889 & 0.845 \\
+MC-dropout & 0.521 & 0.815 & 0.894 & 1.02$\times$ & 0.889 & 0.850 \\
+Gaussian ens. & 0.549 & 0.823 & 0.887 & 1.04$\times$ & 0.890 & 0.871 \\
+Evidential ens. & 0.542 & 0.825 & 0.889 & 1.04$\times$ & 0.886 & 0.850 \\
+\midrule
+Held-out genre & $n$ & In training & Per-axis & Bonferroni & Max-score & Others \\
+\midrule
+blog & 133 & 0.877 & 0.825 & 0.912 & 0.900 & 0.901 \\
+essays & 113 & 0.891 & 0.808 & 0.897 & 0.894 & 0.893 \\
+fiction & 274 & 0.875 & 0.726 & 0.850 & 0.835 & 0.904 \\
+letters & 140 & 0.898 & 0.681 & 0.814 & 0.800 & 0.897 \\
+newspaper & 131 & 0.908 & 0.850 & 0.916 & 0.908 & 0.898 \\
+SemEval & 118 & 0.870 & 0.444 & 0.548 & 0.545 & 0.887 \\
+travel-guides & 91 & 0.923 & 0.883 & 0.916 & 0.908 & 0.883 \\
+\bottomrule
+\end{tabular}

@@ -38,7 +38,7 @@ both arise naturally. Uncertainty-aware affect estimators typically calibrate
 each axis separately, which gives a guarantee about the wrong object. A VA estimate is a single point on the circumplex, but per-axis
 intervals at a nominal $90\%$ jointly contain the true point only
 $85$--$86\%$ of the time on AffectNet and $84$--$86\%$ on the video dataset
-AFEW-VA, and on AffectNet the shortfall is uneven: the worst-covered expression falls to
+AFEW-VA, and $82\%$ on the EmoBank text corpus; on AffectNet the shortfall is uneven: the worst-covered expression falls to
 $78$--$84\%$. We replace the per-axis score with a single variance-normalised
 max-score that yields a rectangular VA region with a finite-sample joint
 guarantee. It restores nominal joint coverage on both datasets and, for every
@@ -49,7 +49,8 @@ size while keeping an exact guarantee. We then ask where any such
 guarantee breaks. Holding each of AffectNet's seven expressions out of training
 and calibration in turn, coverage on the held-out expression falls to
 $28$--$82\%$ ($28\%$ for \emph{happy}), while coverage on the other
-expressions stays at $91$--$93\%$, so the aggregate number hides the failure.
+expressions stays at $91$--$93\%$, so the aggregate number hides the failure;
+on text, holding out news headlines drops their coverage to $55\%$.
 Bonferroni does not prevent it, and the predictive uncertainty does not flag
 it (AUROC $0.47$--$0.81$). Twenty labelled faces of the missing expression
 restore its coverage by group recalibration, but at three to nine times the
@@ -58,7 +59,7 @@ where the failure is worst. The naturally unseen \emph{contempt} expression
 shows the same pattern, and there feature-space novelty detectors fail too,
 because contempt is not an unusual input: its nearest training faces are mostly
 happy and neutral, and only its label is new. Results are over multiple seeds,
-two backbones and two datasets, with proper scoring rules, a calibration split
+two backbones, two face datasets and a text dataset, with proper scoring rules, a calibration split
 that is never used for model selection, and a corruption shift. Joint coverage
 is cheap to obtain and should be the default; for expressions absent from the
 calibration data, a guarantee has to be bought with labelled examples of them.
