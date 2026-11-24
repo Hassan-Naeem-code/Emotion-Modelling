@@ -47,6 +47,14 @@ comes from the conformal half-width — the **same calibrated bound as the paper
 - **Details panel (the honesty surface):** raw valence, arousal, confidence %,
   signal-quality %, abstention reason, and which model is active.
 
+- **Make the box yours (personal calibration):** 20 taps on the chart pair the
+  model's estimate with where *you* say your expression is. Half the taps learn
+  your offset, half set the box size (the paper's "+shift" recalibration, with
+  an exact 90% guarantee for expressions like the ones you calibrated with).
+  Later taps check how often your box and the general box contain your answer.
+  Logic: [src/calibrate.ts](src/calibrate.ts), tested in
+  [src/calibrate.test.ts](src/calibrate.test.ts).
+
 ## Privacy / compliance
 
 All user-facing copy and every threshold live in one auditable file:

@@ -134,3 +134,10 @@ dd { margin: 0; font-variant-numeric: tabular-nums; }
   #video, #va-plane { width: 100%; height: auto; }
   .metrics.three { grid-template-columns: 1fr 1fr; }
 }
+
+/* Personal calibration */
+.calib-bar { height: 6px; background: #21262d; border-radius: 3px; overflow: hidden; margin: 6px 0; }
+.calib-bar span { display: block; height: 100%; width: 0; background: #3fb950; transition: width 0.2s; }
+.calib-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+button.secondary { background: transparent; border: 1px solid #30363d; color: var(--muted); }
+#va-plane.tapping { cursor: crosshair; outline: 2px solid #3fb950; outline-offset: 2px; }

@@ -8,7 +8,10 @@
  */
 import { decide, type Decision } from "./abstain";
 import { frameBrightness, startCamera, stopCamera } from "./camera";
-import { EMOTION_DISPLAY, PRIVACY, THRESHOLDS } from "./config";
+import { CALIBRATION, EMOTION_DISPLAY, PRIVACY, THRESHOLDS } from "./config";
+import {
+  K, contains, fitPersonal, personalRegion, pxToVA, type Personal, type Sample,
+} from "./calibrate";
 import {
   createLandmarker,
   detect,
@@ -51,6 +54,96 @@ let noFaceStreak = 0;
 let smoothed: Prediction | null = null;
 let running = false;
 
+// --- personal calibration (src/calibrate.ts) ---
+// Kept only in this browser's storage, and only as numbers: what the model
+// showed and where the user tapped. Never images.
+const CALIB_KEY = "va-personal-calibration-v1";
+interface CalibState { samples: Sample[]; checks: { hit: number; hitGeneral: number; n: number } }
+let calib: CalibState = { samples: [], checks: { hit: 0, hitGeneral: 0, n: 0 } };
+let personal: Personal | null = null;
+let collecting = false;
+let lastShown: Prediction | null = null;     // last confident estimate on screen
+let lastMark: { v: number; a: number; hit: boolean | null; until: number } | null = null;
+
+function loadCalib() {
+  try {
+    const raw = localStorage.getItem(CALIB_KEY);
+    if (raw) calib = JSON.parse(raw);
+  } catch { /* storage blocked: calibrate for this session only */ }
+  personal = fitPersonal(calib.samples);
+}
+function saveCalib() {
+  try { localStorage.setItem(CALIB_KEY, JSON.stringify(calib)); } catch { /* ignore */ }
+}
+
+function renderCalib() {
+  const n = Math.min(calib.samples.length, K);
+  ($("calib-progress") as HTMLElement).style.width = `${(100 * n) / K}%`;
+  $("calib-forget").classList.toggle("hidden", calib.samples.length === 0);
+  $("calib-start").classList.toggle("hidden", collecting || personal !== null);
+  $("va-plane").classList.toggle("tapping", collecting || personal !== null);
+  if (personal) {
+    const c = calib.checks;
+    $("calib-status").textContent = CALIBRATION.done;
+    $("calib-check").textContent = c.n
+      ? `Check taps: your box contained your answer ${c.hit} of ${c.n} times; ` +
+        `the general box ${c.hitGeneral} of ${c.n}. ${CALIBRATION.caveat}`
+      : `Your offset: valence ${signed(personal.offV)}, arousal ${signed(personal.offA)}. ` +
+        CALIBRATION.caveat;
+  } else if (collecting) {
+    $("calib-status").textContent = `Collecting: ${n} of ${K} taps.`;
+    $("calib-check").textContent = "";
+  } else {
+    $("calib-status").textContent = "Not calibrated: you see the general box.";
+    $("calib-check").textContent = "";
+  }
+}
+
+function onPlaneTap(ev: MouseEvent) {
+  if (!collecting && !personal) return;
+  const canvas = $("va-plane") as HTMLCanvasElement;
+  const rect = canvas.getBoundingClientRect();
+  const [tv, ta] = pxToVA(ev.clientX - rect.left, ev.clientY - rect.top, rect.width, rect.height);
+  if (!lastShown) {
+    lastMark = { v: tv, a: ta, hit: null, until: performance.now() + 800 };
+    return;                                    // no confident estimate to pair with
+  }
+  const p = lastShown;
+  if (collecting) {
+    calib.samples.push({ v: p.valence, a: p.arousal, sv: p.stdV, sa: p.stdA, tv, ta });
+    lastMark = { v: tv, a: ta, hit: null, until: performance.now() + 800 };
+    if (calib.samples.length >= K) {
+      personal = fitPersonal(calib.samples);
+      collecting = false;
+    }
+  } else if (personal) {
+    const hit = contains(personalRegion(p, personal), tv, ta);
+    const q = predictor.meta.joint_q;
+    const hitGeneral = q ? contains(jointRegion(p, q), tv, ta) : false;
+    calib.checks.n++;
+    calib.checks.hit += +hit;
+    calib.checks.hitGeneral += +hitGeneral;
+    lastMark = { v: tv, a: ta, hit, until: performance.now() + 1200 };
+  }
+  saveCalib();
+  renderCalib();
+}
+
+$("calib-intro").textContent = CALIBRATION.intro;
+$("va-plane").addEventListener("click", onPlaneTap);
+$("calib-start").addEventListener("click", () => {
+  calib = { samples: [], checks: { hit: 0, hitGeneral: 0, n: 0 } };
+  personal = null;
+  collecting = true;
+  renderCalib();
+});
+$("calib-forget").addEventListener("click", () => {
+  calib = { samples: [], checks: { hit: 0, hitGeneral: 0, n: 0 } };
+  personal = null;
+  collecting = false;
+  try { localStorage.removeItem(CALIB_KEY); } catch { /* ignore */ }
+  renderCalib();
+});
 // Body signals + timeline state.
 const physioCanvas = document.createElement("canvas");
 const pulseEst = new PulseEstimator();
@@ -111,9 +204,11 @@ function updateExpression(pred: Prediction | null, d: Decision) {
   const q = predictor.meta.joint_q;
   if (show && q) {
     const r = jointRegion(pred, q);
+    const pr = personal ? personalRegion(pred, personal) : null;
+    const box = pr ?? r;
     $("m-region").textContent =
-      `90% region: valence ${signed(r.v[0])} to ${signed(r.v[1])}, ` +
-      `arousal ${signed(r.a[0])} to ${signed(r.a[1])}`;
+      `${pr ? "Your 90%" : "90%"} region: valence ${signed(box.v[0])} to ${signed(box.v[1])}, ` +
+      `arousal ${signed(box.a[0])} to ${signed(box.a[1])}`;
     // Area of the square is 4; the abstention threshold is validation-calibrated.
     const share = r.area / (predictor.meta.abstain_area_threshold ?? 4);
     $("m-certainty").textContent =
@@ -323,7 +418,13 @@ async function loop() {
     updateSummary();
   }
 
-  plane.render(decision.abstain ? null : pred, decision, predictor.meta.joint_q);
+  lastShown = pred && !decision.abstain ? pred : null;
+  const personalBox = personal && lastShown ? personalRegion(lastShown, personal) : null;
+  const hint = collecting
+    ? lastShown ? CALIBRATION.hintTap(calib.samples.length + 1, K) : CALIBRATION.hintAbstain
+    : undefined;
+  plane.render(decision.abstain ? null : pred, decision, predictor.meta.joint_q, personalBox, hint);
+  if (lastMark && performance.now() < lastMark.until) plane.mark(lastMark.v, lastMark.a, lastMark.hit);
   updateExpression(pred, decision);
   updateBody(lastPulse, eyes);
   renderEmotion(decision.abstain ? null : emotion);
@@ -380,3 +481,7 @@ document.querySelectorAll<HTMLButtonElement>(".seg button").forEach((b) =>
     updateSummary();
   }),
 );
+
+// Restore a saved calibration last, once every helper above is defined.
+loadCalib();
+renderCalib();

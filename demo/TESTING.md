@@ -45,6 +45,20 @@ The camera/landmark/render path can only be verified by a person. Run
 - [ ] In any "Not sure" state the **dot is replaced** by the not-sure message and
       the reason is shown both on the plane and in the details panel.
 
+### Personal calibration ("Make the box yours")
+- [ ] Press **Personalise (20 taps)**: the chart gets a green outline and a
+      hint at the bottom ("Make an expression, then tap where it is (1/20)").
+- [ ] Make an expression, tap the matching point on the chart: a white cross
+      flashes and the bar advances. While the system says "Not sure", taps are
+      ignored (the hint says it is waiting for a confident estimate).
+- [ ] After 20 taps: a **solid green box** (yours) and a **dashed blue box**
+      (general) are drawn; the panel shows your offset.
+- [ ] Further taps are checks: green cross = inside your box, red = outside;
+      the panel counts hits for your box and for the general box.
+- [ ] Reload: the calibration is still there. **Forget my calibration** removes
+      it (DevTools → Application → Local Storage: key
+      `va-personal-calibration-v1` is gone). Only numbers are stored, no images.
+
 ### Privacy verification (do this once)
 - [ ] Open DevTools → Network tab, run for a minute → **no outbound requests
       carrying image/frame data** (only static asset + the MediaPipe model/wasm

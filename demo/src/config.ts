@@ -94,3 +94,22 @@ export const ABSTAIN_REASONS = {
 
 export type AbstainReason =
   (typeof ABSTAIN_REASONS)[keyof typeof ABSTAIN_REASONS] | null;
+
+/** Copy for personal calibration (src/calibrate.ts), kept here with the rest. */
+export const CALIBRATION = {
+  intro:
+    "The general box is calibrated on other people's faces, so it can miss " +
+    "yours. Make an expression, then tap the point on the chart that matches " +
+    "it. After 20 taps the demo learns your offset and resizes the box, the " +
+    "remedy from the paper. Only the 20 pairs of numbers are kept, in this " +
+    "browser; no images.",
+  hintTap: (n: number, k: number) => `Make an expression, then tap where it is (${n}/${k})`,
+  hintAbstain: "Waiting for a confident estimate before you tap",
+  done:
+    "Calibrated. Green: your box. Dashed: the general box. Keep tapping to " +
+    "check how often each one contains your answer.",
+  caveat:
+    "Your box is valid for expressions like the ones you calibrated with, " +
+    "labelled the same way. New kinds of expression need new taps.",
+};
+
