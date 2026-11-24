@@ -186,6 +186,20 @@ def run(args):
 # --------------------------------------------------------------- analyze ---
 
 def analyze(args):
+    res = collect(prefix="emobank")
+    out = Path("results/summary/emobank")
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "emobank.json").write_text(json.dumps(res, indent=2))
+    _print(res)
+    if args.tables:
+        Path(args.tables, "emobank.tex").write_text(_latex(res))
+        print(f"wrote {args.tables}/emobank.tex")
+
+
+def collect(prefix: str) -> dict:
+    """Every number for one dataset, from <OUT>/preds: main runs named
+    <prefix>_<method>_s<seed>.npz and held-out-group runs lgo_h<k>_...; the
+    group names are the module-level GENRES (set by the caller for DEAM)."""
     from eval import joint_regions, loeo, recalibrate
     from eval.analyze import ensemble, load_split
     from eval.metrics import accuracy_metrics
@@ -195,7 +209,7 @@ def analyze(args):
     res: dict = {"main": {}, "lgo": {}, "recal": {}}
 
     for method in (*METHODS, "mcdropout"):
-        runs = [load(f) for f in sorted(pdir.glob(f"emobank_{method}_s*.npz"))]
+        runs = [load(f) for f in sorted(pdir.glob(f"{prefix}_{method}_s*.npz"))]
         rows = [{**joint_regions.evaluate(r["val"], r["test"]),
                  "ccc": accuracy_metrics(r["test"]["mean"], r["test"]["target"])["ccc_mean"]}
                 for r in runs]
@@ -213,7 +227,7 @@ def analyze(args):
     rs_rng = np.random.default_rng(0)
     for method in (*METHODS, "mcdropout"):
         cov = {"perdim_joint": [], "joint": [], "bonf": []}
-        for f in sorted(pdir.glob(f"emobank_{method}_s*.npz")):
+        for f in sorted(pdir.glob(f"{prefix}_{method}_s*.npz")):
             r = load(f)
             pool = {k: np.concatenate([r["val"][k], r["test"][k]]) for k in r["val"] if k in r["test"]}
             n = len(pool["mean"])
@@ -236,21 +250,13 @@ def analyze(args):
                 rc.append(recalibrate.run(r["val"], r["test"], h, rng))
             if not rs:
                 continue
-            ref = [joint_regions.evaluate(load(f)["val"], load(f)["test"])
-                   for f in sorted(pdir.glob(f"emobank_{method}_s[123].npz"))]
             row = {k: float(np.mean([r[k] for r in rs if k in r])) for k in rs[0]}
             row["held_cov_ref"] = float(np.mean([_group_cov(load(f), h)
-                                                 for f in sorted(pdir.glob(f"emobank_{method}_s[123].npz"))]))
+                                                 for f in sorted(pdir.glob(f"{prefix}_{method}_s[123].npz"))]))
             res["lgo"][f"{method}_{g}"] = row
             res["recal"][f"{method}_{g}"] = {k: float(np.mean([r[k] for r in rc if k in r]))
                                             for k in rc[0]}
-    out = Path("results/summary/emobank")
-    out.mkdir(parents=True, exist_ok=True)
-    (out / "emobank.json").write_text(json.dumps(res, indent=2))
-    _print(res)
-    if args.tables:
-        Path(args.tables, "emobank.tex").write_text(_latex(res))
-        print(f"wrote {args.tables}/emobank.tex")
+    return res
 
 
 def _group_cov(r: dict, h: int) -> float:

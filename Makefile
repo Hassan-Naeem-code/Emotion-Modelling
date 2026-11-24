@@ -141,6 +141,9 @@ v2-tables:
 	@if [ -d results/emobank/preds ]; then $(PY) -m eval.emobank analyze --tables paper_v2/tables >/dev/null && \
 		echo "wrote tables/emobank.tex"; \
 	else echo "(results/emobank/preds absent: EmoBank table kept as committed; python -m eval.emobank embed && run)"; fi
+	@if [ -d results/deam/preds ]; then $(PY) -m eval.deam analyze --tables paper_v2/tables >/dev/null && \
+		echo "wrote tables/deam.tex"; \
+	else echo "(results/deam/preds absent: DEAM table kept as committed; python -m eval.deam features && run)"; fi
 
 tmlr:
 	bash scripts/make_tmlr.sh

@@ -4,7 +4,7 @@ A VA estimate is one point in the plane, so its uncertainty should be one region
 in the plane. Calibrating valence and arousal separately, as is common, leaves
 the guarantee on the wrong event and under-covers the VA point by about
 four to six points at nominal $90\%$ on AffectNet and AFEW-VA, and by eight
-on EmoBank text. One
+on text and music. One
 max-normalised score fixes this with a finite-sample joint guarantee and,
 whenever the uncertainty is learned, smaller regions than the Bonferroni
 correction and the independence and Gaussian copulas, and the same size as the
@@ -36,7 +36,8 @@ protocol unchanged. We treat video frames independently; a temporal model and
 clip-level calibration are natural extensions, as is a third dataset with
 expression labels (Aff-Wild2~\cite{kollias2019affwild2}). The text experiment uses a frozen encoder, so its accuracy (CCC
 $0.52$--$0.55$) is below that of fine-tuned systems, and its groups are kinds
-of text rather than emotions. The held-out-expression
+of text rather than emotions; the music experiment uses fixed openSMILE
+features and song-level labels, and on it the held-out-group failure is mild. The held-out-expression
 experiment uses the evidential head (and MC-dropout from the same weights) with three seeds. The recalibration experiment draws its $k$
 examples from the test images of the held-out expression and assumes its
 membership is known at test time. The naturally unseen

@@ -90,6 +90,22 @@ only $1{,}000$ sentences each, so a single split carries about one point of
 sampling error in coverage; we therefore also report coverage averaged over
 $200$ random re-splits of the pooled development and test sentences.
 
+\paragraph{Fourth dataset: music.} DEAM~\cite{aljanaki2017deam} contains
+$1{,}802$ Creative-Commons songs and excerpts with song-level valence and arousal
+(mean over raters on a $1$--$9$ scale, mapped to $[-1,1]$) and
+openSMILE~\cite{eyben2010opensmile} features for every half-second. We represent
+a song by the mean and standard deviation of its frame features ($520$ numbers)
+and train the same heads on them. The groups are the seven genres with at least
+$170$ songs (classical, jazz, country, electronic, rock, pop, folk); the
+remaining songs are kept as one further group. Songs are split at random,
+$60\%$ for training ($10\%$ of these for checkpoint selection), $20\%$ for
+calibration and $20\%$ for testing, fixed across seeds. When a genre is held
+out it is removed from training, selection and calibration, and all of its
+songs are used as test songs, which gives $170$--$222$ test songs per held-out
+genre. As for text, we also report coverage averaged over $200$ random
+re-splits of calibration and test songs, since each split has only about
+$360$ songs.
+
 \paragraph{Distribution shift.} As a covariate shift with fixed labels, we apply
 Gaussian blur, Gaussian noise, brightness, contrast, and JPEG compression to the
 test images at severity $3$, cycling through the five types by image index in the
@@ -121,4 +137,4 @@ held-out-expression and AFEW-VA tables are produced by the same scripts
 files, and the copula and recalibration comparisons by
 \texttt{eval/joint\_regions.py} and \texttt{eval/recalibrate.py}, also without
 a GPU. The EmoBank experiment, from download to table, is
-\texttt{eval/emobank.py}. \codestatement
+\texttt{eval/emobank.py}, and the DEAM experiment \texttt{eval/deam.py}. \codestatement

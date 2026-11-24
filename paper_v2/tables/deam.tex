@@ -1,0 +1,23 @@
+\begin{tabular}{lrrrrrr}
+\toprule
+ & & Per-axis & \multicolumn{2}{c}{Bonferroni} & \multicolumn{2}{c}{Max-score (ours)} \\
+Method & CCC & Joint & Joint & Area & Joint & Worst genre \\
+\midrule
+Deterministic & 0.640 & 0.827 & 0.910 & 1.03$\times$ & 0.905 & 0.847 \\
+Gaussian & 0.597 & 0.830 & 0.921 & 1.09$\times$ & 0.910 & 0.866 \\
+Evidential & 0.619 & 0.832 & 0.921 & 1.09$\times$ & 0.911 & 0.879 \\
+MC-dropout & 0.621 & 0.816 & 0.915 & 1.04$\times$ & 0.911 & 0.861 \\
+Gaussian ens. & 0.654 & 0.798 & 0.928 & 1.06$\times$ & 0.922 & 0.889 \\
+Evidential ens. & 0.650 & 0.823 & 0.934 & 1.01$\times$ & 0.934 & 0.915 \\
+\midrule
+Held-out genre & $n$ & In training & Per-axis & Bonferroni & Max-score & Others \\
+\midrule
+Classical & 222 & 0.932 & 0.779 & 0.890 & 0.878 & 0.907 \\
+Jazz & 213 & 0.915 & 0.809 & 0.905 & 0.873 & 0.889 \\
+Country & 205 & 0.927 & 0.850 & 0.938 & 0.930 & 0.888 \\
+Electronic & 194 & 0.898 & 0.787 & 0.880 & 0.869 & 0.920 \\
+Rock & 188 & 0.943 & 0.777 & 0.915 & 0.897 & 0.914 \\
+Pop & 186 & 0.941 & 0.855 & 0.943 & 0.925 & 0.875 \\
+Folk & 170 & 0.949 & 0.851 & 0.929 & 0.933 & 0.913 \\
+\bottomrule
+\end{tabular}

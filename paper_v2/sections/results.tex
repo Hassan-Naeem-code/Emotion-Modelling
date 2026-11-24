@@ -369,8 +369,9 @@ the max-score region again fixes this with smaller regions than Bonferroni.
   \label{tab:afew}
 \end{table}
 
-\subsection{The findings on text}
+\subsection{Beyond faces: text and music}
 \label{sec:emobank}
+\paragraph{Text.}
 Table~\ref{tab:emobank} repeats the analysis on EmoBank. The first finding is
 stronger on text than on faces. Per-axis intervals jointly cover the VA point
 only $81.5$--$82.5\%$ of the time, close to the $81\%$ that two independent
@@ -419,11 +420,56 @@ prediction.
   \label{tab:emobank}
 \end{table}
 
+\paragraph{Music.} On DEAM (Table~\ref{tab:deam}) the first finding holds
+again. Per-axis intervals jointly cover the VA point $79.8$--$83.2\%$ of the
+time ($81.9$--$82.6\%$ averaged over $200$ re-splits), and the max-score region
+covers $90.0$--$90.1\%$ averaged over re-splits for every single model ($90.5$--$93.4\%$
+on the fixed split, which with about $360$ test songs carries a standard
+deviation of over two points). Bonferroni regions are $1$--$9\%$ larger; the
+empirical copula is within $6\%$ in either direction, and the ellipsoid ranges
+from $16\%$ smaller to $4\%$ larger. The worst-covered genre rises from
+$73$--$78\%$ under per-axis intervals to $85$--$92\%$ under the max-score
+region.
+
+The second finding is weakest on music. Holding a genre out lowers its
+coverage in most cases, by up to six points (classical from $93$ to $88\%$,
+jazz from $92$ to $87\%$, electronic from $90$ to $87\%$, rock from $94$ to $90\%$;
+evidential head), but no genre collapses, and country, pop and folk stay at
+$92$--$93\%$. With $170$--$222$ songs per genre, one standard error is about two
+points. The uncertainty is again uninformative about the held-out genre (AUROC
+$0.48$--$0.58$), and twenty labelled songs restore $90$--$91\%$ coverage at
+$0.5$--$1.3$ times the usual region size.
+
+Across the four datasets the two findings therefore behave differently. The
+under-coverage of per-axis intervals, and its repair by the max-score region,
+appear everywhere, at similar size. The failure on a missing group appears
+everywhere in direction but varies greatly in size: it is severe for every
+expression on faces, severe for the most distinctive kinds of text, and mild
+for musical genres, presumably because what changes between genres matters
+less for how a song's valence and arousal map onto its audio features than
+what changes between facial expressions. What does not vary is the
+uncertainty's silence: in no dataset does it separate the missing group from
+the rest (AUROC at most $0.81$, and at most $0.58$ outside faces), so whether
+a deployment is in the mild or the severe case cannot be read off the model.
+
+\begin{table}[h]
+  \centering\small
+  \input{tables/deam.tex}
+  \caption{DEAM (music; openSMILE features; nominal $90\%$, fixed split).
+  Top: mean over five seeds (ensembles combine them); Area: Bonferroni area
+  relative to the max-score region; Worst genre: lowest max-score joint coverage
+  across the seven genres. Bottom: each genre held out from training and
+  calibration in turn, all of its songs used for testing (evidential head,
+  three seeds). In training: max-score coverage on that genre's test songs in
+  the main runs. Others: max-score coverage on the remaining test songs.}
+  \label{tab:deam}
+\end{table}
+
 \subsection{Summary}
-Across five predictors, two backbones, two face datasets and one text
-dataset, three findings are stable. First, per-axis intervals miss the VA point about $14\%$ of the time at
+Across five predictors, two backbones, two face datasets, a text dataset and
+a music dataset, three findings are stable. First, per-axis intervals miss the VA point about $14\%$ of the time at
 nominal $10\%$, on AffectNet and on AFEW-VA alike, and about $18\%$ on
-EmoBank text; the max-score region fixes
+text and music; the max-score region fixes
 this at no cost and, whenever the uncertainty is learned, with regions
 $7$--$13\%$ smaller than Bonferroni and $2$--$13\%$ smaller than the
 independence and Gaussian copulas; the empirical copula matches it in size,
@@ -436,7 +482,8 @@ This holds for all seven AffectNet expressions when each is held out (coverage
 $28$--$82\%$) and for the naturally unseen contempt ($30$--$39\%$), while
 coverage on the other expressions stays near nominal. On text, the kinds of
 text most unlike the rest fail in the same way (news headlines fall to
-$55\%$), while the others keep their coverage. Nothing flags these
+$55\%$), while the others keep their coverage; on music, held-out genres
+lose up to six points. Nothing flags these
 faces: not the predictive uncertainty, nor ensembles, nor feature-space
 detectors, because an unseen expression is mapped onto the expressions the
 model has seen. Twenty labelled faces of the missing expression restore its
